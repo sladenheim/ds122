@@ -1,0 +1,12 @@
+Calamity,Years occured,Damage probability
+Regional drought degree 1,1,0.2
+Regional drought degree 2,1,0.45
+Regional drought degree 3,0,0.65
+Regional drought degree 4,0,0.75
+Pipe breakage,3,0.55
+Human error,1,0.9
+Pollution,1,0.7
+Plague,2,0.8
+Fire degree 1,1,0.8
+Fire degree 2,0,0.95
+No calamities,20,0.0
