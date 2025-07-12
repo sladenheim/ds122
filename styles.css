@@ -1,0 +1,151 @@
+.reveal h2 {
+  text-align: center;
+  font-size: 2em;          /* Adjust size as needed */
+  margin-bottom: 0.5em;    /* Space below the title */
+}
+/* Centers the image and constrains its size */
+.center-title {
+  text-align: center;
+  font-size: 2em;          /* Adjust size as needed */
+  margin-bottom: 0.5em;    /* Space below the title */
+}
+.center-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%; /* Ensure the container has a defined height */
+}
+.antique-center-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh; /* Restrict to 60% of the viewport height */
+  width: 60vw;
+  overflow: hidden;
+  margin: 0 auto;        /* Centers the container horizontally */
+}
+
+/* Centers and styles the text below the image */
+.center-text {
+  text-align: center;
+  font-size: .8em; /* Adjust font size as needed */
+  margin-top: 1em;
+  line-height: 1.5;
+  width: 80%; /* Restrict width for better readability */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.center-textbox {
+  text-align: center;
+  font-size: .6em;
+  line-height: 1.5;
+  width: 80%;
+  margin: 0 auto 1em auto; /* Centers the box and adds spacing below */
+  padding: 1em;
+  background-color: #f0f0f0; /* Light background color for emphasis */
+  border-radius: 8px;        /* Rounded corners for the textbox */
+}
+
+.center-text {
+  text-align: center;
+  font-size: .9em;
+  line-height: 1.5;
+  margin: 0 auto 1em auto;
+  width: 80%;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;       /* Centers images horizontally */
+  align-items: center;           /* Centers images vertically within the container */
+  gap: 1em;                      /* Space between images */
+  height: 50vh;                  /* Container takes up 50% of slide height */
+  width: 100%;                   /* Full slide width */
+  overflow: hidden;              /* Prevents overflow if needed */
+}
+
+/* Individual images within the container */
+.slide-image {
+  height: 100%;                  /* Ensures images fit the full container height */
+  width: auto;                   /* Maintains aspect ratio, allowing flexible width */
+  object-fit: contain;           /* Scales images to fit within the height */
+}
+
+.purple-box {
+  border: 2px solid #bf66ff;
+  background-color: #e6e6ff;
+  border-radius: 3px;
+  padding: 20px;
+  padding-top: 30px; /* Extra padding for the label */
+  position: relative;
+  width: auto /* Adjust the width as needed */
+}
+
+.purple-box .label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  background-color: #bf66ff; /* changed to fun purple color*/
+  color: rgb(245, 245, 255);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.blue-box {
+  border: 2px solid #00ffff;
+  background-color: #e2f9f9;
+  border-radius: 3px;
+  padding: 20px;
+  padding-top: 30px; /* Extra padding for the label */
+  position: relative;
+  width: auto /* Adjust the width as needed */
+}
+
+.blue-box .label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  background-color: #00ffff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.center-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Prevents unnecessary vertical centering */
+  gap: 0.5rem; /* Adds spacing between the image and the text */
+  height: auto; /* Dynamically adjusts height to fit content */
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+}
+
+.smaller-title {
+  font-size: 35px;
+}
+
+.center-y {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+.really-smaller-title {
+  font-size: 30px;
+}
+
+.really-really-smaller-title {
+  font-size: 25px;
+}
+
+.tight-space {
+  margin-top: -10px;
+  margin-bottom: -10px;
+}
+

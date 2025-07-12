@@ -1,0 +1,8 @@
+project:
+  title: "Foundations of Data Science Linear Algebra"
+  output-dir: _slides
+  render:
+    - pca.qmd
+
+
+

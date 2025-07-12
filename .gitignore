@@ -1,0 +1,4 @@
+__pycache__
+*.html
+*_files
+.DS_Store
