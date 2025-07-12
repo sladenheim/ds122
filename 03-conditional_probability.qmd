@@ -1,0 +1,424 @@
+---
+title: Conditional Probability
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Flagged
+:::{style="font-size: .8em"}
+The age of Big Data can be frightening. Part of that fear comes from the belief that algorithms, when supplied with enough data, can make powerful inferences.<br>
+<br>
+How justified are these fears?<br>
+<br>
+Jordan Ellenberg, a mathematics professor at the University of Wisconsin–Madison, gives the following example.<br>
+<br>
+Suppose a Facebook team develops a method to predict which users might be involved in terrorism. Terrorism is extremely rare, so the probability that any given user is a terrorist is very small.
+:::
+
+## Flagged
+:::{style="font-size: .8em"}
+
+The team might generate a list of 100,000 users who are _twice as likely_ as average to be terrorists. So, if someone ends up being flagged by the Facebook algorithm, should we report them to the authorities? 
+
+This leads to two important questions:
+
+1. _What is the chance that a person is on Facebook’s list, given that they are not a terrorist?_
+2. _What is the probability that a person is not a terrorist, given that they are on Facebook’s list?_
+
+These questions sound similar, but they are not. One way to see the difference is by comparing their answers—and you will do just that at the end of this lecture.
+:::
+
+<!-- ##  Big Data, Small Probabilities
+:::{style="font-size: .8em"}
+There are two questions we can ask about this:
+
+1. _What is the chace that a person get put on Facebook's list, given that they are not a terrorist?_
+2. _What is the probability that a person is not a terrorist, given that they are on Facebook's list?_
+
+These questions sound kind of the same, but they are not. One way to see that is by looking at their answers.
+::: -->
+
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+* Definition of conditional probability
+* Probability laws associated with conditional probability:
+    + Independence of events
+    + Chain rule
+    + Law of total probability
+    + Bayes' rule
+* Answering questions relevant to the tree nursery risk analysis using Python (final lecture)
+
+:::
+
+
+## Tree Nursery Risk Analysis
+:::{.center-text}
+```{python}
+import pandas as pd  
+import numpy as np 
+
+# Load the dataset and perform the analysis
+data = pd.read_csv('data/tree_nursery.csv')
+
+df = data.copy()
+
+# Find the total number of years in the historical data
+total_years = sum(df['Years occured'])
+
+# Create a new column containing the desired probabilities
+df['Event probability'] = df['Years occured'] / total_years
+
+# Print the first three probabilities
+print(df[['Calamity', 'Event probability', 'Damage probability']].head(11))
+```
+:::
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/axioms of probability/logo.jpeg" width=400/>
+:::
+:::
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+Assumptions: 
+
+* None of the calamities can occur in the same year.
+* The dataset contains all possible calamity types.
+:::
+:::
+:::
+
+## Tree Nursery Risk Analysis
+:::{style="font-size: .8em"}
+Questions:
+
+- What is the total probability of plants being damaged in a given year?
+- Which of the following actions should be prioritized by the tree nursery? 
+    - Improving the maintenance of the pipes in the supply system.
+    - Further automating the operation to prevent human errors.
+    - Improving safety protocols to prevent fire.
+:::
+
+
+## Conditional Probability
+:::{style="font-size: .8em"}
+Assuming that $P(B) > 0$, we define the conditional probability of $A$ given that $B$ has occured (i.e., given that $B$ is true) as follows.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Conditional Probability</span>
+        <p>
+        If \(P(B)>0\) then the conditional probability of \(A\) given \(B\) is \(P(A|B) = \frac{P(A,B)}{P(B)}.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<br>
+__Remark 1__: In general, $P(A|B) \neq P(B|A).$<br>
+
+
+__Remark 2__: For any fixed $B$ such that $P(B)>0,$ $P(\cdot | B)$ is a probability. That is, it satisfies the three axioms of probability. However, in general, it is not true that $P(A|B,C) = P(A|B)+P(A|C).$ The rules of probability apply to events on the left of the bar.
+:::
+
+:::{.notes}
+Remark 1 example: The probability of spots given that a person has measles is 1, but the probability that you have measles given that you have spots is not 1.
+:::
+
+
+## Conditional Probability
+:::{style="font-size: .8em"}
+
+__Example__: A medical test for a disease $D$ has outcomes $+$ and $-$. The probabilities are:
+
+| Outcome | $D$     | $\overline{D}$ |
+|:--------|--------:|---------------:|
+| $+$     | 0.009   | 0.099          |
+| $-$     | 0.001   | 0.891          |
+
+From the definition of conditional probability,
+\begin{align*}
+\small{
+P(+|D)} & = \small \frac{P(+,D)}{P(D)} = \frac{0.009}{0.009+0.001} = 0.9,\\
+\small
+P(-|\overline D) &= \small \frac{P(-,\overline D)}{P(\overline D)} = \frac{0.891}{0.891+0.099} \approx 0.9.
+\end{align*}
+:::
+
+## Conditional Probability
+:::{style="font-size: .8em"}
+
+__Example (continued)__: 
+Hence, the test is fairly accurate. Sick people yield a positive 90% of the time and healthy people yield a negative 90% of the time.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Suppose that you go for a test and turns out to be positive.
+        What is the probability you have the disease?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+$P(D|+) = \frac{P(+,D)}{P(+)} = frac{0.009}{0.009+0.099} \approx 0.08.$
+:::
+
+## Independence of Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Independent Events</span>
+        <p>
+        If \(A\) and \(B\) are independent events, then \(P(A|B) = P(A).\) Moreover, \(P(A,B) = P(A)P(B).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: Let us say that here in Boston about $10\%$ of the days are rainy. What fraction of the days of the year are rainy Mondays? <br>
+Let $A$ be the event that a day is rainy and $B$ be the event that a day is Monday. Then $P(A) = \frac{1}{10}$ and $P(B) = \frac{1}{7}.$ Since $A$ and $B$ are independent, we can compute the probability that a day is Monday _and_ a day is rainy as 
+$$P(A,B) = P(A)P(B) = \left(\frac{1}{10}\right)\left(\frac{1}{7}\right) = \frac{1}{70}.$$
+If there are 365 days in a year, then $365/70 \approx 5$ of them will be rainy.
+<!-- 
+
+knowing the day of the week does not change our estimate of whether it will be raining or sunny.
+
+$$P(\text{day is rainy}\,|\,\text{day is Monday}) = P(\text{day is rainy}).$$  -->
+:::
+
+## Chain Rule
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Chain Rule</span>
+        <p>
+        For any events \(A\) and \(B\), \(P(A, B) = P(A \,\vert\, B)\; P(B) = P(B \,\vert\, A)\; P(A). \)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: This pattern can be extended to as many events as needed.  For example:
+$$ P(A, B, C) = P(A \,\vert\, B,C) \;P(B \,\vert\, C) \; P(C). $$
+
+__Example__: Assume we draw two cards from a deck, without replacement. Let $A$ be the event that the first draw is the Ace of Clubs and let $B$ be the event that the second draw is the Queen of Diamonds. Then $$P(A,B) = P(A)P(B|A) = \left(\frac{1}{52} \right)\left(\frac{1}{51} \right).$$
+:::
+
+## Law of Total Probability
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Law of Total Probability</span>
+        <p>
+        Let \(B_1\) and \(B_2\) form the complete sample space \(\Omega\) and be disjoint \(\left(B_1 \cap B_2 = \emptyset\right).\) Then for any event \(A\), \(P(A) = P(A|B_1)P(B_1)+P(A|B_2)P(B_2).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: Note that law of total probability is not applicable if $B_1$ and $B_2$ do not form the complete sample space or are not disjoint.
+
+__Remark__: This pattern can be extended to as many events as needed: $$P(A) = \sum_{i=1}^k P(A|B_i)P(B_i).$$
+
+:::
+
+## Bayes' Rule
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Law of Total Probability</span>
+        <p>
+        For any events \(A\) and \(B\) such that \(P(B)>0,\)  \(P(A|B) = \frac{P(B|A)P(A)}{P(B)}.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: From the law of total probability it follows that, if we let $P(B)>0$ and let $A_1, \dots, A_n$ be events where $A_i$'s are disjoint and forn the entire sample space, then 
+$$P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.$$ 
+:::
+
+## Bayes' Rule
+:::{style="font-size: .8em"}
+
+__Example__: Lucy divides her email into three categories: $A_1$ = "spam", $A_2$ = "low priority", and $A_3$ = "high priority."
+
+From her experience Lucy knows that <br>
+- $P(A_1) = 0.7, P(A_2) = 0.2,$ and $P(A_3) = 0.1.$  <br>
+- If $B$ is the event that the email contains the word "free," then $P(B|A_1) = 0.9, P(B|A_2) = 0.01,$ and $P(B|A_3) = 0.01.$ 
+
+Given that Lucy received an email with the word "free," what is probability that it is spam?
+
+From the Bayes' rule, we find that 
+$$P(A_1|B) = \frac{0.9 \cdot 0.7}{0.9 \cdot 0.7 + 0.01 \cdot 0.2 + 0.01 \cdot 0.1} = 0.995.$$
+
+:::
+
+## Tree Nursery Risk Analysis
+:::{style="font-size: .8em"}
+Question 1: _What is the total probability of plants being damaged in a certain year?_<br>
+
+Calculating total probability of plant damage:
+
+1. Create a new column to store the joint probability of an event happening _and_ the plants beign damaged:<br>
+Multiply _Event probability_ and _Damage probability_ entrywise.
+
+2. Compute the total probability: <br>
+Sum all values in the joint probability column. <br>
+
+<span style="color:rgb(1, 180, 180);">What rule or law are we using here? Why are we allowed use it?</span>
+
+:::
+
+## Tree Nursery Risk Analysis
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Create a new column that will store the joint probabilities
+p_event  = df['Event probability']
+p_damage = df['Damage probability']
+df['Joint probability'] = p_event*p_damage
+print(df[['Event probability', 'Damage probability', 'Joint probability']].head(5))
+
+# Find the sum of the joint probabilities
+total_damage_prob = sum(df['Joint probability'])
+print(f"The total probability of plants being damaged in a given year is {total_damage_prob:.4f} or {100*total_damage_prob:.4f}%.")
+```
+:::
+
+## Tree Nursery Risk Analysis
+:::{style="font-size: .8em"}
+Question 2: _Which of the following actions should be prioritized by the tree nursery?_ 
+
+- Improving the maintenance of the pipes in the supply system.
+- Further automating the operation to prevent human errors.
+- Improving safety protocols to prevent fire.  
+
+<br>
+
+To answer this question, we need to find the calamity corresponding to the highest probability in the joint probability column.
+:::
+
+## Tree Nursery Risk Analysis
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Find the calamity with the highest joint probability
+max_row = df.loc[df['Joint probability'].idxmax()]
+
+# Display the result
+print("Calamity with the highest joint probability:")
+print(max_row)
+
+```
+:::
+
+:::{style="font-size: .8em"}
+Hence improving the maintenance of the pipes in the supply system should be the companies priority.
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        An urn contains three red balls and one blue ball. Two balls are selected without replacement. <br>
+        a. What is the probability that they are both red?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        b. What is the probability that a red ball is selected on the second draw?<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::

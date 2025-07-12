@@ -1,0 +1,633 @@
+---
+title: Axioms of Probability
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Why Probability?
+:::{style="font-size: .8em"}
+The core question of probability theory is: <br>
+<br>
+
+:::{.center-text}
+_"Given a data generating process, what are the properties of its outcomes?"_ <br>
+<br>
+
+:::
+:::
+
+:::{.center-text}
+<img src="images/axioms of probability/probability_inference.png" width=800/>
+:::
+
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+* Definition of probability using 3 axioms of probability
+* 4 fundamental properties in probability theory
+<!-- * Probability laws associated with conditional probability:
+    + Independence of events
+    + Chain rule
+    + Law of total probability
+    + Bayes' rule -->
+* Answering questions relevant to the tree nursery risk analysis using Python
+* Continuing to develop a structured approach to solving probability and statistics problems (general course objective)
+
+<!-- * 3 axioms of probability
+* 4 fundamental properties in probability theory
+* Probability laws associated with conditional probability:
+    + Independence of events
+    + Chain rule
+    + Law of total probability
+    + Bayes' rule -->
+
+:::
+
+
+## Tree Nursery Risk Analysis
+:::{.center-text}
+```{python}
+import pandas as pd  
+import numpy as np 
+
+# Load the dataset and perform the analysis
+data = pd.read_csv('data/tree_nursery.csv')
+print(data.head(11))
+```
+:::
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/axioms of probability/logo.jpeg" width=400/>
+:::
+:::
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+Assumptions: 
+
+* None of the calamities can occur in the same year.
+* The dataset contains all possible calamity types.
+:::
+:::
+:::
+
+<!-- ## Tree Nursery Risk Analysis
+:::{style="font-size: .8em"}
+Questions:
+
+- What is the probability of occurance of each of the calamities based on the historical data?
+- What is the total probability of plants being damaged in a given year?
+- Which of the following actions should be prioritized by the tree nursery? 
+    - Improving the maintenance of the pipes in the supply system.
+    - Further automating the operation to prevent human errors.
+    - Improving safety protocols to prevent fire.
+::: -->
+
+
+## Axioms of Probability
+:::{style="font-size: .8em"}
+The following definition outlines the concept of probability in a general form and is valid for both frequentist and Bayesian approaches.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Probability (Probability Measure)</span>
+        <p>
+        A function \(P\) that assigns a real number \(P(A)\) to each event \(A\) in \(\Omega\) is a probability  if it satisfies the following three axioms: <br>
+        <ul>
+        <li> <strong>Axiom 1</strong>: \( 0 \leq P(A) \leq 1 \) for every \(A\).</li>
+        <li><strong>Axiom 2</strong>: \(P(\Omega)=1\).</li>
+        <li><strong>Axiom 3</strong>: If \(A_1\) and \(A_2\) are disjoint, then <span style="font-size: 90%;">\(P(A_1 \cup A_2) = P(A_1) + P(A_2).\)</span></li>
+        More generally, if \(A_1, A_2, A_3, \dots \) are disjoint, then \(P(A_1 \cup A_2 \cup A_3 \cup \dots ) = P(A_1) + P(A_2) + P(A_3) \dots\)
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Have we not defined probability yet? What about the frequentist and Bayesian views on probability? Well... it turns out there is a more general description. [see Ross p.26-27]
+:::
+
+## Axioms of Probability
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        For a given year, such as 2030, how can we compute the probability of the occurrence of each type of calamity based on the provided dataset?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+:::
+
+## Axioms of Probability
+:::{.center-text}
+```{python}
+#| echo: true
+
+import pandas as pd  
+
+# Load the dataset 
+data = pd.read_csv('data/tree_nursery.csv')
+
+# Copy the dataset to avoid any changes to the original data
+df = data.copy()
+
+# Find the total number of years in the historical data
+total_years = sum(df['Years occured'])
+
+# Create a new column containing the desired probabilities
+df['Event probability'] = df['Years occured'] / total_years
+
+# Print the first three probabilities
+print(df[['Calamity', 'Event probability']].head(3))
+```
+:::
+
+
+## Axioms of Probability
+:::{.center-text}
+```{python}
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Convert calamity names to numeric labels
+df['Calamity ID'] = range(len(df))
+
+
+# Plotting the histogram
+plt.figure(figsize=(10,6))
+plt.bar(df['Calamity ID'], df['Event probability'], color='skyblue')
+plt.xlabel('Calamity', fontsize=14)
+plt.ylabel('Event Probability', fontsize=14)
+#plt.title('Event Probability for Each Calamity')
+plt.xticks(df['Calamity ID'], df['Calamity'], rotation=45, ha='right', fontsize=12)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.yticks(fontsize=12)
+plt.tight_layout()
+plt.show()
+
+
+```
+:::
+
+## Axioms of Probability
+:::{style="font-size: .8em"}
+ - [x] Each event has been assigned a real number (see previous slide).
+ - [x] Axiom 1: Each of these numbers is nonnegative but does not exceed 1.
+:::
+
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Compute and display the maximum and minimum event probabilities
+max_prob = df['Event probability'].max()
+min_prob = df['Event probability'].min()
+
+print(f"Maximum event probability: {max_prob:.4f}")
+print(f"Minimum event probability: {min_prob:.4f}")
+
+```
+:::
+:::{style="font-size: .8em"}
+We will next verify Axiom 3 and then use it to confirm Axiom 2.
+:::
+
+
+## Axioms of Probability
+:::{style="font-size: .8em"}
+- [x] Axiom 3: For disjoint events (e.g.,  _Human error_ and _Plague_), the probability of either occurring is the sum of their individual probabilities.
+:::
+
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Compute and compare the probability of the union of two 
+# events and the sum of two event probabilities
+y1 = df.loc[5, 'Years occured']
+y2 = df.loc[7, 'Years occured']
+p1 = df.loc[5, 'Event probability']
+p2 = df.loc[7, 'Event probability']
+
+union_prob = (y1 + y2) / total_years
+sum_2_prob = p1 + p2
+
+print(f"Equal probabilities? {np.isclose(union_prob,sum_2_prob)}")
+```
+:::
+
+
+## Axioms of Probability
+:::{style="font-size: .8em"}
+- [x] Axiom 2: The sum of probabilities for all possible outcomes, including no calamity, is equal to 1.
+:::
+
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Compute and display the sum of all event probabilities
+sum_all_prob = sum(df['Event probability'])
+
+print(f"Sum of all event probabilities: {sum_all_prob:.4f}")
+
+```
+:::
+
+## Properties
+:::{style="font-size: .8em"}
+The following properties of probability are direct consequences of the axioms.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Property A</span>
+        <p>
+        \(P(\overline{A}) = 1 - P(A),\) where \(\overline{A}\) as a complement of \(A.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+Property A follows from Axiom 2 and 3. $P(A) + P(\overline{A})= 1,$ because $A$ and $\overline{A}$ are by definition disjoint and $A \cup \overline{A} = \Omega.$  <br>
+
+<br>
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Property B</span>
+        <p>
+        \(P(\emptyset) = 0.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+In words, Property B says that the probability that there is no outcome at all is zero. It is a direct consequence of Property A, because $\emptyset = \overline{\Omega}.$ 
+:::
+
+## Properties
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+Note that according to property A the probability of a calamity at Verdant Roots in a certain year is simply equal to 
+$$1 - P(\text{no calamity}) = 1 - 0.6667 = 0.3333.$$
+:::
+:::
+ 
+:::{style="font-size: .8em"}
+There is no need for us to add the probabilities of 10 possible calamities to obtain this probability. This illustrates the usefulness of Property A. <br>
+<br>
+
+Property B tells us that there either will be a calamity at the tree nursery or there will not. There has to be an outcome.
+
+
+:::
+
+:::
+
+## Properties
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Property C</span>
+        <p>
+        If \(A\) is contained in \(B\), then \(P(A) \leq P(B).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+This property states that if $B$ occurs whenever $A$ occurs, then $P(A) \leq P(B).$ 
+__Example__: If whenever it rains ($A$) it is cloudy ($B$), then the probability that it rains is less than or equal to the probability that it is cloudy.<br>
+<br>
+
+The last fundamental property tells us about the union of two events that can co-occur.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Property D</span>
+        <p>
+        \(P(A \cup B) = P(A) + P(B) - P(A,B).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+A Venn diagram shows clearly why this is the case.
+:::
+
+:::{.notes}
+Property C follows from Axiom 3, but the connection is not entirely straightforward. Ross has a proof.
+:::
+
+## Property D
+
+:::{.center-text}
+```{python}
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn2_circles, venn2_unweighted;
+
+
+# Create a figure 
+fig, ax1 = plt.subplots(figsize=(8,3))
+
+# 1. Intersection of A and B (provided figure)
+v1 = venn2(ax=ax1, subsets={'10': 1, '01': 1, '11': 1}, set_labels=None, set_colors=('r', 'g'), alpha=0.5)
+v1.get_label_by_id('10').set_text('$A$')
+v1.get_label_by_id('10').set_fontsize(16)
+v1.get_label_by_id('01').set_text('$B$')
+v1.get_label_by_id('01').set_fontsize(16)
+v1.get_label_by_id('11').set_text('')
+#v1.get_label_by_id('11').set_text('$A \cap B$')
+v1.get_label_by_id('11').set_fontsize(16)
+ax1.set_axis_on()
+ax1.text(ax1.get_xlim()[0]+0.1, ax1.get_ylim()[0]+0.1, '$\\Omega$', fontsize=16)
+
+# Adjust layout and save the figure
+plt.tight_layout()
+plt.savefig("venn_diagrams_quarto_slide.png")
+plt.show()
+```
+:::
+
+:::{style="font-size: .8em"}
+$P(A \cup B)$ represents the probability that either event $A$, event $B$, or both occur. When we add $P(A)$ and $P(B)$, we include all outcomes in $A$ and all outcomes in $B$. However, the intersection $A \cap B,$ the outcomes that are common to both $A$ and $B$, are counted twice in this sum. To correct for this double-counting, we subtract  once the probability of the intersection.
+:::
+
+## Holly Example
+:::{.columns}
+::: {.column width="50%"}
+:::{.center-text}
+<img src="images/axioms of probability/Holly_Leaves.png" width=400/>
+
+:::
+:::
+
+::: {.column width="50 K%"}
+:::{style="font-size: .8em"}
+Holly the monkey is being observed for her preferences in different types of leaves. With a probability of 0.5, Holly will like the first type of leaf (leaves from teak trees); with a probability of 0.4, she will like the second type of leaf (leaves from ficus trees); and with a probability of 0.3, she will like both types of leaves. What is the probability that Holly likes neither type of leaf?
+:::
+:::
+:::
+
+## Holly Example
+:::{style="font-size: .8em"}
+- __Given__: 
+    * $P(L_1) = 0.5,$ where $L_1$ is the event that Holly likes the first type of leaf.
+    * $P(L_2) = 0.4,$ where $L_2$ is the event that Holly likes the first type of leaf.
+    * $P(L_1,L_2) = 0.3,$ where $L_1,L_2$ is the intersection of $L_1$ and $L_2$
+- __To find__: $P(\text{Holly likes neither leaf type})$
+- __Tools__: Venn diagrams, Property D, and Property A(?)<br>
+<br>
+We are now ready to start working on the solution.
+
+:::
+
+## Holly Example
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        How does the Venn diagram of Holly's leaf preferences look like? <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+Let us find the probability that Holly likes either teak leaves, or ficus leaves, or both using Property D:
+$$P(L_1 \cup L_2) = P(L_1) + P(L_2) - P(L_1, L_2) = 0.5 + 0.4 - 0.3 = 0.6.$$
+
+:::
+
+## Holly Example
+:::{style="font-size: .8em"}
+That is, the probability that Holly likes at least one of the types is 0.6. 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Given the above \(P(L_1 \cup L_2)\), how do we find the probability that Holly likes neither type of leaf? <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+<br>
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Has the question been fully addressed? Does our answer make sense?<br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Because the event that Holly likes neither type is the complement of the event that she likes at least one of them, we obtain the result:
+$$1 - P(L_1 \cup L_2) = 1 -0.6 = 0.4.$$
+(Note that I already mention Property A, students only need to figure out how to apply it.)
+
+0.4 is between 0 and 1. It is also less than 0.5 (1-the probability of L1), that would be the maximum estimate of P(L1 or L2).
+:::
+
+## Working in Groups of 2–4
+:::{style="font-size: .8em"}
+
+<!-- 1. __Form groups of 2–4.__ Feel free to move around! -->
+1. __Before solving each (sub)question:__
+    - Identify what is _given_.
+    - Clarify the _task_ (i.e., what to compute/prove).
+    - Identify potential _tools/methods_.
+2. __While solving:__
+    - Discuss openly.
+    - Ask me questions as I circulate.
+3. __After solving:__ 
+    - Check if your result makes sense (sign, magnitude, units, etc.).
+    - Confirm that you’ve fully addressed the question or proved the statement.
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        A school has students in grades 1, 2, 3, 4, 5, and 6. Groups 2, 3, 4, 5, and 6 contain the same number of students, but there are twice this number in grade 1. A student is selected at random from the list of all students in the school. What is the probability that the selected student will be in an odd-numbered grade?<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Suppose that a fair coin is tossed twice. What is the probability that heads comes up on the first or the second toss?<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Extra: Group Question 3
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Let \(A\) and \(B\) be events with probabilities \(P(A) = \frac{3}{4}\) and \(P(B) = \frac{1}{3}.\) Prove that \(\frac{1}{12} \leq P(A,B) \leq \frac{1}{3}.\)<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Note: $P(A,B) = P(A \cap B).$
+First, we will use the fact that $P(A \cup B) = P(A) + P(B) - P(A,B)$.
+Since $ P(A \cup B) \leq 1,$ we obtain
+$$P(A,B) = P(A) + P(B) - P(A \cup B) \geq \frac{3}{4} + \frac{1}{3} - 1 = \frac{1}{12}.$$
+On the other hand, $A \cap B \subseteq A$ and $A \cap B \subseteq B.$ Thus, $P(A,B) \leq \min (P(A),P(B)) = \min\left( \frac{3}{4},  \frac{1}{3} \right) = \frac{1}{3}.$
+This proves that $\frac{1}{12} \leq P(A,B) \leq \frac{1}{3}.$ 
+:::

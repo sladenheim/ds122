@@ -1,0 +1,822 @@
+---
+title: Sample Spaces
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+## Paradox
+:::{style="font-size: .8em"}
+Richard Feynman famously stated:<br>
+<br>
+
+_You know, the most amazing thing happened to me tonight. I was coming here, on the way to the lecture, and I came in through the parking lot. And you won’t believe what happened. I saw a car with the license plate ARW 357. Can you imagine? Of all the millions of license plates in the state, what was the chance that I would see that particular one tonight? Amazing!_
+:::
+:::{.center-text}
+<img src="images/sample spaces/license plate.png" width=400/>
+:::
+
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+* Short review of set theory
+* Concepts required for probability theory:
+    + Experiment
+    + Sample space
+    + Event
+    + Combining events: union, intersection, complement
+    + Disjoint events
+* Application of above concepts for tree nursery risk analysis
+* Developing a structured approach to solving probability and statistics problems (general course objective)
+:::
+
+## Tree Nursery Risk Analysis
+
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+A tree nursery Verdant Roots is assessing the vulnerability of their plants to potential calamities and whether to invest in preventive measures. <br>
+For example, they are interested in the probability of the plants being damaged if there is a regional drought or a pipe breakage in their supply system. 
+:::
+:::
+:::
+:::{style="font-size: .8em"}
+Verdant Roots composed a dataset for their study. It contains  
+
+* 3 columns: 'Calamity', 'Years occured', 'Damage probability'; 
+* 11 types of common calamities, including an option for no calamities.
+:::
+
+::: {.notes}
+Today forcus on the first column: Calamity. Next lecture: entire dataset.
+:::
+
+## Tree Nursery Risk Analysis
+:::{.center-text}
+```{python}
+import pandas as pd  
+import numpy as np 
+
+# Load the dataset and perform the analysis
+data = pd.read_csv('data/tree_nursery.csv')
+print(data.head(11))
+```
+:::
+:::{style="font-size: .8em"}
+Assumptions: 
+
+* None of the calamities can occur in the same year.
+* The dataset contains all possible calamity types.
+:::
+
+## Review: Sets
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Set</span>
+        <p>
+        A set is a collection of distinct objects, such as letters or numbers.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: We use curly brackets to identify a set. A set is typically denoted by a capital letter. <br>
+__Remarks__: 
+
+- A set contains _elements_.
+- The _order_ in which the elements of the set are written does not matter.
+- The _repetition_ of the elements does not matter either.
+- Sets can be _infinite_.
+
+__Example__: $\{k\}$ is a set that contains only one element, namely the letter $k.$
+
+:::
+
+## Review: Sets
+:::{style="font-size: .8em"}
+__Examples__: 
+
+- $B = \{1, 2\}$ is a set that contains two elements, 1 and 2.
+- $\{a, e, i, o, u\}$ and $\{u, o, i, e, a\}$ define the same set.
+- $\{1,1,1\}$ and $\{1\}$ are the same set. 
+- $\mathbb{N}$ is the infinite set of all natural numbers
+- $\mathbb{R}$ is the infinite set of all real numbers.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Empty Set</span>
+        <p>
+        The empty set is the set which has no elements.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: $\emptyset$.
+:::
+
+## Review: Subsets
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Subset</span>
+        <p>
+        If \(A\) and \(B\) are sets, and every element of \(A\) is also an element of \(B\), then \(A\) is a subset of \(B\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: If $A$ is a subset of $B$, we write $A\subseteq B$. <br>
+__Example__: Let $A = \{ 1,3\}$ and $B = \{ 1, 2, 3\},$ then $A\subseteq B$.
+
+:::{.center-text}
+<img src="images/sample spaces/subset.png" width=280/>
+:::
+
+:::
+
+## Sets and Subsets
+:::{.columns}
+::: {.column width="20%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+::: {.column width="75%"}
+:::{style="font-size: .8em"}
+Let us define the following set based on the Verdant Roots tree nursery data:<br>
+
+\begin{align*}\small
+S = \{ & \text{Regional drought deg 1}, \text{Regional drought deg 2}, \\
+& \text{Regional drought deg 3}, \text{Regional drought deg 4},\\
+& \text{Pipe breakage}, \text{Human error}, \text{Pollution}, \text{Plague}, \\
+& \text{Fire deg 1}, \text{Fire deg 2}, \text{No calamities} \}. \\
+\end{align*}
+
+:::
+:::
+:::
+
+
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        List 4 subsets of \(S\) that do not have any elements in common and together form \(S\).
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+::: {.notes}
+Example that would be a good option in real life: 
+
+1. Regional droght of any degree
+2. Fire of any degree
+3. Remaining calamities
+4. No calamities
+:::
+
+
+
+## Experiments
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Experiment</span>
+        <p>
+        An experiment is a situation in which the outcomes occur randomly.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: Driving to work, a commuter passes through a sequence of three intersections with traffic lights. At each light she either stops $s$ or continues $c$. This situation is an experiment.
+
+:::{.center-text}
+<img src="images/sample spaces/traffic_lights.png" width=350/>
+:::
+:::
+
+::: {.notes}
+Ask if they could give another example of an experiment.
+:::
+
+
+## Sample Spaces
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Sample Space</span>
+        <p>
+        The sample space is the set of all possible outcomes of the experiment.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: $\Omega$ or $S.$ <br>
+__Example__: Let $csc$ denote the outcome that the commuter <br>
+
+- continues through the first light (first $c$), 
+- stops at the second light ($s$), and 
+- continues through the third light (last $c$). <br>
+
+Then $\Omega = \{ccc, ccs, csc, css, scc, ssc, scs, sss\}$ is the sample space for the commuter example.
+:::
+
+## Sample Spaces
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+
+:::
+:::
+
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+Let us define an experiment as a calamity occuring at Verdant Roots tree nursery in a certain year.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+         What are the possible outcomes of this experiment based on the provided dataset? 
+         <br>
+         <br>
+         <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+::: 
+
+<br>
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        How large is the sample space associated with this experiment?
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- 11, because the outcomes are the calamities.
+-->  
+:::
+
+:::{.notes}
+What would happen if we define the experiment as a sequence of calamities occuring in 3 years?
+:::
+
+
+## Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Event</span>
+        <p>
+        An event is a subset of the sample space.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: Any capital letter. Typically, $E$ or $A$. <br>
+__Example__:  Let us return to the commuter example. An event can be defined as continuing through the first light, $E = \{ccc, ccs, csc, css\}$. <br>
+<span style="color:rgb(1, 180, 180);">How would $E$ look like in the sample-space potato below?</span>
+<!-- dffh 
+<div class="tight-space"></div> -->
+
+:::
+
+:::{.center-text}
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+
+# Create a figure and axis
+fig, ax = plt.subplots(figsize=(7, 3))
+
+# Add 8 small blue dots at specified coordinates
+dot_positions = [(0.5, 0.5), (0.3, 0.5), (0.35, 0.3), (0.6, 0.6), (0.67, 0.63), (0.6, 0.4), (0.8, 0.45), (0.4, 0.68)]
+for pos in dot_positions:
+    ax.plot(pos[0], pos[1], 'o', color='purple', markersize=8)
+
+# Draw a flatter black ellipse
+ellipse = patches.Ellipse((0.5, 0.5), width=0.8, height=0.6, edgecolor='black', facecolor='none')
+ax.add_patch(ellipse)
+
+
+# Add the Greek letter Omega (Ω) inside the ellipse, smaller and further to the left
+plt.text(0.2, 0.4, 'Ω', fontsize=30, ha='center', va='center', color='black')
+
+
+# Remove axis and ticks for a clean look
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.axis('off')
+
+# Display the plot
+#plt.tight_layout()
+plt.show()
+```
+:::
+
+
+## Combining Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Union of Events</span>
+        <p>
+        For any two events \(A\) and \(B\) of a sample space \(\Omega\), we define the new event, the union of \(A\) and \(B\), to consist of all outcomes that are either in \(A\) or in \(B\) or in both \(A\) and \(B\). 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: We will mainly use $A,B$ (i.e., $A$ - comma - $B$) but $A\cup  B$ is also a viable option. <br>
+__Example__: If $A$ is the event that the commuter stops at the first light, $A = \{sss,scs,ssc,scc\},$  and $B$ is the event that she stops at the third light, $B = \{sss,scs,ccs,css\},$ then the union of $A$ and $B$, is the event that she stops at the first _or_ the third light, $\{sss,ssc,scc,scs,ccs,css\}.$
+:::
+
+## Combining Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Intersection of Events</span>
+        <p>
+        The intersection of two events consists of all outcomes that are both in \(A\) and in \(B\). 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: $A \cap B.$ <br>
+__Example__: If $A = \{sss,scs,ssc,scc\}$ and $B=\{sss,scs,ccs,css\}$, then $A \cap B$ is the  event that the commuter stops at the first light and the third light. It consists of those outcomes that are common for both $A$ _and_ $B$: 
+$$A \cap B = \{sss,scs\}.$$
+
+:::
+
+## Combining Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Complement of an Event</span>
+        <p>
+        The complement of event \(E\), consists of all outcomes in the sample space \(\Omega\) that are not in \(E\). 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: $\overline{E}$ or  $E^C.$ <br>
+__Example__: The complement of the event that the commuter stops at the first light is the event that she continues at the first light: $$\overline{A} = \{ccc,ccs,css,csc\}.$$
+
+:::
+
+## Disjoint Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Disjoint (Mutually Exclusive) Events</span>
+        <p>
+        Disjoint events are events that have no common outcomes.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: If we define $A$ as the event that the commuter
+stops at the first light and $C$ as the event that she continues through all three lights,
+$C = \{ccc\}$, then $A$ and $C$ are disjoint. They cannot co-occur.
+:::
+:::{.center-text}
+```{python}
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn2_circles, venn2_unweighted;
+fig, ax = plt.subplots(figsize=(8,3))
+v = venn2(ax = ax, subsets={'10': 1, '01': 1, '11': 0}, set_labels = None, set_colors=('r', 'b'), alpha = 0.5)
+v.get_label_by_id('10').set_text('A')
+v.get_label_by_id('10').set_size(20)
+v.get_label_by_id('01').set_text('C')
+v.get_label_by_id('01').set_size(20)
+ax.set_axis_on()
+plt.text(ax.get_xlim()[0]+0.1, ax.get_ylim()[0]+0.1, '$\Omega$', fontsize = 20);
+```
+:::
+
+
+## Venn Diagrams 
+:::{.center-text}
+```{python}
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn2_circles, venn2_unweighted;
+
+
+# Create a figure with 3 subplots side by side
+fig, axes = plt.subplots(1, 3, figsize=(8, 6))
+
+# 1. Intersection of A and B (provided figure)
+ax1 = axes[0]
+v1 = venn2(ax=ax1, subsets={'10': 1, '01': 1, '11': 1}, set_labels=None, set_colors=('r', 'g'), alpha=0.5)
+v1.get_label_by_id('10').set_text('$A$')
+v1.get_label_by_id('10').set_fontsize(16)
+v1.get_label_by_id('01').set_text('$B$')
+v1.get_label_by_id('01').set_fontsize(16)
+v1.get_label_by_id('11').set_text('')
+#v1.get_label_by_id('11').set_text('$A \cap B$')
+v1.get_label_by_id('11').set_fontsize(16)
+ax1.set_title("a", fontsize=14)
+ax1.set_axis_on()
+ax1.text(ax1.get_xlim()[0]+0.1, ax1.get_ylim()[0]+0.1, '$\\Omega$', fontsize=16)
+
+
+# 2. Union of A and B (both sets in brown)
+ax2 = axes[1]
+v2 = venn2(ax=ax2, subsets={'10': 1, '01': 1, '11': 1}, set_labels=None, set_colors=('saddlebrown', 'saddlebrown'), alpha=0.5)
+
+v2.get_label_by_id('10').set_text('$A$')
+v2.get_label_by_id('10').set_fontsize(16)
+v2.get_label_by_id('01').set_text('$B$')
+v2.get_label_by_id('01').set_fontsize(16)
+v2.get_label_by_id('11').set_text('')
+v2.get_patch_by_id('11').set_color('saddlebrown')
+#v2.get_label_by_id('11').set_text('$A \cup B$')
+v2.get_label_by_id('11').set_fontsize(16)
+ax2.set_title("b", fontsize=14)
+ax2.set_axis_on()
+ax2.text(ax2.get_xlim()[0]+0.1, ax2.get_ylim()[0]+0.1, '$\\Omega$', fontsize=16)
+
+# 3. Complement of A (everything outside A is brown)
+ax3 = axes[2]
+
+# fig.patch.set_facecolor('grey')
+
+light_saddlebrown = (139/255, 69/255, 19/255, 0.4)
+pink_rgba =  (1.0, 0.6, 0.7, 1.0)
+pink_rgba1 = (1.0, 0.5, 0.4, 1.0)
+pink_rgba2 = (1.0, 0.5, 0.5, 1.0)
+
+ax3.set_facecolor(light_saddlebrown)
+
+v3 = venn2(ax=ax3, subsets={'10': 1, '01': 1, '11': 1}, set_labels=None, set_colors=('saddlebrown', 'saddlebrown'), alpha=0.5)
+
+v3.get_label_by_id('10').set_text('$A$')
+v3.get_patch_by_id('10').set_alpha(1)
+v3.get_label_by_id('10').set_fontsize(16)
+v3.get_patch_by_id('10').set_color(pink_rgba2)
+v3.get_label_by_id('01').set_text('')
+v3.get_label_by_id('01').set_fontsize(16)
+v3.get_patch_by_id('01').set_color(pink_rgba2)
+v3.get_patch_by_id('01').set_alpha(0.0)
+v3.get_label_by_id('11').set_text('')
+v3.get_patch_by_id('11').set_alpha(1)
+v3.get_patch_by_id('11').set_color(pink_rgba2)
+#v2.get_label_by_id('11').set_text('$A \cup B$')
+v3.get_label_by_id('11').set_fontsize(16)
+ax3.set_title("c", fontsize=14)
+ax3.set_axis_on()
+ax3.text(ax3.get_xlim()[0]+0.1, ax3.get_ylim()[0]+0.1, '$\\Omega$', fontsize=16)
+
+# Adjust layout and save the figure
+plt.tight_layout()
+plt.savefig("venn_diagrams_quarto_slide.png")
+plt.show()
+```
+:::
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        In the Venn diagrams above, event \(A\) is shown in red and event \(B\) is shown in green. The results of basic set operations (complement, intersection, and union) are depicted in brown. Match each diagram to the corresponding operation.
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+::: {.notes}
+a: Intersection
+
+b: Union
+
+c: Complement
+:::
+
+## Events
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+Let us again define an experiment as a calamity occuring at the tree nursery in a certain year.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        How can we define an event associated with the sample space of this experiment?
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- 11, because the outcomes are the calamities.
+-->  
+<br>
+
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Give an example of two events in this sample space that are not disjoint.
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- Many possible answers: calamity vs. no calamity; regional drought, pipe breakage, ...; regional drought of degree 1, degree 2, degree 3, etc. 
+
+Many possible answers: A = event of fire = {fire deg 1, fire deg 2} and B = any event of degree 1 = {regional drought deg 1 and fire deg 1} will not be disjoint.
+-->
+:::
+
+## Working in Groups of 2–4
+:::{style="font-size: .8em"}
+
+<!-- 1. __Form groups of 2–4.__ Feel free to move around! -->
+1. __Before solving each (sub)question:__
+    - Identify what is _given_.
+    - Clarify the _task_ (i.e., what to compute/prove).
+    - Identify potential _tools/methods_.
+2. __While solving:__
+    - Discuss openly.
+    - Ask me questions as I circulate.
+3. __After solving:__ 
+    - Check if your result makes sense (sign, magnitude, units, etc.).
+    - Confirm that you’ve fully addressed the question or proved the statement.
+:::
+
+## Group Question 1
+:::{style="font-size: .78em"}
+
+:::{.center-text}
+<img src="images/sample spaces/cafeteria.png" width=500/>
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        A cafeteria offers a three-course meal consisting of an entree, a starch, and a dessert. The possible choices are given in the above table.
+       A person is to choose one course from each category.<br>
+        a. How many outcomes are in the sample space for a three-course meal for a single person? <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+<!-- 2x3x4 = 24 -->
+
+
+## Group Question 1 
+:::{style="font-size: .78em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        b. Let \(A\) be the event that ice cream is chosen. How many outcomes are in \(A\)?<br>
+        <br>
+        <br>
+        <br>
+        c. Let \(B\) be the event that chicken is chosen. How many outcomes are in \(B\)?<br>
+        <br>
+        <br>
+        <br>
+        d. List all the outcomes in the event \(A\cap B\).<br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+<!-- b. 2 x 3 = 6
+c. 3 x 4 = 12
+d. {(chicken, pasta, ice cream), (chicken, rice, ice cream),(chicken, potatoes, ice cream)} -->
+
+
+## Group Question 2 
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        Let \(A\) and \(B\) be arbitrary events. Let \(C\) be the event that either \(A\) occurs or \(B\) occurs, but not both. Express \(C\) in terms of \(A\) and \(B\) using any of the basic event operations (i.e., union, intersection, and complement). <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Extra: Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        A coin is tossed 3 times and the sequence of heads and tails is recorded.<br>
+        a. List the sample space of this experiment.
+        <br>
+        <br>
+        <br>
+        <br>
+        b. List the elements that make up the following events: <br> (1) \(A\) = at least two heads, (2) \(B\) = the last toss is a tail, (3) \(A, B = A\cup B.\)<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+<!-- a. {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT}
+b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT} -->
+<!-- Use Venn diagrams: it is all of A AND B (diagram 1)AND the complement of the intersection of A and B(diagram 2) -> C (diagram 3)
+         C = (A \cup B) \cap \overline(A \cap B) -->
+
+
+
+
+<!-- ## Key Takeaways
+
+:::{style="font-size: .8em"} 
+
+
+::: -->
