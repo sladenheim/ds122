@@ -1,0 +1,513 @@
+---
+title: Continuous Distributions
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## From Discrete To Continuous 
+:::{style="font-size: .8em"}
+
+In the last lecture, we focused on discrete distributions, where random variables take on finite or countably infinite values.
+
+However, many real-world variables are uncountable: they can take on any value within a range. For example, the weight of a full-term newborn often falls between 2.6 to 3.8 kg (5 lb 11 oz - 8 lb 6 oz). A baby might weigh 2.809348 kg, 3.4555329 kg, or any other value in that range.
+
+:::{.center-text}
+<img src="images/continuous distributions/newborn.png" width=300/>
+
+:::
+
+Today, we will explore the properties of such continuous distributions.
+
+:::
+
+
+
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+* Short review of integral calculus
+* Probability density function 
+* Cumulative distribution function of a continuous random variable
+* Expected value of a continuous random variable
+* Variance of a continuous random variable
+:::
+
+## News Article Popularity
+:::{.columns}
+::: {.column width="40%"}
+:::{.center-text}
+<img src="images/continuous distributions/newspaper_articles.png" width=600/>
+:::
+:::
+
+::: {.column width="60%"}
+:::{style="font-size: .8em"}
+A data scientist is analyzing normalized popularity scores of news articles. Each score $X$ is a continuous variable ranging from 0 (no engagement) to 1 (maximum engagement).
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+The scores follow this _probability density function_: 
+$$ f(x) = \;\left\{\begin{array}{cr} 2x & \text{for  } 0\leq x \leq 1, \\ 0 & \text{otherwise. }\end{array}\right.$$ 
+:::
+
+## News Article Popularity
+
+:::{.center-text}
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the piecewise function
+def f(x):
+    return np.where((x >= 0) & (x <= 1), 2 * x, 0)
+
+# Generate x values over a wider range to visualize the function
+x = np.linspace(-0.5, 1.5, 400)
+y = f(x)
+
+# Plot the function
+plt.figure(figsize=(9, 4.5))
+plt.plot(x, y, linewidth=3)
+#plt.plot(x, y, label='f(x) = 2x for 0 <= x <= 1, 0 otherwise')
+plt.xlabel('x', size=18)
+plt.ylabel('f(x)', size=18)
+plt.grid(True)
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+#plt.legend()
+plt.show()
+
+```
+:::
+
+:::{style="font-size: .8em"}
+<!-- The shape of the distribution suggests that higher popularity scores are more common, but does not reveal the average score. -->
+Question: What is the average popularity score of the news articles based on the probability density function?
+:::
+
+## Review: Integrals
+:::{.center-text}
+<img src="images/continuous distributions/Riemann_sum.png" width=600/>
+:::
+
+:::{style="font-size: .8em"}
+A definite integral represents the area under a curve between two points on the $x$-axis.
+:::
+
+## Review: Integrals
+:::{style="font-size: .8em"}
+
+Here are some very important properties of definite integrals.
+
+Let $f$ and $g$ be integrable functions on $[a,b]$ and let $c$ be any constant.
+
+- $\int_a^a f(x) dx = 0$.
+- $\int_b^a f(x) dx = -\int_a^b f(x) dx$.
+- $\int_a^b \left(f(x)+g(x)\right) dx = \int_a^b f(x)dx + \int_a^b g(x)dx$.
+- $\int_a^b c f(x) dx = c \int_a^b f(x) dx$.
+- $\int_a^b f(x) dx = \int_a^p f(x) dx + \int_p^b f(x)dx$ for any $p \in [a,b].$
+:::
+
+## Review: Integrals
+:::{style="font-size: .8em"}
+The Fundamental Theorem of Calculus shows that integration and differentiation are inverse operations:
+
+1. $\frac{d}{dx} \int_a^x f(x)dx = f(x).$
+2. $\int_a^b f(x) dx = F(b)-F(a),$ where $F(x) = \int f(x)dx.$
+
+The elementary definite integrals that you should know for this course:
+
+- $\int_a^b c dx = c(b - a)$ for any constant $c$,
+- $\int_a^b x^n dx = \frac{1}{n+1}\left[x^{n+1}\right]_{x=a}^{x=b}$ for $n \neq -1$,
+- $\int_a^b \frac{1}{x}dx = \left[\ln |x| \right]_{x=a}^{x=b}$,
+- $\int_a^b e^x dx = \left[ e^x \right]_{x=a}^{x=b}$.
+:::
+
+
+## Review: Integrals
+:::{style="font-size: .8em"}
+__Example__: $\small{\int_3^6 \frac{1}{x}dx = [\ln x]_{x=3}^{x=6} = \ln 6 - \ln 3 = \ln \frac{6}{3} = \ln 2.}$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Find the area under the parabola \(\small{y=x^2}\) from 0 to 1.<br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<br>
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Improper Integral</span>
+        <p>
+        If \(\small{\int_a^t f(x) dx}\) exists for every number \(\small{t \geq a}\), then \(\small{\int_a^{\infty} f(x)dx = \lim_{t \to \infty} \int_a^t f(x) dx}\) provided this limit exists as a finite number. <br>
+        <br>
+        If \(\small{\int_t^b f(x) dx}\) exists for every number \(\small{t \leq b}\), then \(\small{\int_{-\infty}^b f(x)dx = \lim_{t \to -\infty} \int_t^b f(x) dx}\) provided this limit exists as a finite number.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Review: Integrals
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Convergent and Divergent Integrals</span>
+        <p>
+        The improper integrals \(\small{\int_a^{\infty} f(x)dx}\) and \(\small{\int_{-\infty}^b f(x)dx}\) are called convergent if the corresponding limits exist. They are called divergent if the limits do not exist.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: $\int_1^{\infty} (1/x) dx$ is divergent:
+$$\small{\int_1^{\infty} \frac{1}{x}dx = \lim_{t \to \infty} \int_1^t \frac{1}{x}dx = \lim_{t \to \infty} \left[ \ln |x| \right]_1^t = \lim_{t \to \infty} (\ln \:t - \ln \:1) = \lim_{t \to \infty} \ln \:t.}$$
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Improper Integral (Continued) </span>
+        <p>
+        If both \(\small{\int_a^{\infty} f(x)dx}\) and \(\small{\int_{-\infty}^b f(x)dx}\) are convergent, then we define \(\small{\int_{-\infty}^{\infty} f(x) dx = \int_{-\infty}^a f(x) dx + \int_a^{\infty} f(x) dx,}\) where \(\small{a}\) is any real number.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Probability Density Function
+:::{style="font-size: .8em"}
+Continuous random variables are described by their probability density functions (PDFs). 
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Probability Density Function </span>
+        <p>
+        If \(f\) is a probability density function describing random variable \(X\), then it must have the following properties: 
+        <ol start="1">
+        <li>\(\small{f(x) \geq 0,}\)</li>
+        <li>\(\small{\int_{- \infty}^{\infty} f(x) dx = 1.}\)</li>
+        </ol>
+        </p>
+    In addition, \(f\) can be used to find \( \small{P(a \leq X \leq b)} \): \(\small{P(a \leq X \leq b)= \int_a^b f(x)dx.}\)
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+Let $F$ be the CDF corresponding to $f$, then $\small{f(x) = \frac{d F(x)}{dx},}$ and $\small{F(a) = P(X\leq a) = \int_{-\infty}^a f(x) dx.}$
+
+:::
+
+## Probability Density Function
+:::{.center-text}
+<img src="images/continuous distributions/Pdf_integral.png" width=600/>
+:::
+
+:::{style="font-size: .8em"}
+\begin{align*}
+P(a \leq X \leq b) &= P(X \leq b) - P(X \leq a)=F(b)-F(a) \\
+& = \int_{-\infty}^b f(x) dx - \int_{-\infty}^a f(x) dx = \int_a^b f(x) dx.
+\end{align*}
+:::
+
+## Probability Density Function
+:::{.columns}
+::: {.column width="40%"}
+:::{.center-text}
+<img src="images/continuous distributions/newspaper_articles.png" width=600/>
+:::
+:::
+
+::: {.column width="60%"}
+:::{style="font-size: .8em"}
+Let us show that 
+$$ f(x) = \;\left\{\begin{array}{cr} 2x & \text{for  } 0\leq x \leq 1, \\ 0 & \text{otherwise. }\end{array}\right.$$ 
+is indeed a PDF.
+
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+It is not difficult to see that $f(x) \geq 0$ for all values of $x$. Moreover, 
+$$\int_{-\infty}^{\infty} f(x) dx =  \int_{0}^{1} 2x dx = \frac{2}{2}[x^2]_{x=0}^{x=1} = 1.$$
+Hence, the provided $f$ is a PDF.
+:::
+
+## Probability Density Function
+:::{style="font-size: .8em"}
+__Example__: Consider the following probability density function:
+$$ \small{f(x) = \begin{cases}
+1 & \text{ for } 0 \leq x \leq 1,\\
+0 & \text{ otherwise. }
+\end{cases}}$$
+Let us find the corresponding CDF. 
+:::
+
+:::{.columns}
+::: {.column width="35%"}
+:::{style="font-size: .8em"}
+Since, for $0 \leq x \leq 1,$ $\int_{-\infty}^x f(x)dx = \int_{-\infty}^x 1 dx = x,$
+$$\small{F(x) = \begin{cases}
+0 & \text{ for } x < 0,\\
+x & \text{ for } 0 \leq x \leq 1,\\
+1 & \text{ for } x > 1.\\
+\end{cases}}$$
+:::
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="60%"}
+:::{.center-text}
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the piecewise function
+def F(x):
+    return np.where((x >= 0) & (x <= 1), x, np.where(x > 1, 1, 0))
+
+# Generate x values over a wider range to visualize the function
+x = np.linspace(-0.5, 1.5, 400)
+y = F(x)
+
+# Plot the function
+plt.figure(figsize=(6, 2.5))
+plt.plot(x, y, linewidth=3)
+#plt.plot(x, y, label='f(x) = 2x for 0 <= x <= 1, 0 otherwise')
+plt.xlabel('x', size=18)
+plt.ylabel('F(x)', size=18)
+plt.xticks(np.arange(-0.5, 1.6, 0.5))  
+plt.grid(True)
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+#plt.legend()
+plt.show()
+
+```
+:::
+:::
+:::
+
+## Probability Density Function
+:::{style="font-size: .8em"}
+__Example__:  Suppose that $X$ is a continuous random variable with probability density function 
+
+$$ \small{f(x) = \;\left\{\begin{array}{cr} c(4x - 2x^2) & \text{for  } 0<x<2,\\ 0 & \text{otherwise. }\end{array}\right.}$$ 
+
+Here $c$ is a constant. <br>
+a. What is the value of $c$? <br>
+b. Find $\small{P(X>1).}$
+
+a. Since $f$ is a probability density function, we must have $\small{\int_{-\infty}^{\infty} f(x)dx = 1:}$ 
+$$\small{\int_0^2 c(4x-2x^2) dx = 1.}$$
+:::
+
+## Probability Density Function
+:::{style="font-size: .8em"}
+__Example (continued)__:
+Let us first compute the integral 
+
+$$\small{\int_0^2 c(4x-2x^2) dx = c \int_0^2 (4x-2x^2) dx = c \left[ \frac{4}{2}x^2 - \frac{2}{3} x^3 \right]_{x=0}^{x=2}} $$
+
+$$ \small{= c \left[2x^2 -  \frac{2}{3} x^3 \right]_{x=0}^{x=2} = c\left(2\cdot 2^2 - \frac{2}{3}\cdot 2^3\right) - 0 = c\left(8 - \frac{16}{3}\right) = \frac{8}{3}c.}$$
+
+Since $\small{\frac{8}{3}c = 1}$, we find that $\small{c = \frac{3}{8}.}$
+
+b. $\small{P(X>1) = \int_1^{\infty} f(x) dx = \int_1^{2} \frac{3}{8} (4x - 2x^2) dx = \frac{3}{8} \left[ 2x^2 -  \frac{2}{3} x^3  \right]_{x=1}^{x=2}}$
+$$ \small{= \frac{3}{8} \left[ 2x^2 -  \frac{2}{3} x^3  \right]_{x=1}^{x=2}}\small{ = \frac{3}{8} \left[\left(2\cdot4 - \frac{2}{3}\cdot 8\right) - \left( 2 - \frac{2}{3} \right) \right] = \frac{1}{2}.}$$
+:::
+
+## Expected Value and Variance
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Expected Value (Expectation) </span>
+        <p>
+        If \(\small X\) is a contibuous random variable with
+       PDF \(f,\) then \(E[X] = \int_{-\infty}^{\infty} x f(x) dx.\)
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+We have defined the variance of a random variable $X$ as 
+
+$$\mbox{Var} (X) = E\left[(X- \overline{X})^2 \right].$$ 
+
+<!-- We also said that for a discrete random variable with PMF $p$ and $\overline{X} = \mu$, the variance can be computed from
+
+$$\mbox{Var} (X) = \sum_{x= -\infty}^{\infty} (x - \mu)^2 p(x).$$ -->
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Variance </span>
+        <p>
+        For a continuous random variable with density function \(f(x)\) and \(\overline{X} = \mu\)
+\(\mbox{Var}(X) = \int_{-\infty}^{\infty} (x - \mu)^2 f(x) dx.\)
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## News Article Popularity
+:::{.columns}
+::: {.column width="40%"}
+:::{.center-text}
+<img src="images/continuous distributions/newspaper_articles.png" width=600/>
+:::
+:::
+
+::: {.column width="60%"}
+:::{style="font-size: .8em"}
+Question: What is the average popularity score of the news articles based on the probability density function?<br>
+<br>
+Let us find $E[X]$ when the PDF of $X$ 
+
+$$ f(x) = \;\left\{\begin{array}{cr} 2x & \text{for  } 0\leq x \leq 1, \\ 0 & \text{otherwise. }\end{array}\right.$$ 
+
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+\begin{align*} E[X] &= \int_{-\infty}^{\infty} x f(x) dx = \int_0^1 x \cdot 2x \:dx  \\
+&= \int_0^1 2x^2 dx = 2 \int_0^1 x^2 dx  2 \left[ \frac{1}{3}x^3\right]_{x=0}^{x=1} = \frac{2}{3}.
+\end{align*}
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Consider continuous random variable \(X\) with probability density function $$f(x) = \begin{cases} 
+    \alpha x^{-\alpha-1} & \text{ for } x \geq 1,\\
+    0 & \text{ otherwise. }
+    \end{cases}$$
+    Here, \(\alpha > 1.\) Find the expected value of \(X.\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+$\alpha/(\alpha -1)$
+
+$E\left[X\right]=\int_1^{\infty}x\cdot\alpha x^{-\alpha-1}\ dx=\left[\frac{\alpha x^{1-\alpha}}{1-\alpha}\right]_1^{\infty}=\frac{\alpha}{\alpha-1}$
+
+Grasple 2521 Exercise #14855
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    \(X\) is a continuous random variable with a cumulative distribution function (CDF) given by
+    $$F(x) = \begin{cases}
+        1 - e^{-x} - \frac{1}{2} x e^{-x}  & \text{ for } x \geq 0, \\
+        0 & \text{ for } x < 0.
+    \end{cases}$$
+    Find the corresponding probability density function (PDF).
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::{.notes}
+The PDF is the derivative of the CDF:
+$$f(x) = \frac{dF}{dx}(x) = e^{-x} - \frac{1}{2} e^{-x}+ \frac{1}{2} x e^{-x} = \frac{1}{2}(e^{-x} + x e^{-x}) \text{ for } x \geq 0.$$
+The PDF is 0 otherwise.
+:::
+
+
+<!-- ## Group Question 3
+:::{style="font-size: .8em"}
+
+::: -->
+
+
+
+

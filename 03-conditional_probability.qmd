@@ -27,14 +27,14 @@ Suppose a Facebook team develops a method to predict which users might be involv
 ## Flagged
 :::{style="font-size: .8em"}
 
-The team might generate a list of 100,000 users who are _twice as likely_ as average to be terrorists. So, if someone ends up being flagged by the Facebook algorithm, should we report them to the authorities? 
+The team might generate a list of 100,000 users who are _twice as likely_ as average to be terrorists. So, if someone ends up being flagged by the Facebook algorithm, should Facebook report them to the authorities? 
 
 This leads to two important questions:
 
 1. _What is the chance that a person is on Facebook’s list, given that they are not a terrorist?_
 2. _What is the probability that a person is not a terrorist, given that they are on Facebook’s list?_
 
-These questions sound similar, but they are not. One way to see the difference is by comparing their answers—and you will do just that at the end of this lecture.
+These questions sound similar, but they are not. One way to see the difference is by comparing their answers. You will do just that at the end of this lecture.
 :::
 
 <!-- ##  Big Data, Small Probabilities
@@ -382,7 +382,17 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p><l start="*">
-        
+        There are about 200 million Facebook users in the USA. About 100,000 of these users end up on Facebook's terrorist list. However, only 10 of them are actually involved in terrorism. Moreover, there 9,990 other Facebook users who are involved in terrorism but are not flagged by Facebook. <br>
+        a. What is the chance that a person is on Facebook’s list, given that they are not a terrorist?
+        <br>
+        <br>
+        <br>
+        <br>
+        b. What is the probability that a person is not a terrorist, given that they are on Facebook’s list?
+        <br>
+        <br>
+        <br>
+        <br>
         </p>
     </div>
     """
@@ -390,6 +400,12 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+:::
+
+:::{.notes}
+a. The chance that an innocent person is flagged as a potential terrorist is $\frac{100 000 - 10}{199 990 000} = \frac{99 990}{199 990 000} = 0.05\%.$
+
+b. The probability that a person is not a terrorist, given that they are on Facebook’s list is $\frac{99 990}{100 000}=99.99\%.$
 :::
 
 ## Group Question 2

@@ -1,0 +1,611 @@
+---
+title: Random Variables and Discrete Distributions
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Should You Play the Lottery?
+:::{style="font-size: .8em"}
+
+In 2005, a group of MIT students cracked the Massachusetts State Lottery.
+
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+
+:::
+
+They did not rely on luck. They relied on probability.
+By understanding how payouts shifted when jackpots "rolled down", they used random variables to turn a game of chance into a calculated win.
+<br>
+<br>
+
+Today, we will explore the concepts that made their success possible. The same concepts form the foundation of how we model uncertainty in data science.
+
+:::
+<!-- ## Why Random Variables?
+:::{style="font-size: .8em"}
+Statistics and data science are concerned with data. How do we link sample spaces, and events to data? The link is provided by the concept of a random variable.<br>
+<br>
+
+In the remaining part of the course, we will rarely mention sample spaces and work directly with random variables. However, you should keep in mind that the sample space is still there, lurking in the background.
+::: -->
+
+
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+* Definition of a random variable
+* Types of random variables
+    + Categorical
+    + Numerical: discrete and continuous
+* Probability mass function 
+* Cumulative distribution function of a discrete random variable
+* Expected value of a discrete random  variable
+* Variance of a discrete random  variable
+:::
+
+## Cash WinFall Game
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+:::
+:::
+::: {.column width="60%"}
+:::{style="font-size: .8em"}
+Main Rules of the Massachusetts State Lottery in 2005: 
+
+* Players chose 6 numbers from 1 to 46.
+* Ticket cost was \$2.
+* The jackpot was capped at \$2 million.
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+The roll down: 
+
+* If no one won the jackpot when it reached $2 million, the prize money was “rolled down” to lower-tier winners.
+* This meant that players who matched 5, 4, or even 3 numbers received much larger payouts than usual.
+:::
+
+## Cash WinFall Game
+:::{style="font-size: .8em"}
+
+Prize distribution on a normal day:
+
+| Match Type            | Probability            | Prize         |
+|-----------------------|------------------------|---------------|
+| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
+| Match 5 of 6          | 1 in 39,028            | \$4,000       |
+| Match 4 of 6          | 1 in 801               | \$150         |
+| Match 3 of 6          | 1 in 47                | \$5           |
+| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket)          |
+
+Questions:
+
+- How did return rates differ between normal days and roll-down days?
+- How did MIT students exploit the opportunity in Cash WinFall?
+
+
+:::
+
+:::{.notes}
+jackpot : 46 choose 6
+2nd : (6 choose 5)(40 choose 1)/(46 choose 6)
+:::
+## Random Variables 
+:::{style="font-size: .8em"}
+Statistics and data science are concerned with data. How do we link sample spaces, and events to data? The link is provided by the concept of a random variable. <br>
+<br>
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Random Variable</span>
+        <p>
+        A random variable is a function \(X: \Omega \to \mathbb{R}\) that assigns a real number to each outcome \(X(\omega)\) to each outcome \(\omega.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: Since the value of a random variable is determined by the outcome of an experiment, we assign probabilities to the possible values of the random variable.
+
+__Notation__: We use capital letters for random variables and lowercase for non-random quantities.
+
+
+
+:::
+
+## Random Variables 
+:::{style="font-size: .8em"}
+
+__Example__: When tossing dice, we are usually interested in the sum of the two dice, say 7, rather than the specific combinations that produce it, such as $(1, 6), (2, 5), (3, 4), (4, 3), (5, 2),$ or $(6, 1)$. <br>
+
+__Example__: When flipping a coin, we may be interested in the total number of heads that occur, for example 2, and not care about the actual head–tail sequence that results such as HTHT or HHTT.<br>
+<br>
+
+In the remaining part of the course, we will rarely mention sample spaces and work directly with random variables. However, you should keep in mind that the sample space is still there, lurking in the background.
+
+:::
+
+## Categorical Random Variables 
+:::{style="font-size: .8em"}
+We distinguish between _categorical_ and _numerical_ random variables.
+
+A __categorical random variable__ assigns outcomes to categories. Even though the categories are non-numeric, we can still treat categorical random variable as random variables by mapping each category to a real number.
+
+__Example__: 
+Consider a traffic light that may be red, green, or yellow. We can describe it as a categorical random variable, corresponding to what we see when we observe it at a random time.
+
+If we denote this random variable as $X$, we might find the following:
+
+| Color  | $P(X = \text{color})$ |
+|--------|-----------------------|
+| Red  (=1)  | 0.4                   |
+| Green (=2) | 0.4                   |
+| Yellow (=3)| 0.2                   |
+
+:::
+
+## Numerical Random Variables 
+:::{style="font-size: .8em"}
+A __numerical random variable__ takes on numbers as values.  
+
+We distinguish between discrete and continuous random variables. 
+
+- A __discrete random variable__ is a random variable that can take on
+only a finite or at most a countably infinite number of values. <br>
+__Example__: The number of points showing after a roll of a six-sided die can be 1, 2, 3, 4, 5, and 6.
+
+- A __continuous random variable__ is a random variable that can take on any value from a given range. That is, a continuous random variable has an uncountable set of possible outcomes.<br>
+__Example__: The lifetime of a light bulb can range from 0 to possibly thousands of hours. Any value in that range is a valid outcome.
+:::
+
+## Random Variables 
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+:::
+:::
+
+::: {.column width="58%"}
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Let us define \(X\) as a random variable associated with the returns of a Cash WinFall game. What type of random variable is \(X\)?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+:::
+
+:::{.notes}
+discrete
+:::
+
+
+## Probability Mass Function 
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Probability Mass Function</span>
+        <p>
+       For a discrete random variable \(X\), we define the probability mass function (PMF) \(p(a)\) of \(X\) by \(p(a) = P(X=a).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+If $X$ must assume one of the values $x_1, x_2,...,$ then
+\begin{align*}
+&p(x_i)  \geq 0 \:  \text{ for } i=1,2,... \\
+&p(x)  = 0 \: \text{ for all other values of } x.
+\end{align*}
+In addition, $\sum_{i=1}^{\infty} p(x_i) = 1.$
+
+__Example.__  Consider the roll of a single fair die.  The random variable here is the number of points showing. Since all outcomes are equally likely, we assign equal probabilities to each outcome in $\Omega = \{1, 2, 3, 4, 5, 6\}$: $p(x_i) = \frac{1}{6}.$
+
+:::
+
+## Probability Mass Function 
+:::{.center-text}
+```{python}
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=(10, 5.5))
+x = np.arange(1, 7)
+plt.plot(x, 6*[1/6.], 'bo', ms=8)
+plt.vlines(x, 0, 1/6., colors='b', lw=5, alpha=0.5)
+plt.xlim([0.5, 6.5])
+plt.ylim([0, 1.1])
+plt.xlabel(r'x (Number of points showing)', size=18)
+plt.ylabel(r'$P(X = x)$', size=18);
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+plt.tight_layout()
+plt.show()
+
+
+```
+:::
+
+## Probability Mass Function 
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+:::
+:::
+
+::: {.column width="65%"}
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Assume that the jackpot in Cash WinFall is \$1 million.
+        If \(X\) is a random variable associated with the returns of a Cash WinFall game. <br>
+        Find the PMF of \(X\).
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+:::
+
+:::{.notes}
+\begin{align*}
+p(0) &= P(X=0) = 1/6.8\\
+p(3) & = 1/47\\
+p(148) & = 1/800\\
+p(3998) & = 1/39000\\
+p(999998) & = 1/9300000\\
+p(-2) & = 1-(1/6.8+1/47+1/800+1/39000+1/9300000) \approx 0.83
+\end{align*}
+:::
+
+## Cumulative Distribution Function
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Cumulative Distribution Function Function</span>
+        <p>
+       The cumulative distribution function (CDF) \(F\) can be expressed in terms of \(p(a)\) by \(F(a) = P(X \leq a) = \sum_{x\leq a} p(x).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+If $X$ is a discrete random variable whose possible values are $x_1 , x_2 , x_3 ,...$, where $x_1 < x_2 < x_3 <...$, then the distribution function $F$ of $X$ is a step function. That is, the value of $F$ is constant in the intervals $[x_i−1,x_i)$ and then takes a step (or jump) of size $p(x_i)$ at $x_i$. 
+:::
+
+## Cumulative Distribution Function
+:::{style="font-size: .8em"}
+__Example__: The CDF of a fair six-sided die is shown below.
+:::
+
+:::{.center-text}
+```{python}
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=(9, 4.5))
+for i in range(7):
+    plt.plot([i, i+1-.08], [i/6, i/6],'-b')
+for i in range(1, 7):
+    plt.plot(i, i/6, 'ob')
+    plt.plot(i, (i-1)/6, 'ob', fillstyle = 'none')
+plt.xlim([0, 7])
+plt.ylim([-0.05, 1.1])
+plt.xlabel(r'$x$ (Number of points showing)', size=18)
+plt.ylabel(r'$P(X\leq x)$', size=18);
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+plt.tight_layout()
+plt.show()
+
+
+```
+:::
+
+## Cumulative Distribution Function
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+:::
+:::
+
+::: {.column width="65%"}
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Assume that the jackpot in Cash WinFall is \$1 million.
+        If \(X\) is a random variable associated with the returns of a Cash WinFall game. <br>
+        Find the CDF of \(X\).
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+:::
+
+:::{.notes}
+\begin{align*}
+F(X \leq -2) & = 1-(1/6.8+1/47+1/800+1/39000+1/9300000) \approx 0.83\\
+F(X \leq 0) &= 0.83+ 1/6.8 = 0.98\\
+F(X \leq 3) & = 0.98+1/47 = 0.998 \\
+F(X \leq 148) & = 0.998+1/800 \approx 0.99958\\
+F(X \leq 3998) & = 0.99958+1/39000 \approx 0.99961\\
+F(X \leq 999998) & = 1/9300000 = 1\\
+\end{align*}
+:::
+
+## Expected Value
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Expected Value (Expectation)</span>
+        <p>
+       If \(\small X\) is a discrete random variable with PMF \( \small p(x)\), then the expected value of \( \small X\) is given by 
+\( \small E[X] = \sum_{x=-\infty}^{+\infty} x \cdot  P(X=x) = \sum_{x=-\infty}^{+\infty} x \cdot p(x). \)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Notation__: $\small E[X], \mu$ or $\small \overline{X}.$<br>
+__Remark__: The expected value tells us what to expect from the average of many observations of the random variable, _not_ what to expect from a single observation.
+
+__Example__: If $X$ is the number of points after a single die roll. Then
+$$
+\small E[X] = \sum_{x=1}^{6} P(X=x) \cdot x = 1/6 \cdot (1 + 2 + 3 + 4 + 5 + 6) = 3.5.
+$$
+
+But 3.5 is a value that can _never occur_ for a roll of the die!
+:::
+
+## Variance
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Variance</span>
+        <p>
+       The variance of a random variable \(X\) is \(\mbox{Var} (X) = E[(X - \overline{X})^2].\) <br>
+        
+        Here, we use the notation \(\overline{X}\) to represent \(E[X].\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: Given a discrete random variable $X$ with $E[X] = \mu$ this would be:
+
+$$ \small \mbox{Var} (X) = \sum_{x=-\infty}^{+\infty} (x-\mu)^2\; P(X=x) = \sum_{x=-\infty}^{+\infty} (x-\mu)^2\; p(x). $$
+
+__Notation__: We frequently use the symbol $\sigma^2$ to denote variance.
+
+__Example__: The variance of the number of points after a single die roll is 
+$$ \small \mbox{Var} (X) = \sum_{x=1}^{6} (x-3.5)^2\; P(X=x)= 1/6\sum_{x=1}^{6} (x-3.5)^2\; = 35/12.$$
+
+:::
+
+## Cash WinFall Game
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/random variables/MA_lottery_logo.png" width=400/>
+:::
+:::
+::: {.column width="60%"}
+:::{style="font-size: .8em"}
+Question 1: _How did return rates differ between normal days and roll-down days?_
+<!-- - How did MIT students exploit the opportunity in Cash WinFall? -->
+:::
+:::
+:::
+
+:::{style="font-size: .8em"}
+- Expected value of returns in \$ on a normal day with a jackpot of \$1 million:
+
+\begin{align*}  
+    E[X] &= (10^6 - 2) \cdot 1/9366819 + 3998 \cdot 1/39028 +\\
+    &+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2*0.83 = -1.2
+\end{align*} 
+:::
+
+## Cash WinFall Game
+:::{style="font-size: .8em"}
+Prize distribution on February 7, 2005, a roll-down day:
+
+| Match Type            | Probability            | Prize         |
+|-----------------------|------------------------|---------------|
+| Match 5 of 6          | 1 in 39,028            | \$50,000          |
+| Match 4 of 6          | 1 in 801               | \$2,385           |
+| Match 3 of 6          | 1 in 47                | \$60              |
+| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) |
+
+- Expected value of returns in \$ on February 7, 2005:
+
+$$ \small E[X] = (5 \cdot 10^4 - 2) \cdot 1/39028 + 2383 \cdot 1/801 + 58 \cdot 1/47 - 2*0.83 = 3.8$$
+:::
+
+## Cash WinFall Game
+:::{style="font-size: .8em"}
+Question 2: _How did MIT students exploit the opportunity in Cash WinFall?_
+
+As we said earlier, the expected value tells us what to expect from the average of many observations of the random variable, not what to expect from a single observation. 
+
+Keeping this in mind, MIT students, purchased thousands of Cash WinFall tickets for the game on February 7, 2005.
+:::
+
+## Group Question 1
+
+```{python}
+
+import numpy as np
+```
+
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Outcomes
+outcomes = np.array([1, 2, 3, 4, 5, 6])
+
+# Probabilities
+probabilities = np.array([1/6, 1/6, 1/6, 1/6, 1/6, 1/6])
+
+# Expected Value
+mean = np.sum(outcomes * probabilities)
+print("Expected value: ", mean)
+
+# Variance
+variance = np.sum((outcomes-mean)**2 * probabilities)
+print("Variance: ",variance)
+```
+:::
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        The above code computes the expectation and variance of a fair 6-sided die. Propose a modification to the die such that the expected value remains 3.5, but the variance changes.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    An experiment consists of throwing a fair coin four times. Let \(X\) be a random variable that represents the number of heads following the first tail. <br>
+    a. Find the PMF of \(X\). <br>
+    <br>
+    <br>
+    b. Find the expectated value of \(X\). <br>
+    <br>
+    <br>
+    Extra: c. Find the variance of \(X\).   <br>
+    <br>
+    <br>
+
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Fall 24 HW1
+:::
+
+
+

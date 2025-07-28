@@ -13,7 +13,48 @@ format:
         chalkboard: true 
 ---
 
-## Why Probability?
+
+## Slime Mold's Decisions
+:::{.center-text}
+<img src="images/axioms of probability/mold_oats.png" width=300/>
+:::
+
+:::{style="font-size: .8em"}
+- No brain, no nervous system
+- Loves oats, avoids light
+- Makes decisions like a human or a democratic nation
+:::
+
+## Slime Mold's Decisions
+:::{style="font-size: .8em"}
+Three options:<br>
+$A$: 3 g of oats in the dark<br>
+$B$: 5 g of oats in the light<br>
+$C$: 1 g of oats in the dark<br>
+<br>
+__When only $A$ and $B$ are available__: <br>
+The mold chooses each about half the time.<br>
+<br>
+__When all three options are available__: <br> 
+The mold almost never chooses $C$. 
+<span style="color:rgb(1, 180, 180);">How often does it choose $A$?</span>
+<br>
+<br>
+To make sense of choices under uncertainty, from slime molds to humans, we turn to probability theory.
+
+:::
+
+:::{.notes}
+The mold will choose $A$ about 75\% of the time. 
+
+This illustrates how:
+
+- A seemingly irrelevant third option can shift preferences (violating independence of irrelevant alternatives)
+- The same logic applies to elections—and even dating strategy:
+Bring a friend who’s just slightly less appealing than you. :::
+:::
+
+<!-- ## Why Probability?
 :::{style="font-size: .8em"}
 The core question of probability theory is: <br>
 <br>
@@ -27,7 +68,7 @@ _"Given a data generating process, what are the properties of its outcomes?"_ <b
 
 :::{.center-text}
 <img src="images/axioms of probability/probability_inference.png" width=800/>
-:::
+::: -->
 
 
 ## Learning Objectives
