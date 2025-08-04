@@ -57,7 +57,7 @@ For example, they are interested in the probability of the plants being damaged 
 :::{style="font-size: .8em"}
 Verdant Roots composed a dataset for their study. It contains  
 
-* 3 columns: 'Calamity', 'Years occured', 'Damage probability'; 
+* 3 columns: 'Calamity', 'Years occurred', 'Damage probability'; 
 * 11 types of common calamities, including an option for no calamities.
 :::
 
@@ -289,7 +289,7 @@ Then $\Omega = \{ccc, ccs, csc, css, scc, ssc, scs, sss\}$ is the sample space f
 
 ::: {.column width="70%"}
 :::{style="font-size: .8em"}
-Let us define an experiment as a calamity occuring at Verdant Roots tree nursery in a certain year.
+Let us define an experiment as a calamity occurring at Verdant Roots tree nursery in a certain year.
 
 ```{python}
 from IPython.core.display import HTML
@@ -336,7 +336,7 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-What would happen if we define the experiment as a sequence of calamities occuring in 3 years?
+What would happen if we define the experiment as a sequence of calamities occurring in 3 years?
 :::
 
 
@@ -617,7 +617,7 @@ c: Complement
 :::
 ::: {.column width="70%"}
 :::{style="font-size: .8em"}
-Let us again define an experiment as a calamity occuring at the tree nursery in a certain year.
+Let us again define an experiment as a calamity occurring at the tree nursery in a certain year.
 
 ```{python}
 from IPython.core.display import HTML

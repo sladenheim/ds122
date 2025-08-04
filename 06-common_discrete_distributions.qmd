@@ -33,7 +33,7 @@ Common discrete distributions help us answer questions like:
 - Binomial distribution
 - Geometric distribution
 - Poisson distribution
-- Discrete uniform distribution
+- Uniform distribution
 
 :::
 
@@ -221,10 +221,20 @@ __Remark__: The mean of the geometric distribution is equal to $\frac{1}{p}$ and
 
 ## Geometric Distribution
 :::{style="font-size: .8em"}
-__Example__: A basketball player has a 30% chance of making a free throw. What is the probability that he makes his first successful shot on the 4th attempt?<br>
-Let $X$ represent the trial number on which the first success occurs. Then 
+__Example__: A basketball player has a 30% chance of making a free throw. <br>
+a. What is the probability that he makes his first successful shot on the 4th attempt?<br>
+b. What is the expected number of attempts until he makes his first successful free throw?<br>
+
+a. Let $X$ represent the trial number on which the first success occurs. Then 
 $$P(X = 4) = 0.3(1-0.3)^{4-1} = 0.1029.$$
+
+b. We also know that for a geometrically distributed random variable $E[X] = \frac{1}{p}.$ Hence,
+
+$$E[X] = \frac{1}{0.3} \approx 3.33.$$
 :::
+
+## Geometric Distribution
+:::{style="font-size: .8em"}
 
 ```{python}
 #| echo: true
@@ -236,7 +246,14 @@ p = 0.3  # probability of success
 # Compute the probability
 probability = geom.pmf(4, p)
 print(f"The probability of the first successful shot on the 4th attempt is {probability:.4f}")
+
+# Calculate the expected value
+expected_value = 1 / p
+
+print(f"The expected number of trials until the first success is: {expected_value:.2f}")
+
 ```
+:::
 
 ## Geometric Distribution
 :::{.center-text}
@@ -349,7 +366,7 @@ plt.ylabel(r'$P[X = k]$', size=18);
 ```
 :::
 
-## Discrete Uniform Distribution
+## Uniform Distribution
 :::{style="font-size: .8em"}
 The uniform distribution models the case in which all outcomes are equally probable. This distribution can be a discrete or continuous. We will introduce the continuous version of the uniform distribution in the next lecture.
 
@@ -372,7 +389,7 @@ plt.ylabel(r'$P[X = x]$', size=18);
 ```
 :::
 
-## Discrete Uniform Distribution
+## Uniform Distribution
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
@@ -380,7 +397,7 @@ from IPython.core.display import HTML
 def generate_html():
     return r"""
     <div class="purple-box">
-     <span class="label"> Discrete Uniform Distribution</span>
+     <span class="label"> (Discrete) Uniform Distribution</span>
         <p>
        A random variable is said to be uniformly distributed on interval \([a,b]\), if it has the PMF equal to 
 
@@ -391,7 +408,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-
+__Remark__: $a$ and $b$ are the parameters of the uniform distribution.
 __Remark__: The expected value of a discrete uniform distribution is equal to $\frac{a+b}{2}$ and its variance is given by $\frac{n^2 - 1}{12}.$
 :::
 

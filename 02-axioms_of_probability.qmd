@@ -127,7 +127,7 @@ Assumptions:
 :::{style="font-size: .8em"}
 Questions:
 
-- What is the probability of occurance of each of the calamities based on the historical data?
+- What is the probability of occurrence of each of the calamities based on the historical data?
 - What is the total probability of plants being damaged in a given year?
 - Which of the following actions should be prioritized by the tree nursery? 
     - Improving the maintenance of the pipes in the supply system.
@@ -215,10 +215,10 @@ data = pd.read_csv('data/tree_nursery.csv')
 df = data.copy()
 
 # Find the total number of years in the historical data
-total_years = sum(df['Years occured'])
+total_years = sum(df['Years occurred'])
 
 # Create a new column containing the desired probabilities
-df['Event probability'] = df['Years occured'] / total_years
+df['Event probability'] = df['Years occurred'] / total_years
 
 # Print the first three probabilities
 print(df[['Calamity', 'Event probability']].head(3))
@@ -288,8 +288,8 @@ We will next verify Axiom 3 and then use it to confirm Axiom 2.
 
 # Compute and compare the probability of the union of two 
 # events and the sum of two event probabilities
-y1 = df.loc[5, 'Years occured']
-y2 = df.loc[7, 'Years occured']
+y1 = df.loc[5, 'Years occurred']
+y2 = df.loc[7, 'Years occurred']
 p1 = df.loc[5, 'Event probability']
 p2 = df.loc[7, 'Event probability']
 

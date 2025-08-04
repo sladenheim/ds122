@@ -75,10 +75,10 @@ data = pd.read_csv('data/tree_nursery.csv')
 df = data.copy()
 
 # Find the total number of years in the historical data
-total_years = sum(df['Years occured'])
+total_years = sum(df['Years occurred'])
 
 # Create a new column containing the desired probabilities
-df['Event probability'] = df['Years occured'] / total_years
+df['Event probability'] = df['Years occurred'] / total_years
 
 # Print the first three probabilities
 print(df[['Calamity', 'Event probability', 'Damage probability']].head(11))
@@ -114,7 +114,7 @@ Questions:
 
 ## Conditional Probability
 :::{style="font-size: .8em"}
-Assuming that $P(B) > 0$, we define the conditional probability of $A$ given that $B$ has occured (i.e., given that $B$ is true) as follows.
+Assuming that $P(B) > 0$, we define the conditional probability of $A$ given that $B$ has occurred (i.e., given that $B$ is true) as follows.
 ```{python}
 from IPython.core.display import HTML
 
