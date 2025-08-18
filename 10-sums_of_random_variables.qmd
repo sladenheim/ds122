@@ -1,0 +1,429 @@
+---
+title: From Sums of Random Variables to the Central Limit Theorem
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Brain Cancer
+:::{style="font-size: .8em"}
+_Which parts of the USA have the biggest brain cancer problem?_
+
+
+- Most deaths: California, Texas, New York, Florida. 
+
+- Highest rates per 100,000 people: Nebraska, Alaska, Delaware, Maine.<br>
+Lowest rates: Wyoming, Vermont, North Dakota, Hawaii, D.C.
+
+_What can we conclude?_
+
+- Rates per capita are more meaningful: States like California and Texas have the most brain cancer deaths simply because they have the largest populations.
+- Small states dominate both extremes in terms of rates.
+
+
+One of today's topics, the _Law of Large Numbers_, explains why small populations show more fluctuation.
+
+
+:::
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+* Law of the Unconscious Statistician
+* Linearity of Expectation
+* Additional properties of variance and covariance:
+    - New expression for variance and covariance
+    - Variance of a linear function of a random variable
+    - Variance of a sum
+* The Weak Law of Large Numbers
+* An Introduction to the Central Limit Theorem 
+
+:::
+
+## Classifying Songs
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="70%"}
+A data science student Anush is building a machine learning model to classify music genres from audio files. He has a playlist of 500 songs, each with a variable processing time. The processing times are independent and follow a common distribution with:
+
+- Mean: 3 minutes
+- Standard deviation: 0.5 minutes
+:::
+
+::: {.column width="30%"}
+:::{.center-text}
+<img src="images/sums of random variables/Anush.jpeg" width=300/>
+:::
+:::
+:::
+
+__Question__: What distribution can be used to approximate the amount of time that Anush needs to process the first 45 songs?
+<!-- Anush has 100 minutes available before class starts. 
+
+__Question__: Approximate the probability that Anush will be able to process at least 45 songs before class. -->
+
+:::
+
+
+## LOTUS
+:::{style="font-size: .8em"}
+To study a function $g(X)$ of a random variable $X$, we use the _Law of the Unconscious Statistician (LOTUS)_. 
+Examples of $g(x)$ include $X^2, e^X$, or $\log X.$  
+
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Law of the Unconscious Statistician (LOTUS) </span>
+        <p>
+    For a discrete random variable \( X \) and a function \( g(x) \) defined for all values that \( X \) can take,
+     \[
+    \small{E[g(X)] = \sum_x g(x) \cdot P(X = x).}
+     \]
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: The same principle extends to continuous random variables using integration.
+
+__Example__: $$\small{E[X^2] = \sum_x x^2 p(x) \quad \text{ and } \quad E[e^X] = \sum_x e^x p(x).}$$
+:::
+
+## LOTUS 
+:::{style="font-size: .8em"}
+Let us use LOTUS to find $E[X+b]$ where $b$ is a number.
+
+$$\small{\begin{align*}
+E[X+b] &= \sum_x (x + b) p(x) & \text{(LOTUS)} \\
+&= \sum_x x p(x) + \sum_x b p(x) & \text{(break $(x + b) p(x)$ into $xp(x) + bp(x)$)} \\
+&= \sum_x x p(x) + b\sum_x p(x) & \text{(factor constant outside the sum)} \\
+&= E[X] + b & \text{(definitions of expected value, p.m.f.)}
+\end{align*}}$$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    What is \(E[aX]\) where \(a\) is a number?
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Linearity of Expectation
+
+:::{style="font-size: .75em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Linearity of Expectation (LOE) </span>
+        <p>
+    Let \(\small{X}\) and \(\small{Y}\) be discrete random variables. Then 
+
+    $$\begin{equation}
+    \small{E[X+Y] = E[X] + E[Y].}
+    \end{equation}
+    $$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Proof__: Suppose that the joint distribution of $\small{X}$ and $\small{Y}$ is $\small{p(x, y)}$. Then 
+$$\small{
+\begin{align*}
+E[X + Y] &= \sum_x \sum_y (x + y) p(x, y) \: \quad \qquad \qquad \qquad \text{(LOTUS)} \\
+ &= \sum_x \sum_y x p(x, y) + \sum_x \sum_y y p(x, y) \qquad \text{(distribute $p(x, y)$ over the sum)} \\
+&= \sum_x x \sum_y p(x, y) + \sum_y y \sum_x p(x, y) \: \: \quad \text{(move term outside the inner sum)} \\
+&= \sum_x x p_X(x) + \sum_y y p_Y(y) \qquad \qquad \quad \text{(definition of marginal distribution)} \\
+&= E[X] + E[Y]. \qquad \qquad \qquad \qquad \qquad\text{(definition of expected value)}
+\end{align*}}
+$$
+:::
+
+## Linearity of Expectation
+
+:::{style="font-size: .8em"}
+__Remark__: Suppose we have $n$ random variables with the same distribution. Then 
+
+$$ E\left[\sum_i X_i\right] = n E[X_1] $$
+
+That is, if you have $n$ random variables, and each has mean $\mu$, then the mean of the sum is $n\mu$.
+:::
+
+## Linearity of Expectation
+
+:::{style="font-size: .8em"}
+__Example__: Suppose two people are playing Roulette. They each first bet on red three times in a row.  Note that in Roulette, 18 of the 38 numbers are red. The first player leaves, but the second player bets two more times on red. How many more times is player 2 expected to win than player one?
+
+Note that the number of times player 2 wins is not independent from the number of times player 1 wins, because every time player 1 wins, player 2 also wins.
+
+:::{.center-text}
+<img src="images/sums of random variables/roulette.png" width=300/>
+:::
+
+:::
+
+## Linearity of Expectation
+
+:::{style="font-size: .8em"}
+__Example (continued)__:
+Let $X$ be the number of times player one wins and $Y$ be the number of times player 2 wins, we want to calculate $E[Y-X].$ 
+
+$X$ is Binomial with $n=3$ and $p=18/38.$ Similarly, $Y$ is Binomial with $n=5$ and $p=18/38.$
+
+Then 
+
+$$\small{E[Y−X]=E[Y]+E[−1⋅X]=E[Y]+(−1)E[X]=E[Y]−E[X].}$$
+
+We just saw in an earlier lecture that the expect value of a Binomail is $np$ so putting it all together: 
+
+$$\small{E[Y−X]=E[Y]−E[X]=5*18/38−3*18/38=2*18/38 = 18/19.}$$
+
+<span style="color:rgb(1, 180, 180);">Is it possible to solve this problem in a different way?</span>
+:::
+
+## Covariance
+
+:::{style="font-size: .8em"}
+Using linearity of expectation we can prove some useful equations for calculating variance and covariance.
+
+$$ 
+\begin{align*} 
+\operatorname{Cov}(X, Y) & = E[(X−E[X])(Y−E[Y])] \: \: \qquad \qquad \qquad \qquad  \text{(definition)}\\
+& \\
+ & = E[XY−XE[Y]−E[X]Y+E[X]E[Y]] \qquad \quad \text{(expansion)}\\
+ & \\
+ & = E[XY]−E[XE[Y]]−E[E[X]Y]+ E[E[X]E[Y]]  \quad  \: \text{(LOE)} \\
+  & \\
+ & = E[XY]−E[X]E[Y]−E[X]E[Y]+E[X]E[Y] \: \: \: \: \: \: \text{(LOTUS)}\\
+  & \\
+ & = E[XY]−E[X]E[Y].
+\end{align*} 
+$$
+
+:::
+
+## Variance and Covariance
+
+:::{style="font-size: .8em"}
+From $\operatorname{Cov}(X, Y) = E[XY]−E[X]E[Y]$ and $\operatorname{Cov}(X, X) = \operatorname{Var}(X),$ it follows that $$ \small{\operatorname{Var}(X) = E[X^2] - E[X]^2.} $$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Properties of Variance and Covariance </span>
+        <p>
+       $$\small{\operatorname{Cov}(X, Y) = E[XY]−E[X]E[Y],}$$
+       $$\small{\operatorname{Var}(X) = E[X^2] - E[X]^2,}$$
+       $$\small{\operatorname{Var}(aX+b) = a^2\operatorname{Var}(X), \text{ where } a \text{ and } b \text{ are numbers},}$$
+       $$\small{\operatorname{Var}(X+Y) = \operatorname{Var}(X) + \operatorname{Var}(Y) + 2 \operatorname{Cov}(X, Y).}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: We will prove the last property as a group exercise.
+:::
+
+## Weak Law of Large Numbers
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Weak Law of Large Numbers </span>
+        <p>
+        Let \(\small{X_1,X_2,...,X_i, ...}\) be a sequence of independent random variables with \(\small{E[X_i] = \mu}\) and \(\operatorname{Var}(X_i) = \sigma^2.\) Let \(\overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i.\) Then, for any \(\varepsilon >0,\)
+
+    $$\small{P(|\overline{X}_n - \mu| \geq \varepsilon) \to 0 \quad \text{ as } n \to \infty.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- __Example__: It is commonly believed that if a fair coin is tossed many times and the proportion of heads is calculated, that proportion will be close to $\frac{1}{2}$.   -->
+
+__Example__: It is commonly believed that if a fair coin is tossed many times and the proportion of heads is calculated, that proportion will be close to 50%. 
+
+ Imagine we are repeatedly flipping a certain number of coins at time and keep track of the number of head counts. The results can look as follows.
+:::
+
+## Weak Law of Large Numbers
+:::{style="font-size: .8em"}
+
+__Example (continued)__: <br>
+- **10 coins** per trial:  
+  `4, 4, 5, 6, 5, 4, 3, 3, 4, 5, 5, 9, 3, 5, 7, 4, 5, 7, 7, 9`  
+  → Wide variability (30%–90% heads)
+
+- **100 coins** per trial:  
+  `46, 54, 48, 45, 52, 49, 47, 58, 40, 57, 46, 45, 51, 52...`  
+  → Narrower range (40%–60%)
+
+- **1000 coins** per trial:  
+  `486, 501, 489, 472, 537, 474, 508, 510, 478, 508, 493,...`  
+  → Tight clustering near 500 heads (47.2%–53.7%)
+
+
+As the number of coins per trial increases, the proportion of heads converges toward 50%.  
+
+
+:::
+
+## Central Limit Theorem
+:::{style="font-size: .8em"}
+
+
+The Weak Law of Large Numbers tells us that the average of many random values tends to get close to the true mean.
+
+The Central Limit Theorem (CLT) goes further: it describes how the average fluctuates around the mean.
+
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Central Limit Theorem (CLT) </span>
+        <p>
+        Let \(X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\mu\) and variance \(\sigma^2.\) Let \(S_n = \sum_{i=1}^n X_i.\) Then 
+
+    $$\frac{S_n - n\mu}{\sigma\sqrt{n}}$$
+
+    tends to the standard normal distribution as \(n \to \infty.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Classifying Songs
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="70%"}
+Let $X_i$ be the time that it takes to process song $i$, then 
+
+$$\small{S_{45} = \sum_{i=1}^{45} X_i}$$
+
+is the time it takes to classify the first 45 exams. 
+:::
+
+::: {.column width="30%"}
+:::{.center-text}
+<img src="images/sums of random variables/Anush.jpeg" width=300/>
+:::
+:::
+:::
+
+From CLT it follows that $S_{45}$ is approximately normally distributed with 
+$$\small{E[S_{45}] = E\left[\sum_{i=1}^{45} X_i \right] = 45\cdot 3 = 135,}$$
+
+$$\small{\text{Var}[S_{45}] = \text{Var}\left(\sum_{i=1}^{45} X_i \right) = 45\cdot 0.5^2 = 11.25.}$$
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Use \(\small{\operatorname{Var}(X) = E[X^2] - E[X]^2}\) to show that \(\small{\operatorname{Var}(X+Y) = \operatorname{Var}(X) + \operatorname{Var}(Y) + 2 \operatorname{Cov}(X, Y).}\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    You roll a 4-sided die and a 6-sided die.  <br>
+    a. What is the expected value of the sum of two die rolls?
+    <br>
+    <br>
+    <br>
+    <br> 
+    b. What is the variance of the sum of the two die rolls?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Q5 HW 3 Fall 25
+:::

@@ -1,0 +1,134 @@
+---
+title: Introduction
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Logistics
+:::{style="font-size: .8em"}
+
+Lectures: 595 Commonwealth Ave HAR 105, MWF 1:25 PM -- 2:15 PM
+
+Discussions: 665 Comm Ave CDS 164
+
+ - A2: M 9:05 AM -- 9:55 AM
+ - A3: M 10:10 AM -- 11:10 AM
+ - A4: M 11:15 AM -- 12:05 PM
+ - A5: M 12:20 AM -- 1:10 PM
+
+_Teaching Staff_
+
+ - Instructors: Prof. Lisa Wobbes and Prof. Lauren Wheelock <br>
+ - TFs: Freddy Reiber and Taishan Chen <br>
+ - CAs: Carol Kong, Jabir Ahmed, and Karl Boma
+
+:::
+
+## Getting Set Up
+:::{style="font-size: .8em"}
+
+_Programming environment_ 
+
+ - __Python__ 
+
+_Platforms_
+
+- __Piazza__: https://piazza.com/demo_login?nid=mef2pij5gjt4p3&auth=f25aab6 <br>
+Check it weekly!
+- __Gradescope__: https://www.gradescope.com<br>
+Entry code: NGNY6P
+
+:::
+
+## Course Grade
+:::{style="font-size: .8em"}
+_Computation_
+
+- 10% Participation
+- 15% Homework assignments
+- 25% Midterm 1
+- 15% Midterm 2 
+- 35% Final exam
+
+_Participation_
+
+- Discussion Labs (5%): attend at least 11 out of 14
+- In-class participation (4%): participate at least  every three weeks 
+- Homework 0 (1%)
+:::
+
+## Course Grade
+:::{style="font-size: .8em"}
+_Homework_
+
+- 8 homework assignments
+- Pen-and-paper mathematical questions and coding questions
+- Due at 11:59 pm on a Wednesday
+- Submisions via Gradescope
+- Questions during discussions and office hours are allowed and encouraged
+- Bonus quizzes during discussions
+- Clarity and correctness matter
+- No late submissions, no assignments are dropped
+
+
+:::
+
+## Course Grade
+:::{style="font-size: .8em"}
+_Exams_
+
+All exams are cumulative, with emphasis on material covered since the previous exam. Content may include lectures, discussion labs, homework, and potentially required readings.
+
+- Midterm 1: __October 15, 1:25 PM, HAR 105__ <br>
+In-calss exam
+- Midterm 2: __November 19, 1:25 PM, HAR 105__ <br>
+Take-home exam. You must submit a hard copy. Late or digital submissions will not be accepted!
+- Final exam: __December 15-19__
+In-person exam
+:::
+
+## Policies
+:::{style="font-size: .8em"}
+_Regrade requests_
+
+- Up to one week after the grade is posted 
+- Submition via Gradescope 
+
+_Collaboration Policy_
+
+- No copying (or allowing to copy)
+- No searching for answers
+- Disclose collaboration and sources
+
+_Learning Environment_
+
+- Inclusive environment for individuals of all genders, races, cultures, abilities, and sexual orientations
+
+
+:::
+
+## General Information
+:::{style="font-size: .8em"}
+
+_Office Hours_
+
+- Schedule is on Piazza under Resources/Staff 
+- Any changes will be announced on Piazza.
+
+_Reasonable Accommodations_
+
+- Office for Disability Services (ODS) 
+- Report to the instructors in the first two weeks of the semester!
+
+__More details can be found in the syllabus.__
+
+:::

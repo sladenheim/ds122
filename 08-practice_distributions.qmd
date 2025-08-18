@@ -1,0 +1,24 @@
+---
+title: Distributions  
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Practice general discrete distributions
+- Practice general continuous distributions
+- Practice common discrete distributions
+- Practice common continuous distributions
+
+:::
