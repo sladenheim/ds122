@@ -1,0 +1,301 @@
+---
+title: HMM Example
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Practice setting up an HMM model
+- Practice the Vierbi algorithm:
+    1. Initialization
+    2. Forward pass
+    3. Backward pass
+
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="30%"}
+:::{.center-text}
+<img src="images/hmm/baby_monitor.png" width=400/>
+:::
+:::
+
+::: {.column width="70%"}
+Baby monitors allow new parents to combine caretaking of their baby with other activities, while the baby is napping. Many parents evaluate whether the baby is awake or asleep based on how much noise she makes over a certain period of time, say 2 minutes. 
+:::
+
+For this exercise we assume three possible levels of noise:
+
+- 0 - quiet;
+- 1 - little noise;
+- 2 - much noise. 
+
+:::
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+The table below gives the probabilities of different noise levels for when the baby is awake and when she is asleep.
+
+| state $\backslash$ noise level | 0 | 1 |2 |
+| ---| --- |  --- |  --- | 
+|__Awake__  | 0.5  | 0.3 | 0.2  | 
+|__Asleep__ | 0.85 | 0.1 | 0.05 |
+
+Moreover, we assume that if the baby was asleep in the last 2 minutes, she will remain asleep with probability 80%. Whereas if she was awake in the last 2 minutes, she will remain awake with probability 60%. Finally, we assume that when the parents start monitoring the baby, the probability of her being asleep is 70%. Find the states of the baby in the last 6 minutes if first there was much noise, then little noise, and then it was quiet.
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/hmm/HMM_baby_monitor.svg" width=900/>
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Define \(A, B, \pi, \) and \(O.\)<br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Perform the initialization stage of the Viterbi algorithm.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Perform the forward pass of the Viterbi algorithm.
+        <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Baby-Noise Problem
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Perform the backward pass of the Viterbi algorithm.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+Recall a problem we solved in the first HMM lecture.
+
+A veterinarian is monitoring a dog’s health state by asking the dog owner about its activity levels over the last 3 days. 
+
+The veterinarian assumes three possible activity levels:<br>
+
+-1: quiet,<br>
+0: usual,<br>
+1: restless.<br> 
+
+The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
+
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+
+
+ We assume that if the dog is sick on day $n$, it will remain sick on day $n+1$ with probability 70%. Whereas if it was healthy on day $n$, it will remain healthy on day $n+1$ with probability 90%. Finally, we assume that a dog is healthy 90% of the time. 
+:::
+:::
+
+We found previously that the model can be described as
+$$\small{A = \begin{bmatrix} 0.9 & 0.3\\ 0.1 & 0.7 \end{bmatrix}, B = \begin{bmatrix} 0.2 & 0.6 \\ 0.6 & 0.3\\ 0.2 & 0.1 \end{bmatrix}, \pi = \begin{bmatrix}0.9 \\ 0.1 \end{bmatrix}.}$$
+
+We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet.
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+a. Define the observed sequence, \(O\).
+<br>
+<br>
+<br>
+b. Perform the initialization stage of the Viterbi algorithm.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+c. Perform the forward pass of the Viterbi algorithm.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+d. Perform the backward pass of the Viterbi algorithm.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::

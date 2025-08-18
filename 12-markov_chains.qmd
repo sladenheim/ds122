@@ -1,0 +1,533 @@
+---
+title: Markov Chains
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+
+- Imagine someone randomly clicking links on the internet, hopping from one page to another without a specific plan.
+
+- Pages with more incoming links get visited more often. Each link acts like a vote for the page’s importance.
+
+- Google models this behavior using a Markov chain, which tracks the chances of landing on each page after many random clicks.
+
+:::{.columns}
+::: {.column width="30%"}
+
+:::{.center-text}
+<img src="images/markov/pagerank.png" width=500/>
+:::
+
+:::
+::: {.column width="70%"}
+
+- Behind the scenes, this is represented by a massive matrix of probabilities that includes the chances of moving from one page to another for billions of web pages.
+
+- The result? Pages that are more likely to be visited in this random walk are ranked higher.
+
+:::
+
+
+
+<!-- Markov chains are the mathematical foundation of Google's PageRank, the algorithm that revolutionized web search.
+
+Google creates rankings by a walk that follows web links. A link to a page is like a vote for its importance.
+
+The Markov matrix has more than 3 billion rows and columns. -->
+:::
+:::
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- States of a Markov chain
+- Markov property 
+- Definition of a Markov chain
+- (n-step) transition matrices
+- Distribution vectors
+- Forward Kolomogorov equation
+
+
+:::
+
+## Vote Prediction
+:::{style="font-size: .8em"}
+Suppose you live in a country with three political parties $P$, $Q$, and $R$.
+ We use $P_k$, $Q_k$, and $R_k$ to denote the percentage of voters voting for that party in election $k$.
+
+
+:::{.center-text}
+<img src="images/markov/vote_prediction.png" width=300/>
+:::
+
+Voters will change parties from one election to the next as shown in the figure. 
+
+Suppose that initially 40% of citizens vote for party $P$,
+ 30% vote for party $Q$, and 30% vote for party $R.$
+
+
+__Question__: Predict the vote distribution in the next two elections.
+
+
+:::
+
+## Weather in Boston
+:::{style="font-size: .8em"}
+Consider this simple weather model for Boston: 
+
+- If today is sunny, tomorrow will be sunny with probability 0.8, otherwise rainy.
+- If today is rainy, tomorrow will be rainy with probability 0.6, otherwise sunny.
+
+:::{.center-text}
+<img src="images/markov/Sunny_Rainy2.png" width=500/>
+:::
+
+The above _state-transition diagram_ describes an example of a Markov chain.
+<!-- Markov chains help us reason about what might happen many days in the future for all possible starting conditions.  -->
+:::
+
+## States of a Markov Chain
+:::{style="font-size: .8em"}
+A Markov chain is a mathematical model describing a system that evolves over discrete time steps on a set of states $S$. 
+
+At each step, the system occupies a specific state, which can represent any discrete category—such as a location, color, count, or parameter value. 
+
+__Example__: In the weather model, the possible states are _Sunny_ and _Rainy_, $S = \{\text{Sunny}, \text{Rainy}\}.$
+
+The basic idea of a Markov chain is that it moves from state to state __probabilistically.__  In any state, there are certain probabilities of moving to each of the other states. 
+
+__Notation__: We will denote the state that the Markov chain is in at time $n$ as $X_n$.  Since the Markov chain evolves probabilistically, $X_n$ is a random variable.
+
+<!-- :::{.center-text}
+<img src="images/markov/mc_sequence.png" width=500/>
+::: -->
+:::
+
+## Markov Property
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/markov/mc_sequence.png" width=500/>
+:::
+
+ _Markov property:_ Each time a Markov chain moves from the current state to the new state, the probability of that transition __only depends on the current state.__  Whatever states the chain was in previously do not matter.  
+
+ The Markov property is required to define a Markov chain. 
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Markov Chain </span>
+        <p>
+    Given a finite set of states \(S \), a process \(X_0, X_1, \dots\) is a Markov chain on \(S\) if, when the process is in state \(j\), the probability that its next  state is \(i\) depends only on \(j\):
+
+    $$\small{P(X_{n+1} = i \,\vert\, X_{n} = j, X_{n-1} = x_{n-1}, \dots, X_0 = x_0) =  P(X_{n+1} = i \,\vert\, X_{n} = j).}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Transition Matrix
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Transition Matrix </span>
+        <p>
+    The transition matrix of the Markov chain is the matrix \(P\) with \(P_{ij}  = P(X_{n+1} = i \,\vert\, X_{n} = j).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: $P_{ij}$ is the _transition probability_ from state $j$ to state $i$.<br>
+
+$P$ has the following properties:
+
+1. $P_{ij} \geq 0 \quad \forall i, j$
+2. $\sum_i P_{ij} = 1 \quad \forall j$
+
+The second property states that each column of $P$ sums to 1.  A matrix with this property is called a _stochastic_ matrix (or more specifically, a column-stochastic matrix).
+:::
+
+## Transition Matrix
+:::{style="font-size: .8em"}
+
+__Example__: 
+
+:::{.center-text}
+<img src="images/markov/Sunny_Rainy2.png" width=500/>
+:::
+
+
+We can see that if at time $t=0$ the chain is in the "sunny" state, at time $t=1$ it will either be in a "sunny" state (with probability 0.8) or "rainy" state (with probability 0.2).
+
+This chain has transition matrix:
+
+$$\small{P = 
+\begin{bmatrix}
+.8 & .4 \\
+.2 & .6 \\
+\end{bmatrix}.}
+$$
+
+We can confirm that this is a stochastic matrix by observing that the columns sum to 1.
+:::
+
+## Transition Matrix
+:::{style="font-size: .8em"}
+
+__Example__: 
+
+:::{.columns}
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/markov/mc-example.png" width=500/>
+:::
+
+::: 
+
+::: {.column width="50%"}
+
+The illustrated Markov chain with states $\{0, 1, 2, 3\}$ has transition matrix:
+
+$$\small{P = 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+0.7 & 0 & 1 & 0 \\
+0.3 & 0.6 & 0 & 0 \\
+0 & 0.4 & 0 & 1 
+\end{bmatrix}.}
+$$
+
+:::
+
+Again, we can confirm that this is a stochastic matrix by summing the columns.
+
+:::
+:::
+
+## N-Step Transition Matrix
+:::{style="font-size: .78em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> n-Step Transition Matrix </span>
+        <p>
+    The n-step transition matrix of the Markov chain is the matrix \(P^{(n)}\) with \(\small{P_{ij}^{(n)}  = P(X_n = i\,\vert\,X_0 = j).}\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+<!-- How can we compute $P^{(n)}$? -->
+
+Let's compute $P^{(n)}$ for the simple case of $n = 2$:
+
+$$\small{P^{(2)}_{ij} = P(X_2 = i\,\vert\,X_0 = j)}$$
+
+$$\small{= \sum_k P(X_2 = i\,\vert\,X_1 = k, X_0 = j)\,P(X_1 = k\,\vert\,X_0 = j)}$$
+$$\small{= \sum_k P(X_2 = i\,\vert\,X_1 = k)\,P(X_1 = k\,\vert\,X_0 = j).}$$
+
+The first equality uses the law of total probability, while the second one uses the Markov property.
+
+:::
+
+## N-Step Transition Matrix
+:::{style="font-size: .78em"}
+
+Now let's write the expression above in terms of matrices:
+
+$$\small{P^{(2)}_{ij} = \sum_k P_{ik}P_{kj}.}$$
+
+This turns out to be the definition of matrix multiplication:
+
+$$\small{P(X_2 = i\,\vert\,X_0 = j) = P^{(2)}_{ij} = P^2_{ij}.}$$
+
+In other words, the two-step transition probabilities are given by the square of the $P$ matrix. 
+
+You can see that this generalizes: the $n$-step transition probabilities are therefore given by the $n$th power of $P$.
+    
+$$\small{P^{(n)} = P^n.}$$
+
+:::
+
+## N-Step Transition Matrix
+:::{style="font-size: .8em"}
+__Example__: 
+
+:::{.center-text}
+<img src="images/markov/Sunny_Rainy2.png" width=500/>
+:::
+
+If at time $t=0$ the chain is in a "sunny" state, at time $t=2$ it will either be in "sunny" state (with probability 0.72) or a "rainy" state (with probability 0.28).
+
+We can confirm that by computing $P^2$:
+
+$$\small{P^2  = 
+\begin{bmatrix}
+0.8 & 0.4 \\
+0.2 & 0.6 \\
+\end{bmatrix}  \begin{bmatrix}
+0.8 & 0.4 \\
+0.2 & 0.6 \\
+\end{bmatrix} = 
+\begin{bmatrix}
+0.72 & .56  \\
+0.28 & 0.44 \\
+\end{bmatrix}.}
+$$
+:::
+
+## N-Step Transition Matrix
+:::{style="font-size: .8em"}
+
+__Example__: 
+
+:::{.columns}
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/markov/mc-example.png" width=500/>
+:::
+
+::: 
+
+::: {.column width="50%"}
+
+If at time $t= 0$ the chain is in state 1, at time $t = 2$ it will either be in state 1 (with probability 0.6) or state 3 (with probability 0.4).
+
+$$\small{P^2  = 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+0.3 & 0.6 & 0 & 0 \\
+0.42 & 0 & 0.6 & 0 \\
+0.28 & 0.4 & 0.4 & 1 
+\end{bmatrix}.}
+$$
+
+:::
+
+
+:::
+:::
+
+## Distributions Over States
+:::{style="font-size: .8em"}
+
+Suppose the initial state of a Markov chain is not known with certainty, but is instead described by a probability distribution over possible states. Let this distribution be represented by the column vector $\mathbf{x}_0$, whose entries are nonnegative and sum to 1.<br>
+
+That is, $X_0$ is a random variable with distribution $P(X_0 = i) = \mathbf{x}_{0,i}$.<br>
+<br>
+
+As the chain evolves over time, the distribution at time $n$ is denoted by $\mathbf{x}_n$. The entries of $\mathbf{x}_n$ are also nonnegative and sum to 1. Any vector satisfying these properties is known as a _probability vector_.
+<br>
+<br>
+Vector $\mathbf{x}_0$ is known as the_initial (state) distribution_ and $\mathbf{x}_n$ is called the _distribution at time_ $n.$
+
+:::
+
+
+## Forward Kolmogorov 
+:::{style="font-size: .8em"}
+The _Forward Kolmogorov Equation_ tells us that taking one step forward in time corresponds to multiplying $P$ times $\mathbf{x}_n$. This follows from the law of total probability:
+
+$$\small{\mathbf{x}_{n+1,i} = P(X_{n+1} = i) = \sum_j P(X_{n+1} = i\,\vert\,X_n = j)\,P(X_n = j) = \sum_j P_{ij} \mathbf{x}_{n,j} = P\mathbf{x}_n.}$$
+ 
+It is clear then that
+$$\small{\mathbf{x}_n = P^n \mathbf{x}_0.}$$
+
+That is, if we know the initial probability distribution at time 0, we can find the distribution at any later time using powers of the matrix $P$.
+
+:::
+
+## Forward Kolmogorov 
+:::{style="font-size: .8em"}
+__Example__: If we say that an aribtrary day in Boston has an 80% chance of being sunny, we can calculate whether it will be sunny two days later.
+
+We consider an initial probability distribution over states:
+    
+$$ \mathbf{x}_0 = \begin{bmatrix}0.8\\0.2\end{bmatrix}. $$
+
+Then to compute the distribution two days later, ie $\mathbf{x}_2,$ we can use $P^2$:
+
+
+$$ \mathbf{x}_2 = P^2\mathbf{x}_0 = 
+\begin{bmatrix}
+0.72 & .56  \\
+0.28 & 0.44 \\
+\end{bmatrix} \, \begin{bmatrix}0.8\\0.2\end{bmatrix} = \begin{bmatrix}0.688\\0.312\end{bmatrix}.
+$$
+
+:::
+
+## Forward Kolmogorov
+:::{style="font-size: .8em"}
+__Example__:
+Continuing our larger more abstract model again, if we consider an initial probability distribution over states:
+    
+$$\small{\mathbf{x}_0 = \begin{bmatrix}0.1\\0.3\\0.2\\0.4\end{bmatrix}.}$$
+
+
+Then to compute the distribution two steps later, ie $\mathbf{x}_2,$ we can use $P^2$:
+
+$$\small{\mathbf{x}_2 = P^2\mathbf{x}_0 = 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+0.3 & 0.6 & 0 & 0 \\
+0.42 & 0 & 0.6 & 0 \\
+0.28 & 0.4 & 0.4 & 1 
+\end{bmatrix} \, \begin{bmatrix}0.1\\0.3\\0.2\\0.4\end{bmatrix} = \begin{bmatrix}0\\0.21\\0.162\\0.628\end{bmatrix}.}
+$$
+
+:::
+
+## Vote Prediction
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="40%"}
+:::{.center-text}
+<img src="images/markov/vote_prediction.png" width=400/>
+:::
+:::
+
+::: {.column width="60%"}
+The transition matrix is given by $$\small{P = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix}.}$$
+
+The initial state distribution is $\small{\mathbf{x}_0=\begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix}.}$
+:::
+:::
+The vote distribution in the next two elections is given by $\mathbf{x}_1$ and $\mathbf{x}_2:$
+$$\small{\mathbf{x}_1 = P\mathbf{x}_0 = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix}\mathbf{x}_0=\begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix} = \begin{bmatrix} 0.3\\ 0.4 \\ 0.3\end{bmatrix}.}$$
+
+
+:::
+
+## Vote Prediction
+:::{style="font-size: .8em"}
+Although it is possible and usually recommended to compute $\mathbf{x}_2$ using $P\mathbf{x}_1.$ We will do so using $P^2\mathbf{x}_0.$
+
+$$\small{P^2 = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix} \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix} = \begin{bmatrix} 0.36 & 0.08 & 0.24\\ 0.48 & 0.44 & 0.32 \\ 0.16 & 0.48 & 0.44\end{bmatrix}.}$$
+$$\small{\mathbf{x}_2 = P^2\mathbf{x}_0 = \begin{bmatrix} 0.36 & 0.08 & 0.24\\ 0.48 & 0.44 & 0.32 \\ 0.16 & 0.48 & 0.44\end{bmatrix} \begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix}= \begin{bmatrix}0.24 \\ 0.42 \\ 0.34\end{bmatrix}.}$$
+
+Therefore, in the first upcoming election 30% of the citizens will vote for party $P$, 40% for $Q$, and 30% for $R$. 
+
+In the second election 24% of the citizens will vote for party $P$, 42% for $Q$, and 34% for $R$. 
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    We classify the women in a country according to whether they live in an urban (U), suburban (S), or rural (R) area.
+    Each woman has just one daughter, who also has just one daughter, and so on.<br>
+    Suppose further that the following is true:<br>
+
+    - For urban women, 10% of the daughters settle in rural areas, and 50% in suburban areas.<br>
+    - For suburban women, 20% of the daughters settle in rural areas, and 30% in urban areas.<br>
+    - For rural women, 20% of the daughters settle in the suburbs, and 70% in rural areas.<br>
+    a. Give the transition matrix for this Markov chain, taking states in the order U, S, R.
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    b. Find the proportion of urban women whose granddaughters are suburban women.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    c. Find the proportion of rural women whose granddaughters are rural women.
+    <br>
+    <br>
+    <br>
+    <br>
+    
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    d. If the initial population distribution vector for all the women is \(\begin{bmatrix} 0.4 \\ 0.5 \\ 0.1 \end{bmatrix}\), find the population distribution vector for the next generation.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::

@@ -1,0 +1,364 @@
+---
+title: Steady States
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/markov/pagerank.png" width=500/>
+:::
+In the last lecture, we said that PageRank uses Markov chains to find the importance of each webpage. How does it work exactly?
+:::
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+- Definition of a steady state
+- Existence of a steady state 
+- Definition of detailed balance
+- Connection between steady state and detailed balance
+:::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+Suppose that we have a small Internet consisting of just 4 websites referencing each other in the manner suggested by the figure below.
+
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Each page should transfer evenly its importance to the pages that it links to. For example, node 1 has 3 outgoing edges, so it will pass on  of its importance to each of the other 3 nodes.
+
+__Question__: Find the PageRank of each website.
+:::
+
+
+## Long Term Behavior
+:::{style="font-size: .8em"}
+Let's consider the long run behavior of Boston weather. 
+
+:::{.center-text}
+<img src="images/markov/Sunny_Rainy2.png" width=500/>
+:::
+
+We know that the one-step transition matrix for this problem is
+
+$$P = \begin{bmatrix}0.8 & 0.4\\0.2 & 0.6\end{bmatrix}$$
+
+We can calculate the probabilty of a sunny day in 2 days or in 10 days by using the powers of $P$. Can we say anything interesting about the weather in 100 or 1,000 days?
+:::
+
+## Long Term Behavior
+:::{style="font-size: .8em"}
+Let us assume that day 0 is sunny, and let the chain "run" for a while:
+```{python}
+import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+```
+```{python}
+#| echo: true
+# day 0 is sunny
+x = np.array([1, 0])
+
+# P is one-step transition matrix
+P = np.array([[0.8, 0.4], [0.2, 0.6]])
+
+for i in range(10):
+    print (f'On day {i}, state is {x}')
+    x = P @ x
+```
+:::
+
+## Steady State
+:::{style="font-size: .8em"}
+This model seems to be converging to a particular vector: $\small{\begin{bmatrix} 2/3 \\ 1/3 \end{bmatrix}}$.
+
+<span style="color:rgb(1, 180, 180);">What if the chain starts from a rainy day?</span>
+<br>
+<br>
+
+$\small{\begin{bmatrix} 2/3 \\ 1/3 \end{bmatrix}}$ is a special vector. 
+If the chain reaches this vector, it would never deviate after that, because
+
+$$\small{\begin{bmatrix}0.8 & 0.4\\0.2 & 0.6\end{bmatrix} \begin{bmatrix} 2/3 \\ 1/3 \end{bmatrix} = \begin{bmatrix} 2/3 \\ 1/3 \end{bmatrix}.}$$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Steady State</span>
+        <p>
+        A vector \(\mathbf{x}\) for which \(P \mathbf{x} = \mathbf{x}\) is called a steady state of the Markov chain corresponding to \(P\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Steady State
+:::{style="font-size: .8em"}
+__Example__: If the Markov chain below is in state $\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}$, is it in a steady state?
+
+:::{.center-text}
+<img src="images/markov/mc-example-4.jpeg" width=400/>
+:::
+
+:::
+
+## Steady State
+:::{style="font-size: .8em"}
+
+__Example (continued)__: The transition matrix $\small{P=\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and the state $\small{\mathbf{x}=\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$
+
+We just need to check if $P\mathbf{x}=\mathbf{x}.$
+
+$$\small{\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix} \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}= \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$$  
+
+Hence, the chain is in a steady state.
+:::
+
+## Existence of a Steady State
+:::{style="font-size: .8em"}
+
+Does every Markov chain have a steady state?<br>
+
+In general, no. However, if the chain has a finite set of states, then it can be represented by a column stochastic matrix $P$.
+
+Since each column of $P$ sums to 1, $P^\top \mathbf{1} = \mathbf{1}.$ Recall from DS121 that 1 is called an eigenvalue of $P^\top$. There is a theorem that says that  $P^\top$ and $P$ have the same eigenvalues.
+
+Hence, 1 is always an eigenvalue of $P$. This implies that there exists a vector $\mathbf{x}$ such that $P\mathbf{x} = \mathbf{x}.$
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+        <p>
+        Each finite-state Markov chain has at least one steady state.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Detailed Balance
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Detailed Balance</span>
+        <p>
+        A Markov chain satisfies detailed balance with respect to \(\ \boldsymbol{\pi}\) if
+
+    $$ \pi_i P_{ji} = \pi_j P_{ij}\;\;\; \forall i, j. $$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: The above equations are called the  _detailed balance equations._
+
+__Remark__: For a Markov chain with $n$ states, there are $n^2$ of the detailed balance equations. However, due to the symmetry of these equations not all of them need to be checked.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+        <p>
+        If a Markov chain satisfies detailed balance with respect to \(\ \boldsymbol{\pi}\), then 
+        \(\ \boldsymbol{\pi}\) is one of its steady states.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Traffic Flow Analogy
+:::{style="font-size: .8em"}
+- Imagine NYC and its surroundings as a graph:
+    * Each borough or suburb is a node.
+    * Bridges, tunnels, and direct roads are edges.
+    * Example: Manhattan connects to Jersey City (Holland Tunnel) and Fort Lee (GW Bridge).
+- Cars represent little elements of probability.
+- Steady state: The number of cars in each borough stays constant over time.
+- Detailed balance: For each connection (e.g., Holland Tunnel), the rate of cars entering equals the rate of cars exiting.
+:::
+
+## Detailed Balance
+:::{style="font-size: .8em"}
+__Example__: We have shown that if the following Markov chain is in state $\small{\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}$, it is in a steady state. However, is it in detalied balance?
+
+:::{.center-text}
+<img src="images/markov/mc-example-4.jpeg" width=400/>
+:::
+
+:::
+
+## Detailed Balance
+:::{style="font-size: .8em"}
+__Example (continued)__: To check if it is in detailed balance, we need to confirm that $\pi_i P_{ji} = \pi_j P_{ij}$ for all $i$, $j$ for
+$\small{P = \begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and $\small{\boldsymbol{\pi} = \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$<br>
+
+We do not need to check cases where $i=j.$ For example, for $i=1$ and $j=1,$ the detailed balance equation is $\small{\pi_1 P_{1,1} = \pi_1 P_{1,1}}$ is always true.
+
+- [x] $\small{i=1}$ and $\small{j=2}:$ $\small{\frac{6}{11} \cdot 0.1 \stackrel{}{=} \frac{3}{11} \cdot 0.2}$
+- [x] $\small{i=1}$ and $\small{j=3}:$ $\small{\frac{6}{11} \cdot 0.1 = \frac{2}{11} \cdot 0.3}$
+- [x] $\small{i=2}$ and $\small{j=3}:$ $\small{\frac{3}{11} \cdot 0.2  =  \frac{2}{11} \cdot 0.3}$
+
+We do not need to check the remaining equations. For example, for $i=2$ and $j=1$ the resulting equation is equivalent to the equation for $i=1,j=2.$ The Markov chain is in detailed balance with respect to $\boldsymbol{\pi}.$
+:::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Denoting the importance of the four pages by $x_1, x_2, x_3,$ and $x_4,$ and analyzing the situation for each page, we get the following system 
+
+$$\small{\begin{align*}
+x_1 & = x_3 + (1/2)x_4,\\
+x_2 & = (1/3) x_1,\\
+x_3 & = (1/3)x_1 + (1/2) x_2 + (1/2) x_4,\\
+x_4 & = (1/3) x_1 + (1/2).
+\end{align*}}$$
+
+:::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Using vector $\small{\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}}$ and the transition matrix
+$\small{P = \begin{bmatrix} 0 & 0 & 1 & 1/2 \\ 1/3 & 0 & 0 & 0 \\ 1/3 & 1/2 & 0 & 1/2 \\ 1/3 & 1/2 & 0 & 0 \end{bmatrix},}$
+the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
+
+:::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+Using the knowledge from DS121, we can show that any vector $\small{\mathbf{x} = c\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix}},$ where $c$ is a scalar, satisfies $\small{P\mathbf{x} = \mathbf{x}.}$
+<br>
+<br>
+Since PageRank should reflect only the relative importance of the nodes, we can choose any of them to be our PageRank vector.
+<br>
+<br>
+If we choose $\mathbf{x}$ to be a probability vector, then it is also a steady state vector of our Markov chain.
+
+:::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+
+Hence, we find the value of $c$ by making the entries of $\mathbf{x}$ sum to 1:
+
+$$\small{\begin{align*}
+x_1+x_2+x_3+x_4 &= 1 \\
+c \cdot (12+4+9+6) & = 1
+\end{align*}}$$
+
+It follows that $\small{c = 1/31.}$
+
+Hence, the PageRank of our websites is given by the stationary state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.38 \\ 0.12 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Consider \(\small{P = \begin{bmatrix} 1/2 & 1/3 & 1/2 \\ 1/2 & 1/3 & 1/2\\ 0 & 1/3 & 1/3 \end{bmatrix}}\) and \( \small{\mathbf{x} = \begin{bmatrix} 1/3 \\ 1/3 \\ 1/3 \end{bmatrix}} \).<br>
+    a. Does the Markov chain corresponding to \(P\) satisfy detailed balance with respect to \( \mathbf{x} \)?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    b. Is \( \mathbf{x} \) a steady state of this Markov chain?
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+No, Yes
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Prove that if a Markov chain satsfies detailed balance with respect to \(\boldsymbol{\pi},\)  then \(\boldsymbol{\pi}\) is one of its steady states.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+
+$$ (P\pi)_i = \sum_j \pi_j P_{ij} = \sum_j \pi_i P_{ji} = \pi_i \sum_j  P_{ji} = \pi_i.$$ 
+
+:::
