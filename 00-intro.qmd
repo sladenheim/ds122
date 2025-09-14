@@ -13,12 +13,13 @@ format:
         chalkboard: true 
 ---
 
+
 ## Logistics
 :::{style="font-size: .8em"}
 
-Lectures: 595 Commonwealth Ave HAR 105, MWF 1:25 PM -- 2:15 PM
+_Lectures_: 595 Commonwealth Ave HAR 105, MWF 1:25 PM -- 2:15 PM
 
-Discussions: 665 Comm Ave CDS 164
+_Discussions_: 665 Comm Ave CDS 164
 
  - A2: M 9:05 AM -- 9:55 AM
  - A3: M 10:10 AM -- 11:10 AM
@@ -33,20 +34,41 @@ _Teaching Staff_
 
 :::
 
+:::{.notes}
+Good Afternoon! Welcome
+
+One of the instructors
+:::
+
+:::{.notes}
+Invite the staff
+
+Yilan!
+:::
+
 ## Getting Set Up
 :::{style="font-size: .8em"}
 
-_Programming environment_ 
-
- - __Python__ 
-
 _Platforms_
 
-- __Piazza__: https://piazza.com/demo_login?nid=mef2pij5gjt4p3&auth=f25aab6 <br>
+- __Piazza__: https://piazza.com/bu/fall2025/ds122 <br>
 Check it weekly!
 - __Gradescope__: https://www.gradescope.com<br>
 Entry code: NGNY6P
 
+_Resources_
+
+- __Lecture slides and notes__: Links are on Piazza<br>
+Slides reflect the latest content!
+
+_Programming environment_ 
+
+ - __Python__: Setup instructions are on Piazza
+
+:::
+
+:::{.notes}
+Has everyone been enrolled?
 :::
 
 ## Course Grade
@@ -66,6 +88,12 @@ _Participation_
 - Homework 0 (1%)
 :::
 
+:::{.notes}
+Has everyone received a digital ID card with a QR code?
+
+Question box: write your full name and BU ID
+:::
+
 ## Course Grade
 :::{style="font-size: .8em"}
 _Homework_
@@ -73,7 +101,7 @@ _Homework_
 - 8 homework assignments
 - Pen-and-paper mathematical questions and coding questions
 - Due at 11:59 pm on a Wednesday
-- Submisions via Gradescope
+- Submissions via Gradescope
 - Questions during discussions and office hours are allowed and encouraged
 - Bonus quizzes during discussions
 - Clarity and correctness matter
@@ -86,14 +114,18 @@ _Homework_
 :::{style="font-size: .8em"}
 _Exams_
 
-All exams are cumulative, with emphasis on material covered since the previous exam. Content may include lectures, discussion labs, homework, and potentially required readings.
+All exams are cumulative. Content may include lectures, discussion labs, homework, and required readings.
 
 - Midterm 1: __October 15, 1:25 PM, HAR 105__ <br>
 In-calss exam
 - Midterm 2: __November 19, 1:25 PM, HAR 105__ <br>
 Take-home exam. You must submit a hard copy. Late or digital submissions will not be accepted!
-- Final exam: __December 15-19__
+- Final exam: __December 15-19__ <br>
 In-person exam
+:::
+
+:::{.notes}
+Take-home exam: try solving it by yourself in the first week and make sure that you tie up loose ends in the second week
 :::
 
 ## Policies
@@ -101,7 +133,7 @@ In-person exam
 _Regrade requests_
 
 - Up to one week after the grade is posted 
-- Submition via Gradescope 
+- Submission via Gradescope 
 
 _Collaboration Policy_
 
@@ -113,7 +145,10 @@ _Learning Environment_
 
 - Inclusive environment for individuals of all genders, races, cultures, abilities, and sexual orientations
 
+:::
 
+:::{.notes}
+Please be respectful to your fellow students and the teaching staff
 :::
 
 ## General Information
@@ -122,13 +157,334 @@ _Learning Environment_
 _Office Hours_
 
 - Schedule is on Piazza under Resources/Staff 
-- Any changes will be announced on Piazza.
+- Any changes will be announced on Piazza
 
-_Reasonable Accommodations_
+_Accommodations_
 
-- Office for Disability Services (ODS) 
-- Report to the instructors in the first two weeks of the semester!
-
-__More details can be found in the syllabus.__
+- Only through Office for Disability Services (ODS) 
 
 :::
+
+:::{.notes}
+My OH: CDS 1401 at 2:30 pm
+:::
+
+## General Information
+:::{style="font-size: .8em"}
+
+__More details, including the weekly schedule, can be found in the syllabus.__
+
+:::{.center-text}
+<img src="images/intro/Syllabus.png" width=900/>
+:::
+:::
+
+:::{.notes}
+Where to find the syllabus
+
+Read the academic code of conduct 
+:::
+
+
+## Downstream Courses
+:::{style="font-size: .8em"}
+Courses requiring DS-122: 
+
+- DS-436 / 596: Foundations of Biological Data Science (Cleary)
+- DS-453 / 653: Crypto for Data Science (Varia)
+- DS-522: Stochastic Methods for Algorithms (Zhang?)
+- DS-592: Intro to Sequential Decision Making (Pacchiano)
+- DS-574: Algorithmic Mechanism Design (Goldner)
+
+:::
+
+## Words of Wisdom
+:::{style="font-size: .8em"}
+Advice from former students:
+
+- _Go to the lectures and ask questions._
+- _This class moves fast and this class builds on every little thing from the previous lecture. It is CRUCIAL that you understand the very basics like distributions, random variables, and probability._
+- _I would tell them to go to lecture and set time aside to review the lectures._
+- _Take the time to practice the problems and learn the content. There's a lot of content and it's hard to learn all of it at once._
+- _practice! probability is hard…. and recognizing questions and what they are asking needs practice_
+- _Pay attention during the discussions._
+
+:::
+
+:::{.notes}
+high-paced course
+
+concepts build on one another
+
+Advice: come to lectures, participate, go to discussions, think deeply about the homework questions
+:::
+
+## Probability
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/intro/Thinking.png" width=400/>
+:::
+
+:::
+::: {.column width="50%"}
+
+<br>
+<br>
+<br>
+<br>
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    What are examples of probability in everyday life?
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+:::
+:::
+
+## Probability
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/intro/Coin_toss.jpg" width=240/>
+:::
+
+:::
+::: {.column width="50%"}
+
+- __Frequentist view__: Probability is the proportion of times an outcome occurs when a situation is repeated many times under the same conditions.
+<!-- __Examples__: Flipping a coin and counting heads.<br>
+Rolling a die and observing the number of points. -->
+
+:::
+
+:::{.columns}
+::: {.column width="50%"}
+
+
+:::{.center-text}
+<img src="images/intro/NBA_Finals_2025.png" width=240/>
+:::
+
+:::
+::: {.column width="50%"}
+
+- __Bayesian view__: Probability is a measure of how strongly we believe an outcome will occur, based on current information and reasoning.
+<!-- __Examples__: Predicting which team will win a game. <br>
+Estimating the likelihood of having a medical condition. -->
+
+:::
+:::
+
+:::
+:::
+
+:::{.notes}
+Both perspectives are valid and both have their pros and cons.
+
+Frequentist: more objective and interpretive
+
+Bayesian: more intuitive and allows to use prior knowledge BUT can be contaversial!
+
+NBA Finals 2025 Okhlahoma City Thunder vs Indiana Pacers
+:::
+
+## Probability
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/intro/Linda.png" width=280/>
+:::
+
+:::
+::: {.column width="50%"}
+
+Linda is 31 years old, single, outspoken, and very bright. She majored in philosophy. As a student, she was deeply concerned with issues of discrimination and social justice, and also participated in anti-nuclear demonstrations. 
+<!-- <span style="color:rgb(1, 180, 180);">Which is more probable?</span> -->
+
+:::
+:::
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Which is more probable?<br>
+    <br>
+    1. Linda is a bank teller.<br>
+    2. Linda is a bank teller and is active in the feminist movement.
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- 1. Linda is a bank teller.
+2. Linda is a bank teller and is active in the feminist movement. -->
+
+
+:::
+
+## Why Is Probability Important?
+:::{style="font-size: .8em"}
+_Statistical thinking will one day be as necessary for efficient citizenship as the ability to read and write!_ <br>
+
+::: {style="text-align: right;"}
+Samuel S. Wilks (1906 - 1964)
+:::
+<br>
+
+Imagine you receive a letter from a stockbroker predicting that a certain stock will go up next week. It does. 
+
+The next week, you get another letter from the same broker. Another correct prediction. This continues for several weeks. Each prediction spot-on. 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Would you consider investing based on their next tip?
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+10 weeks: (1/2)^{10} = 1/1024
+
+a company launches a mutual fund, maintain it in-house before opening to public -> incubator
+
+In practice: many incubated funds and only successfull ones are released to public. Data: Average returns
+
+:::
+
+## Course Structure
+:::{style="font-size: .8em"}
+_Units_
+
+1. Probability
+2. Markov models
+3. Frequentist statistics
+4. Bayesian statistics
+<br>
+<br>
+
+_Lectures_
+
+Almost each lecture will be structured around a certain problem.
+
+
+:::
+
+## Considered Problems
+:::{style="font-size: .8em"}
+
+
+:::{.columns}
+::: {.column width="30%"}
+
+:::{.center-text}
+<img src="images/intro/World_cup_thropy.png" width=180/>
+:::
+
+:::
+::: {.column width="70%"}
+
+1. How can we predict the outcome of a soccer game rematch?
+
+:::
+:::
+
+:::{.columns}
+
+:::
+::: {.column width="70%"}
+
+2. How did a group of MIT students crack the Massachusetts State Lottery?
+:::
+
+::: {.column width="30%"}
+
+:::{.center-text}
+<img src="images/intro/MA_lottery_logo.png" width=300/>
+:::
+
+:::
+
+:::
+
+:::{.notes}
+What problem belongs to what unit?
+
+2022 World Cup in Qatar: Argentina vs France : 4 -2 on penalties
+
+Massachusetts’ Cash WinFall 2005, a quirk in the way a jackpot was broken down into smaller prizes if there was no big winner, spend $600 000 on tickets -> 15-20% return profit 
+:::
+
+## Considered Problems
+:::{style="font-size: .8em"}
+
+3. How can we accurately assign word classes to a body of text?
+
+:::{.center-text}
+<img src="images/intro/POS_example.png" width=600/>
+::: 
+
+4. How can we estimate the total number of episodes in a show after watching just one?
+
+:::{.center-text}
+<img src="images/intro/Netflix.png" width=400/>
+::: 
+
+:::{.notes}
+Parts of Speech tagging, NLP
+
+:::
+
+
+
+<!-- Units
+Each lecture - one problem
+Examples -->
+
+<!-- word classes
+game re-match prediction
+when to play lottery 
+
+-->
+
+:::
+

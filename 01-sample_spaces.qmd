@@ -11,9 +11,10 @@ format:
         slide-number: true
         show-slide-number: all
         chalkboard: true
+
 ---
 
-## Paradox
+## ARW 357
 :::{style="font-size: .8em"}
 Richard Feynman famously stated:<br>
 <br>
@@ -24,12 +25,20 @@ _You know, the most amazing thing happened to me tonight. I was coming here, on 
 <img src="images/sample spaces/license plate.png" width=400/>
 :::
 
+:::{.notes}
+Richard Feynman (Fine-man) was a Nobel Prize-winning physicist known for his work in quantum electrodynamics.
+
+Quote: ironically points out that despite having very low probability ($1/(17 \cdot 10^6)$) of happining the situation does not feel special to us.
+
+Seeing a blue lobster
+:::
+
 
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
 * Short review of set theory
-* Concepts required for probability theory:
+* Basics of probability theory:
     + Experiment
     + Sample space
     + Event
@@ -62,7 +71,9 @@ Verdant Roots composed a dataset for their study. It contains
 :::
 
 ::: {.notes}
-Today forcus on the first column: Calamity. Next lecture: entire dataset.
+Today forcus on the first column: Calamity. 
+
+Next lecture: entire dataset.
 :::
 
 ## Tree Nursery Risk Analysis
@@ -81,6 +92,12 @@ Assumptions:
 
 * None of the calamities can occur in the same year.
 * The dataset contains all possible calamity types.
+
+__Question__: Relate the dataset to the basics of probability theory.
+:::
+
+::: {.notes}
+No hurricanes
 :::
 
 ## Review: Sets
@@ -103,10 +120,10 @@ display(HTML(html_content))
 __Notation__: We use curly brackets to identify a set. A set is typically denoted by a capital letter. <br>
 __Remarks__: 
 
-- A set contains _elements_.
-- The _order_ in which the elements of the set are written does not matter.
-- The _repetition_ of the elements does not matter either.
-- Sets can be _infinite_.
+- A set contains _**elements**_.
+- The _**order**_ in which the elements of the set are written does not matter.
+- The _**repetition**_ of the elements does not matter either.
+- Sets can be _**infinite**_.
 
 __Example__: $\{k\}$ is a set that contains only one element, namely the letter $k.$
 
@@ -137,7 +154,13 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Notation__: $\emptyset$.
+__Notation__: $\emptyset \:$ or $\{ \: \}.$
+:::
+
+:::{.notes}
+Bag of apples
+
+Bag of apples and bananas
 :::
 
 ## Review: Subsets
@@ -247,7 +270,7 @@ __Example__: Driving to work, a commuter passes through a sequence of three inte
 :::
 
 ::: {.notes}
-Ask if they could give another example of an experiment.
+Can you give another example of an experiment?
 :::
 
 
@@ -336,7 +359,15 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
+Fire degree 1, 2, 3, pipe breakage, etc.
+
+11 outcomes
+
 What would happen if we define the experiment as a sequence of calamities occurring in 3 years?
+
+(Fire degree 1, Fire degree 1, Fire degree 1), (Fire degree 2,...)
+
+$11^3$
 :::
 
 
@@ -358,8 +389,8 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 __Notation__: Any capital letter. Typically, $E$ or $A$. <br>
-__Example__:  Let us return to the commuter example. An event can be defined as continuing through the first light, $E = \{ccc, ccs, csc, css\}$. <br>
-<span style="color:rgb(1, 180, 180);">How would $E$ look like in the sample-space potato below?</span>
+__Example__:  Let us return to the commuter example. An event can be defined as _**continuing through the first light**_, $E = \{ccc, ccs, csc, css\}$. <br>
+<span style="color:rgb(1, 180, 180);">How would an event look like in the sample-space potato below?</span>
 <!-- dffh 
 <div class="tight-space"></div> -->
 
@@ -400,6 +431,8 @@ plt.show()
 :::
 
 
+
+
 ## Combining Events
 :::{style="font-size: .8em"}
 ```{python}
@@ -410,15 +443,15 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Union of Events</span>
         <p>
-        For any two events \(A\) and \(B\) of a sample space \(\Omega\), we define the new event, the union of \(A\) and \(B\), to consist of all outcomes that are either in \(A\) or in \(B\) or in both \(A\) and \(B\). 
+        For any two events \(A\) and \(B\) of a sample space \(\Omega\), we define the new event, the union of \(A\) and \(B\), as all outcomes that are either in \(A\) or in \(B\) or in both \(A\) and \(B\). 
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Notation__: We will mainly use $A,B$ (i.e., $A$ - comma - $B$) but $A\cup  B$ is also a viable option. <br>
-__Example__: If $A$ is the event that the commuter stops at the first light, $A = \{sss,scs,ssc,scc\},$  and $B$ is the event that she stops at the third light, $B = \{sss,scs,ccs,css\},$ then the union of $A$ and $B$, is the event that she stops at the first _or_ the third light, $\{sss,ssc,scc,scs,ccs,css\}.$
+__Notation__: $A\cup  B.$ <br>
+__Example__: If $A$ is the event that the commuter _**stops at the first light**_, $A = \{sss,scs,ssc,scc\},$  and $B$ is the event that she _**stops at the third light**_, $B = \{sss,scs,ccs,css\},$ then the union of $A$ and $B$, is the event that she stops at the first _**or**_ the third light, $\{sss,scs,ssc,scc,ccs,css\}.$
 :::
 
 ## Combining Events
@@ -438,7 +471,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Notation__: $A \cap B.$ <br>
+__Notation__: We will mainly use $A,B$ (i.e., $A$ - comma - $B$) but $A\cap  B$ is also a viable option. <br>
 __Example__: If $A = \{sss,scs,ssc,scc\}$ and $B=\{sss,scs,ccs,css\}$, then $A \cap B$ is the  event that the commuter stops at the first light and the third light. It consists of those outcomes that are common for both $A$ _and_ $B$: 
 $$A \cap B = \{sss,scs\}.$$
 
@@ -454,7 +487,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Complement of an Event</span>
         <p>
-        The complement of event \(E\), consists of all outcomes in the sample space \(\Omega\) that are not in \(E\). 
+        The complement of event \(E\) consists of all outcomes in the sample space \(\Omega\) that are not in \(E\). 
         </p>
     </div>
     """
@@ -462,7 +495,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 __Notation__: $\overline{E}$ or  $E^C.$ <br>
-__Example__: The complement of the event that the commuter stops at the first light is the event that she continues at the first light: $$\overline{A} = \{ccc,ccs,css,csc\}.$$
+__Example__: The complement of the event that the commuter _**stops at the first light**_ is the event that she _**continues at the first light**_: $$\overline{A} = \{ccc,ccs,css,csc\}.$$
 
 :::
 
@@ -483,8 +516,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Example__: If we define $A$ as the event that the commuter
-stops at the first light and $C$ as the event that she continues through all three lights,
+__Example__: If we define $A$ as the event that the _**commuter stops at the first light**_ and $C$ as the event that she _**continues through all three lights**_,
 $C = \{ccc\}$, then $A$ and $C$ are disjoint. They cannot co-occur.
 :::
 :::{.center-text}
@@ -667,17 +699,23 @@ Many possible answers: A = event of fire = {fire deg 1, fire deg 2} and B = any 
 -->
 :::
 
+::: {.notes}
+Any subset : For example, no calamities
+
+{No calamities, Fire degree 1} and Fire degree 1
+:::
+
 ## Working in Groups of 2–4
-:::{style="font-size: .8em"}
+:::{style="font-size: .78em"}
 
 <!-- 1. __Form groups of 2–4.__ Feel free to move around! -->
 1. __Before solving each (sub)question:__
-    - Identify what is _given_.
-    - Clarify the _task_ (i.e., what to compute/prove).
-    - Identify potential _tools/methods_.
+    - Identify what is _**given**_.
+    - Clarify the _**task**_ (i.e., what to compute/prove).
+    - Identify potential _**tools/methods**_.
 2. __While solving:__
     - Discuss openly.
-    - Ask me questions as I circulate.
+    - Ask Prof. Wheelock and me questions as we circulate.
 3. __After solving:__ 
     - Check if your result makes sense (sign, magnitude, units, etc.).
     - Confirm that you’ve fully addressed the question or proved the statement.
@@ -717,6 +755,10 @@ display(HTML(html_content))
 ## Group Question 1 
 :::{style="font-size: .78em"}
 
+:::{.center-text}
+<img src="images/sample spaces/cafeteria.png" width=500/>
+:::
+
 ```{python}
 from IPython.core.display import HTML
 
@@ -732,7 +774,28 @@ def generate_html():
         <br>
         <br>
         <br>
-        d. List all the outcomes in the event \(A\cap B\).<br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1 
+:::{style="font-size: .78em"}
+
+:::{.center-text}
+<img src="images/sample spaces/cafeteria.png" width=500/>
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        d. Let \(A\) be the event that ice cream is chosen.  Let \(B\) be the event that chicken is chosen. List all the outcomes in the event \(A\cap B\).<br>
         <br>
         <br>
         <br>
@@ -748,7 +811,7 @@ c. 3 x 4 = 12
 d. {(chicken, pasta, ice cream), (chicken, rice, ice cream),(chicken, potatoes, ice cream)} -->
 
 
-## Group Question 2 
+<!-- ## Group Question 2 
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
@@ -773,10 +836,11 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+Use Venn diagrams: it is all of A AND B (diagram 1)AND the complement of the intersection of A and B(diagram 2) -> C (diagram 3)
+         C = (A \cup B) \cap \overline(A \cap B) 
+::: -->
 
-:::
-
-## Extra: Group Question 3
+## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -792,7 +856,7 @@ def generate_html():
         <br>
         <br>
         <br>
-        b. List the elements that make up the following events: <br> (1) \(A\) = at least two heads, (2) \(B\) = the last toss is a tail, (3) \(A, B = A\cup B.\)<br>
+        b. List the elements that make up the following events: <br> (1) \(A\) = at least two heads, (2) \(B\) = the last toss is a tail, (3) \(A, B = A\cap B.\)<br>
         <br>
         <br>
         <br>
@@ -806,17 +870,11 @@ display(HTML(html_content))
 ```
 :::
 
-<!-- a. {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT}
-b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT} -->
-<!-- Use Venn diagrams: it is all of A AND B (diagram 1)AND the complement of the intersection of A and B(diagram 2) -> C (diagram 3)
-         C = (A \cup B) \cap \overline(A \cap B) -->
+:::{.notes}
+a. {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT}
+b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHH, HHT, HTH, THH, THT, HHT, TTT}
+:::
 
 
 
 
-<!-- ## Key Takeaways
-
-:::{style="font-size: .8em"} 
-
-
-::: -->

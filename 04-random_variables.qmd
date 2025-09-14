@@ -53,6 +53,7 @@ In the remaining part of the course, we will rarely mention sample spaces and wo
 * Cumulative distribution function of a discrete random variable
 * Expected value of a discrete random  variable
 * Variance of a discrete random  variable
+* Applying the above concepts to Cash WinFall
 :::
 
 ## Cash WinFall Game
@@ -93,7 +94,7 @@ Prize distribution on a normal day:
 | Match 3 of 6          | 1 in 47                | \$5           |
 | Match 2 of 6          | 1 in 6.8               | \$2 (free ticket)          |
 
-Questions:
+__Questions:__
 
 - How did return rates differ between normal days and roll-down days?
 - How did MIT students exploit the opportunity in Cash WinFall?
@@ -102,13 +103,16 @@ Questions:
 :::
 
 :::{.notes}
-jackpot : 46 choose 6
+jackpot : (6 choose 6)/ (46 choose 6)
+
 2nd : (6 choose 5)(40 choose 1)/(46 choose 6)
 :::
 ## Random Variables 
 :::{style="font-size: .8em"}
-Statistics and data science are concerned with data. How do we link sample spaces, and events to data? The link is provided by the concept of a random variable. <br>
-<br>
+Statistics and data science are concerned with data. How do we link sample spaces, and events to data? <br>
+
+The link is provided by the concept of a random variable. <br>
+
 
 
 ```{python}
@@ -119,7 +123,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Random Variable</span>
         <p>
-        A random variable is a function \(X: \Omega \to \mathbb{R}\) that assigns a real number to each outcome \(X(\omega)\) to each outcome \(\omega.\)
+        A random variable is a function \(X: \Omega \to \mathbb{R}\) that assigns a real number \(X(\omega)\) to each outcome \(\omega.\)
         </p>
     </div>
     """
@@ -127,9 +131,9 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Remark__: Since the value of a random variable is determined by the outcome of an experiment, we assign probabilities to the possible values of the random variable.
+__Remark__: Since the value of a random variable is determined by the outcome of an experiment, _**probabilities are assigned to the possible values of the random variable**_.
 
-__Notation__: We use capital letters for random variables and lowercase for non-random quantities.
+__Notation__: We use capital letters to denote random variables.
 
 
 
@@ -147,11 +151,17 @@ In the remaining part of the course, we will rarely mention sample spaces and wo
 
 :::
 
-## Categorical Random Variables 
-:::{style="font-size: .8em"}
-We distinguish between _categorical_ and _numerical_ random variables.
+:::{.notes}
+Draw the sample-space potato
 
-A __categorical random variable__ assigns outcomes to categories. Even though the categories are non-numeric, we can still treat categorical random variable as random variables by mapping each category to a real number.
+Sample space - BIHEND the scenes
+:::
+
+## Categorical Random Variables 
+:::{style="font-size: .75em"}
+We distinguish between _**categorical**_ and _**numerical**_ random variables.
+
+A __categorical random variable__ assigns outcomes to categories. Even though the categories are non-numeric, we can still treat categorical random variable as random variables by _**mapping each category to a real number**_.
 
 __Example__: 
 Consider a traffic light that may be red, green, or yellow. We can describe it as a categorical random variable, corresponding to what we see when we observe it at a random time.
@@ -181,6 +191,35 @@ __Example__: The lifetime of a light bulb can range from 0 to possibly thousands
 :::
 
 ## Random Variables 
+:::{style="font-size: .8em"}
+
+| Match Type            | Probability            | Prize         |
+|-----------------------|------------------------|---------------|
+| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
+| Match 5 of 6          | 1 in 39,028            | \$4,000       |
+| Match 4 of 6          | 1 in 801               | \$150         |
+| Match 3 of 6          | 1 in 47                | \$5           |
+| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Let us define \(X\) as a random variable associated with the returns of a Cash WinFall game. What type of random variable is \(X\)?
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+<!-- ## Random Variables 
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
@@ -213,10 +252,12 @@ display(HTML(html_content))
 ```
 :::
 :::
-:::
+::: -->
 
 :::{.notes}
 discrete
+
+can be categorical if you consider the returns to be: loss, breaking even, small win, big win, jackpot
 :::
 
 
@@ -230,7 +271,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Probability Mass Function</span>
         <p>
-       For a discrete random variable \(X\), we define the probability mass function (PMF) \(p(a)\) of \(X\) by \(p(a) = P(X=a).\)
+       For a discrete random variable \(\small{X}\), we define the probability mass function (PMF) \(\small{p(a)}\) of \(\small{X}\) by \(\small{p(a) = P(X=a).}\)
         </p>
     </div>
     """
@@ -240,12 +281,12 @@ display(HTML(html_content))
 
 If $X$ must assume one of the values $x_1, x_2,...,$ then
 \begin{align*}
-&p(x_i)  \geq 0 \:  \text{ for } i=1,2,... \\
-&p(x)  = 0 \: \text{ for all other values of } x.
+&\small{p(x_i)  \geq 0} \:  \text{ for } \small{i=1,2,...} \\
+&\small{p(x)  = 0} \: \text{ for all other values of } \small{x}.
 \end{align*}
-In addition, $\sum_{i=1}^{\infty} p(x_i) = 1.$
+In addition, $\small{\sum_{i=1}^{\infty} p(x_i) = 1.}$
 
-__Example.__  Consider the roll of a single fair die.  The random variable here is the number of points showing. Since all outcomes are equally likely, we assign equal probabilities to each outcome in $\Omega = \{1, 2, 3, 4, 5, 6\}$: $p(x_i) = \frac{1}{6}.$
+__Example.__  Consider the roll of a single fair die.  The random variable here is the number of points showing. Since all outcomes are equally likely, we assign equal probabilities to each outcome in $\small{\Omega = \{1, 2, 3, 4, 5, 6\}}$: $\small{p(x_i) = \frac{1}{6}.}$
 
 :::
 
@@ -273,7 +314,42 @@ plt.show()
 ```
 :::
 
-## Probability Mass Function 
+## Random Variables 
+:::{style="font-size: .8em"}
+
+| Match Type            | Probability            | Prize         |
+|-----------------------|------------------------|---------------|
+| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
+| Match 5 of 6          | 1 in 39,028            | \$4,000       |
+| Match 4 of 6          | 1 in 801               | \$150         |
+| Match 3 of 6          | 1 in 47                | \$5           |
+| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) 
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Assume that the jackpot in Cash WinFall is \$1 million.
+        If \(X\) is a random variable associated with the returns of a Cash WinFall game. <br>
+        Find the PMF of \(X\).
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+<!-- ## Probability Mass Function 
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
@@ -310,7 +386,7 @@ display(HTML(html_content))
 ```
 :::
 :::
-:::
+::: -->
 
 :::{.notes}
 \begin{align*}
@@ -319,7 +395,10 @@ p(3) & = 1/47\\
 p(148) & = 1/800\\
 p(3998) & = 1/39000\\
 p(999998) & = 1/9300000\\
-p(-2) & = 1-(1/6.8+1/47+1/800+1/39000+1/9300000) \approx 0.83
+p(-2) & = 1-(1/6.8\\
+&+1/47+1/800\\
+&+1/39000+1/9300000)\\
+& \approx 0.83
 \end{align*}
 :::
 
@@ -333,7 +412,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Cumulative Distribution Function Function</span>
         <p>
-       The cumulative distribution function (CDF) \(F\) can be expressed in terms of \(p(a)\) by \(F(a) = P(X \leq a) = \sum_{x\leq a} p(x).\)
+       The cumulative distribution function (CDF) \(\small{F}\) can be expressed in terms of \(\small{p(a)}\) by \(\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}\)
         </p>
     </div>
     """
@@ -341,7 +420,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-If $X$ is a discrete random variable whose possible values are $x_1 , x_2 , x_3 ,...$, where $x_1 < x_2 < x_3 <...$, then the distribution function $F$ of $X$ is a step function. That is, the value of $F$ is constant in the intervals $[x_i−1,x_i)$ and then takes a step (or jump) of size $p(x_i)$ at $x_i$. 
+If $\small{X}$ is a discrete random variable whose possible values are $\small{x_1 , x_2 , x_3 ,...}$, where $\small{x_1 < x_2 < x_3 <...}$, then the distribution function $\small{F}$ of $\small{X}$ is a _**step function**_. That is, the value of $\small{F}$ is constant in the intervals $\small{[x_i−1,x_i)}$ and then takes a step (or jump) of size $\small{p(x_i)}$ at $\small{x_i}$. 
 :::
 
 ## Cumulative Distribution Function
@@ -355,7 +434,7 @@ __Example__: The CDF of a fair six-sided die is shown below.
 import matplotlib.pyplot as plt
 import numpy as np
 
-plt.figure(figsize=(9, 4.5))
+plt.figure(figsize=(9, 4))
 for i in range(7):
     plt.plot([i, i+1-.08], [i/6, i/6],'-b')
 for i in range(1, 7):
@@ -374,7 +453,7 @@ plt.show()
 ```
 :::
 
-## Cumulative Distribution Function
+<!-- ## Cumulative Distribution Function
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
@@ -420,7 +499,7 @@ F(X \leq 148) & = 0.998+1/800 \approx 0.99958\\
 F(X \leq 3998) & = 0.99958+1/39000 \approx 0.99961\\
 F(X \leq 999998) & = 1/9300000 = 1\\
 \end{align*}
-:::
+::: -->
 
 ## Expected Value
 :::{style="font-size: .8em"}
@@ -441,14 +520,14 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 __Notation__: $\small E[X], \mu$ or $\small \overline{X}.$<br>
-__Remark__: The expected value tells us what to expect from the average of many observations of the random variable, _not_ what to expect from a single observation.
+__Remark__: The expected value tells us what to expect from the average of many observations of the random variable, _**not**_ what to expect from a single observation.
 
 __Example__: If $X$ is the number of points after a single die roll. Then
 $$
 \small E[X] = \sum_{x=1}^{6} P(X=x) \cdot x = 1/6 \cdot (1 + 2 + 3 + 4 + 5 + 6) = 3.5.
 $$
 
-But 3.5 is a value that can _never occur_ for a roll of the die!
+But 3.5 is a value that can _**never occur**_ for a roll of the die!
 :::
 
 ## Variance
@@ -491,7 +570,7 @@ $$ \small \mbox{Var} (X) = \sum_{x=1}^{6} (x-3.5)^2\; P(X=x)= 1/6\sum_{x=1}^{6} 
 :::
 ::: {.column width="60%"}
 :::{style="font-size: .8em"}
-Question 1: _How did return rates differ between normal days and roll-down days?_
+Question 1: _**How did return rates differ between normal days and roll-down days?**_
 <!-- - How did MIT students exploit the opportunity in Cash WinFall? -->
 :::
 :::
@@ -501,8 +580,8 @@ Question 1: _How did return rates differ between normal days and roll-down days?
 - Expected value of returns in \$ on a normal day with a jackpot of \$1 million:
 
 \begin{align*}  
-    E[X] &= (10^6 - 2) \cdot 1/9366819 + 3998 \cdot 1/39028 +\\
-    &+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2*0.83 = -1.2
+    \small{E[X]} &= \small{(10^6 - 2) \cdot 1/9366819 + 3998 \cdot 1/39028 +}\\
+    &\small{+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2*0.83 = -1.2}
 \end{align*} 
 :::
 
@@ -524,7 +603,7 @@ $$ \small E[X] = (5 \cdot 10^4 - 2) \cdot 1/39028 + 2383 \cdot 1/801 + 58 \cdot 
 
 ## Cash WinFall Game
 :::{style="font-size: .8em"}
-Question 2: _How did MIT students exploit the opportunity in Cash WinFall?_
+Question 2: _**How did MIT students exploit the opportunity in Cash WinFall?**_
 
 As we said earlier, the expected value tells us what to expect from the average of many observations of the random variable, not what to expect from a single observation. 
 
@@ -575,7 +654,7 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Question 2
+<!-- ## Group Question 2
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
@@ -605,7 +684,7 @@ display(HTML(html_content))
 
 :::{.notes}
 Fall 24 HW1
-:::
+::: -->
 
 
 

@@ -19,20 +19,31 @@ The age of Big Data can be frightening. Part of that fear comes from the belief 
 <br>
 How justified are these fears?<br>
 <br>
-Jordan Ellenberg, a mathematics professor at the University of Wisconsin–Madison, gives the following example.<br>
-<br>
-Suppose a Facebook team develops a method to predict which users might be involved in terrorism. Terrorism is extremely rare, so the probability that any given user is a terrorist is very small.
+Jordan Ellenberg, a mathematics professor at the University of Wisconsin–Madison, gives the following example.
+
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/random variables/FB_logo.png" width=120/>
+:::
+:::
+
+::: {.column width="70%"}
+_Suppose a Facebook team develops a method to predict which users might be involved in terrorism. Terrorism is extremely rare, so the probability that any given user is a terrorist is very small._
+:::
+:::
+
 :::
 
 ## Flagged
 :::{style="font-size: .8em"}
 
-The team might generate a list of 100,000 users who are _twice as likely_ as average to be terrorists. So, if someone ends up being flagged by the Facebook algorithm, should Facebook report them to the authorities? 
+_The team might generate a list of 100,000 users who are **twice as likely** as average to be terrorists. So, if someone ends up being flagged by the Facebook algorithm, should Facebook report them to the authorities?_ 
 
-This leads to two important questions:
+_This leads to two important questions:_
 
-1. _What is the chance that a person is on Facebook’s list, given that they are not a terrorist?_
-2. _What is the probability that a person is not a terrorist, given that they are on Facebook’s list?_
+1. _**What is the chance that a person is on Facebook’s list, given that they are not a terrorist?**_
+2. _**What is the probability that a person is not a terrorist, given that they are on Facebook’s list?**_
 
 These questions sound similar, but they are not. One way to see the difference is by comparing their answers. You will do just that at the end of this lecture.
 :::
@@ -53,9 +64,9 @@ These questions sound kind of the same, but they are not. One way to see that is
 :::{style="font-size: .8em"}
 
 * Definition of conditional probability
-* Probability laws associated with conditional probability:
-    + Independence of events
+* Probability laws/concepts associated with conditional probability:
     + Chain rule
+    + Independence of events
     + Law of total probability
     + Bayes' rule
 * Answering questions relevant to the tree nursery risk analysis using Python (final lecture)
@@ -100,9 +111,13 @@ Assumptions:
 :::
 :::
 
+:::{.notes}
+Notice the new collumn with event probability!
+:::
+
 ## Tree Nursery Risk Analysis
 :::{style="font-size: .8em"}
-Questions:
+__Questions__:
 
 - What is the total probability of plants being damaged in a given year?
 - Which of the following actions should be prioritized by the tree nursery? 
@@ -114,7 +129,7 @@ Questions:
 
 ## Conditional Probability
 :::{style="font-size: .8em"}
-Assuming that $P(B) > 0$, we define the conditional probability of $A$ given that $B$ has occurred (i.e., given that $B$ is true) as follows.
+Assuming that $\small{P(B) > 0}$, we define the conditional probability of $\small{A}$ given that $\small{B}$ has occurred (i.e., given that $\small{B}$ is true) as follows.
 ```{python}
 from IPython.core.display import HTML
 
@@ -123,21 +138,25 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Conditional Probability</span>
         <p>
-        If \(P(B)>0\) then the conditional probability of \(A\) given \(B\) is \(P(A|B) = \frac{P(A,B)}{P(B)}.\)
+        If \(\small{P(B)>0}\), then the conditional probability of \(\small{A}\) given \(\small{B}\) is \(\small{P(A|B) = \frac{P(A,B)}{P(B)}}.\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-<br>
-__Remark 1__: In general, $P(A|B) \neq P(B|A).$<br>
+__Remark 1__: In general, $\small{P(A|B) \neq P(B|A).}$
 
 
-__Remark 2__: For any fixed $B$ such that $P(B)>0,$ $P(\cdot | B)$ is a probability. That is, it satisfies the three axioms of probability. However, in general, it is not true that $P(A|B,C) = P(A|B)+P(A|C).$ The rules of probability apply to events on the left of the bar.
+__Remark 2__: The rules of probability apply to events on the left of the bar. <br>
+
+Namely, for any fixed $\small{B}$ such that $\small{P(B)>0,}$ $\small{P(\cdot | B)}$ defines a valid probability measure. That is, it satisfies the three axioms of probability.<br>
+However, in general, it is **_not true_** that if $\small{B}$ and $\small{C}$ are disjoint, that $$\small{P(A|B,C) = P(A|B)+P(A|C).}$$
 :::
 
 :::{.notes}
+Divide by the probability of the event that is given.
+
 Remark 1 example: The probability of spots given that a person has measles is 1, but the probability that you have measles given that you have spots is not 1.
 :::
 
@@ -165,7 +184,7 @@ P(-|\overline D) &= \small \frac{P(-,\overline D)}{P(\overline D)} = \frac{0.891
 :::{style="font-size: .8em"}
 
 __Example (continued)__: 
-Hence, the test is fairly accurate. Sick people yield a positive 90% of the time and healthy people yield a negative 90% of the time.
+Therefore, the test is considered fairly accurate: it correctly identifies sick individuals 90% of the time, and correctly identifies healthy individuals 90% of the time.
 
 ```{python}
 from IPython.core.display import HTML
@@ -174,7 +193,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-        Suppose that you go for a test and turns out to be positive.
+        Suppose that you go for a test and it turns out to be positive.
         What is the probability you have the disease?
         <br>
         <br>
@@ -191,35 +210,7 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-$P(D|+) = \frac{P(+,D)}{P(+)} = frac{0.009}{0.009+0.099} \approx 0.08.$
-:::
-
-## Independence of Events
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-     <span class="label">Independent Events</span>
-        <p>
-        If \(A\) and \(B\) are independent events, then \(P(A|B) = P(A).\) Moreover, \(P(A,B) = P(A)P(B).\)
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-__Example__: Let us say that here in Boston about $10\%$ of the days are rainy. What fraction of the days of the year are rainy Mondays? <br>
-Let $A$ be the event that a day is rainy and $B$ be the event that a day is Monday. Then $P(A) = \frac{1}{10}$ and $P(B) = \frac{1}{7}.$ Since $A$ and $B$ are independent, we can compute the probability that a day is Monday _and_ a day is rainy as 
-$$P(A,B) = P(A)P(B) = \left(\frac{1}{10}\right)\left(\frac{1}{7}\right) = \frac{1}{70}.$$
-If there are 365 days in a year, then $365/70 \approx 5$ of them will be rainy.
-<!-- 
-
-knowing the day of the week does not change our estimate of whether it will be raining or sunny.
-
-$$P(\text{day is rainy}\,|\,\text{day is Monday}) = P(\text{day is rainy}).$$  -->
+$P(D|+) = \frac{P(+,D)}{P(+)} = \frac{0.009}{0.009+0.099} \approx 0.08.$
 :::
 
 ## Chain Rule
@@ -232,7 +223,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Chain Rule</span>
         <p>
-        For any events \(A\) and \(B\), \(P(A, B) = P(A \,\vert\, B)\; P(B) = P(B \,\vert\, A)\; P(A). \)
+        For any events \(\small{A}\) and \(\small{B}\), \(\small{P(A, B) = P(A \,\vert\, B)\; P(B) = P(B \,\vert\, A)\; P(A). }\)
         </p>
     </div>
     """
@@ -243,7 +234,52 @@ display(HTML(html_content))
 __Remark__: This pattern can be extended to as many events as needed.  For example:
 $$ P(A, B, C) = P(A \,\vert\, B,C) \;P(B \,\vert\, C) \; P(C). $$
 
-__Example__: Assume we draw two cards from a deck, without replacement. Let $A$ be the event that the first draw is the Ace of Clubs and let $B$ be the event that the second draw is the Queen of Diamonds. Then $$P(A,B) = P(A)P(B|A) = \left(\frac{1}{52} \right)\left(\frac{1}{51} \right).$$
+__Example__: Assume we draw two cards from a deck, without replacement. Let $A$ be the event that the _**first draw is the Ace of Clubs**_ and let $B$ be the event that the _**second draw is the Queen of Diamonds**_. Then $$\small{P(A,B) = P(B|A)P(A) = \left(\frac{1}{51} \right)\left(\frac{1}{52} \right).}$$
+:::
+
+:::{.notes}
+Definition of conditional probability
+:::
+
+
+## Independence of Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Independent Events</span>
+        <p>
+        If \(\small{A}\) and \(\small{B}\) are independent events, then \(\small{P(A|B) = P(A).}\) Equivalently, \(\small{P(A,B) = P(A)P(B).}\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: Let us say that here in Boston about $\small{10\%}$ of the days are rainy. What fraction of the days of the year are rainy Mondays? <br>
+Let $\small{A}$ be the event that _**a day is rainy**_ and $\small{B}$ be the event that _**a day is Monday**_. Then $\small{P(A) = \frac{1}{10}}$ and $\small{P(B) = \frac{1}{7}.}$ Since $\small{A}$ and $\small{B}$ are independent, we can compute the probability that a day is Monday _**and**_ a day is rainy as 
+$$\small{P(A,B) = P(A)P(B) = \left(\frac{1}{10}\right)\left(\frac{1}{7}\right) = \frac{1}{70}.}$$
+If there are 365 days in a year, then $\small{365/70 \approx 5}$ of them will be rainy.
+<!-- 
+
+knowing the day of the week does not change our estimate of whether it will be raining or sunny.
+
+$$P(\text{day is rainy}\,|\,\text{day is Monday}) = P(\text{day is rainy}).$$  -->
+:::
+
+:::{.notes}
+1. Disjoint: $P(A,B) = 0.$
+
+2. I am flipping a coin 1 time.
+
+2 outcomes: heads or tails. H: heads come up, T: tails comeup
+
+Are H and T independent? -> No
+
+Are they disjoint? -> Yes
 :::
 
 ## Law of Total Probability
@@ -256,16 +292,18 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Law of Total Probability</span>
         <p>
-        Let \(B_1\) and \(B_2\) form the complete sample space \(\Omega\) and be disjoint \(\left(B_1 \cap B_2 = \emptyset\right).\) Then for any event \(A\), \(P(A) = P(A|B_1)P(B_1)+P(A|B_2)P(B_2).\)
+        Let \(\small{B_1}\) and \(\small{B_2}\) form the complete sample space \(\small{\Omega}\) \(\small{\left(B_1 \cup B_2 = \Omega\right)}\) and be disjoint \(\small{\left(B_1 \cap B_2 = \emptyset\right).}\) <br>Then for any event \(\small{A}\), 
+        
+        $$\small{P(A) = P(A|B_1)P(B_1)+P(A|B_2)P(B_2).}$$
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: Note that law of total probability is not applicable if $B_1$ and $B_2$ do not form the complete sample space or are not disjoint.
+__Remark__: Note that law of total probability is not applicable if $\small{B_1}$ and $\small{B_2}$ do not form the complete sample space or are not disjoint.
 
-__Remark__: This pattern can be extended to as many events as needed: $$P(A) = \sum_{i=1}^k P(A|B_i)P(B_i).$$
+__Remark__: This pattern can be extended to as many events as needed: $$\small{P(A) = \sum_{i=1}^k P(A|B_i)P(B_i)}.$$
 
 :::
 
@@ -277,49 +315,59 @@ from IPython.core.display import HTML
 def generate_html():
     return r"""
     <div class="purple-box">
-     <span class="label">Law of Total Probability</span>
+     <span class="label">Bayes' Rule</span>
         <p>
-        For any events \(A\) and \(B\) such that \(P(B)>0,\)  \(P(A|B) = \frac{P(B|A)P(A)}{P(B)}.\)
+        For any events \(\small{A}\) and \(\small{B}\) such that \(\small{P(B)>0,}\)  \(\small{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}.\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: From the law of total probability it follows that, if we let $P(B)>0$ and let $A_1, \dots, A_n$ be events where $A_i$'s are disjoint and forn the entire sample space, then 
-$$P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.$$ 
+__Remark__: From the law of total probability it follows that, if we let $\small{P(B)>0}$ and let $\small{A_1, \dots, A_n}$ be events where $\small{A_i}$'s are disjoint and form the entire sample space, then 
+$$\small{P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.}$$ 
 :::
 
 ## Bayes' Rule
 :::{style="font-size: .8em"}
 
-__Example__: Lucy divides her email into three categories: $A_1$ = "spam", $A_2$ = "low priority", and $A_3$ = "high priority."
+__Example__: Lucy divides her email into three categories: $\small{A_1}$ = "spam", $\small{A_2}$ = "low priority", and $\small{A_3}$ = "high priority."
 
 From her experience Lucy knows that <br>
-- $P(A_1) = 0.7, P(A_2) = 0.2,$ and $P(A_3) = 0.1.$  <br>
-- If $B$ is the event that the email contains the word "free," then $P(B|A_1) = 0.9, P(B|A_2) = 0.01,$ and $P(B|A_3) = 0.01.$ 
+- $\small{P(A_1) = 0.7, P(A_2) = 0.2,}$ and $\small{P(A_3) = 0.1.}$  <br>
+- If $\small{B}$ is the event that the email contains the word "free," then $\small{P(B|A_1) = 0.9, P(B|A_2) = 0.01,}$ and $\small{P(B|A_3) = 0.01.}$ 
 
 Given that Lucy received an email with the word "free," what is probability that it is spam?
 
 From the Bayes' rule, we find that 
-$$P(A_1|B) = \frac{0.9 \cdot 0.7}{0.9 \cdot 0.7 + 0.01 \cdot 0.2 + 0.01 \cdot 0.1} = 0.995.$$
+$$\begin{align*}
+\small{P(A_1|B)} & = \small{\frac{P(B|A_1)P(A_1)}{P(B|A_1)P(A_1)+P(B|A_2)P(A_2) + P(B|A_3)P(A_3)}} \\
+ &= \small{\frac{0.9 \cdot 0.7}{0.9 \cdot 0.7 + 0.01 \cdot 0.2 + 0.01 \cdot 0.1} = 0.995.}
+\end{align*}$$
 
+:::
+
+:::{.notes}
+Why am I allowed to use the law of total probability here?
 :::
 
 ## Tree Nursery Risk Analysis
 :::{style="font-size: .8em"}
-Question 1: _What is the total probability of plants being damaged in a certain year?_<br>
+Question 1: _**What is the total probability of plants being damaged in a certain year?**_<br>
 
 Calculating total probability of plant damage:
 
-1. Create a new column to store the joint probability of an event happening _and_ the plants beign damaged:<br>
+1. Create a new column to store the joint probability of a calamity happening _**and**_ the plants being damaged, given that calamity occurred:<br>
 Multiply _Event probability_ and _Damage probability_ entrywise.
 
 2. Compute the total probability: <br>
 Sum all values in the joint probability column. <br>
 
-<span style="color:rgb(1, 180, 180);">What rule or law are we using here? Why are we allowed use it?</span>
+<span style="color:rgb(1, 180, 180);">What rule or law are we using here? Why are we allowed to use it?</span>
 
+:::
+:::{.notes}
+$$P(Calamity)P(Damage|Calamity) = P(Calamity, Damage)$$
 :::
 
 ## Tree Nursery Risk Analysis
@@ -341,15 +389,13 @@ print(f"The total probability of plants being damaged in a given year is {total_
 
 ## Tree Nursery Risk Analysis
 :::{style="font-size: .8em"}
-Question 2: _Which of the following actions should be prioritized by the tree nursery?_ 
+Question 2: _**Which of the following actions should be prioritized by the tree nursery?**_ 
 
 - Improving the maintenance of the pipes in the supply system.
 - Further automating the operation to prevent human errors.
 - Improving safety protocols to prevent fire.  
 
-<br>
-
-To answer this question, we need to find the calamity corresponding to the highest probability in the joint probability column.
+Since a fire of degree 2 has never occurred in the nursery, we can limit our analysis to fires of degree 1. Therefore, to answer this question, we simply need to identify the calamity with the highest joint probability.
 :::
 
 ## Tree Nursery Risk Analysis
@@ -382,7 +428,38 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p><l start="*">
-        There are about 200 million Facebook users in the USA. About 100,000 of these users end up on Facebook's terrorist list. However, only 10 of them are actually involved in terrorism. Moreover, there 9,990 other Facebook users who are involved in terrorism but are not flagged by Facebook. <br>
+        An urn contains three red balls and one blue ball. Two balls are selected without replacement. <br>
+        a. What is the probability that they are both red?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        b. What is the probability that a red ball is selected on the second draw?<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        There are about 200 million Facebook users in the USA. About 100,000 of these users end up on Facebook's terrorist list. However, only 10 of them are actually involved in terrorism. Moreover, there are 9,990 other Facebook users who are involved in terrorism but are not flagged by Facebook. <br>
         a. What is the chance that a person is on Facebook’s list, given that they are not a terrorist?
         <br>
         <br>
@@ -406,35 +483,4 @@ display(HTML(html_content))
 a. The chance that an innocent person is flagged as a potential terrorist is $\frac{100 000 - 10}{199 990 000} = \frac{99 990}{199 990 000} = 0.05\%.$
 
 b. The probability that a person is not a terrorist, given that they are on Facebook’s list is $\frac{99 990}{100 000}=99.99\%.$
-:::
-
-## Group Question 2
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p><l start="*">
-        An urn contains three red balls and one blue ball. Two balls are selected without replacement. <br>
-        a. What is the probability that they are both red?
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        b. What is the probability that a red ball is selected on the second draw?<br>
-        <br>
-        <br>
-        <br>
-        <br>
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
 :::

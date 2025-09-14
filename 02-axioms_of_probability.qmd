@@ -22,22 +22,26 @@ format:
 :::{style="font-size: .8em"}
 - No brain, no nervous system
 - Loves oats, avoids light
-- Makes decisions like a human or a democratic nation
+- Makes decisions based on the majority vote
+:::
+
+:::{.notes}
+Primitive organism
 :::
 
 ## Slime Mold's Decisions
 :::{style="font-size: .8em"}
 Three options:<br>
-$A$: 3 g of oats in the dark<br>
-$B$: 5 g of oats in the light<br>
-$C$: 1 g of oats in the dark<br>
+A: 3 g of oats in the dark<br>
+B: 5 g of oats in the light<br>
+C: 1 g of oats in the dark<br>
 <br>
-__When only $A$ and $B$ are available__: <br>
+__When only A and B are available__: <br>
 The mold chooses each about half the time.<br>
 <br>
 __When all three options are available__: <br> 
-The mold almost never chooses $C$. 
-<span style="color:rgb(1, 180, 180);">How often does it choose $A$?</span>
+The mold almost never chooses C. 
+<span style="color:rgb(1, 180, 180);">How often does it choose A?</span>
 <br>
 <br>
 To make sense of choices under uncertainty, from slime molds to humans, we turn to probability theory.
@@ -45,13 +49,13 @@ To make sense of choices under uncertainty, from slime molds to humans, we turn 
 :::
 
 :::{.notes}
-The mold will choose $A$ about 75\% of the time. 
+The mold will choose A about 75\% of the time. 
 
 This illustrates how:
 
 - A seemingly irrelevant third option can shift preferences (violating independence of irrelevant alternatives)
 - The same logic applies to elections—and even dating strategy:
-Bring a friend who’s just slightly less appealing than you. :::
+Bring a friend who’s just slightly less appealing than you. 
 :::
 
 <!-- ## Why Probability?
@@ -147,12 +151,12 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Probability (Probability Measure)</span>
         <p>
-        A function \(P\) that assigns a real number \(P(A)\) to each event \(A\) in \(\Omega\) is a probability  if it satisfies the following three axioms: <br>
+        A function \(\small{P}\) that assigns a real number \(\small{P(A)}\) to each event \(\small{A}\) in the sample space \(\small{\Omega}\) is a probability  if it satisfies the following three axioms: <br>
         <ul>
-        <li> <strong>Axiom 1</strong>: \( 0 \leq P(A) \leq 1 \) for every \(A\).</li>
-        <li><strong>Axiom 2</strong>: \(P(\Omega)=1\).</li>
-        <li><strong>Axiom 3</strong>: If \(A_1\) and \(A_2\) are disjoint, then <span style="font-size: 90%;">\(P(A_1 \cup A_2) = P(A_1) + P(A_2).\)</span></li>
-        More generally, if \(A_1, A_2, A_3, \dots \) are disjoint, then \(P(A_1 \cup A_2 \cup A_3 \cup \dots ) = P(A_1) + P(A_2) + P(A_3) \dots\)
+        <li> <strong>Axiom 1</strong>: \( \small{0 \leq P(A) \leq 1} \) for every \(\small{A}\).</li>
+        <li><strong>Axiom 2</strong>: \(\small{P(\Omega)=1}\).</li>
+        <li><strong>Axiom 3</strong>: If \(\small{A_1}\) and \(\small{A_2}\) are disjoint, then <span style="font-size: 90%;">\(\small{P(A_1 \cup A_2) = P(A_1) + P(A_2).}\)</span></li>
+        More generally, if \(\small{A_1, A_2, A_3, \dots }\) are disjoint, then \(\small{P(A_1 \cup A_2 \cup A_3 \cup \dots ) = P(A_1) + P(A_2) + P(A_3) \dots}\)
         </ul>
         </p>
     </div>
@@ -199,6 +203,14 @@ display(HTML(html_content))
 ```
 :::
 :::
+:::
+
+:::{.notes}
+
+- Find the **total number of years** in the dataset
+
+- Divide the entry in **year occured** by that **total number of years**
+
 :::
 
 ## Axioms of Probability
@@ -272,10 +284,27 @@ print(f"Minimum event probability: {min_prob:.4f}")
 
 ```
 :::
-:::{style="font-size: .8em"}
+<!-- :::{style="font-size: .8em"}
 We will next verify Axiom 3 and then use it to confirm Axiom 2.
+::: -->
+
+
+## Axioms of Probability
+:::{style="font-size: .8em"}
+- [x] Axiom 2: The sum of probabilities for all possible outcomes, including no calamity, is equal to 1.
 :::
 
+:::{.center-text}
+```{python}
+#| echo: true
+
+# Compute and display the sum of all event probabilities
+sum_all_prob = sum(df['Event probability'])
+
+print(f"Sum of all event probabilities: {sum_all_prob:.4f}")
+
+```
+:::
 
 ## Axioms of Probability
 :::{style="font-size: .8em"}
@@ -301,22 +330,6 @@ print(f"Equal probabilities? {np.isclose(union_prob,sum_2_prob)}")
 :::
 
 
-## Axioms of Probability
-:::{style="font-size: .8em"}
-- [x] Axiom 2: The sum of probabilities for all possible outcomes, including no calamity, is equal to 1.
-:::
-
-:::{.center-text}
-```{python}
-#| echo: true
-
-# Compute and display the sum of all event probabilities
-sum_all_prob = sum(df['Event probability'])
-
-print(f"Sum of all event probabilities: {sum_all_prob:.4f}")
-
-```
-:::
 
 ## Properties
 :::{style="font-size: .8em"}
@@ -329,14 +342,14 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Property A</span>
         <p>
-        \(P(\overline{A}) = 1 - P(A),\) where \(\overline{A}\) as a complement of \(A.\)
+        \(\small{P(\overline{A}) = 1 - P(A),}\) where \(\small{\overline{A}}\) as a complement of \(\small{A.}\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-Property A follows from Axiom 2 and 3. $P(A) + P(\overline{A})= 1,$ because $A$ and $\overline{A}$ are by definition disjoint and $A \cup \overline{A} = \Omega.$  <br>
+Property A follows from Axiom 2 and 3. $\small{P(A) + P(\overline{A})= 1,}$ because $\small{A}$ and $\small{\overline{A}}$ are by definition disjoint and $\small{A \cup \overline{A} = \Omega.}$  <br>
 
 <br>
 
@@ -348,14 +361,14 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Property B</span>
         <p>
-        \(P(\emptyset) = 0.\)
+        \(\small{P(\emptyset) = 0.}\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-In words, Property B says that the probability that there is no outcome at all is zero. It is a direct consequence of Property A, because $\emptyset = \overline{\Omega}.$ 
+In words, Property B says that the probability that there is no outcome at all is zero. It is a direct consequence of Property A, because $\small{\emptyset = \overline{\Omega}.}$ 
 :::
 
 ## Properties
@@ -369,7 +382,7 @@ In words, Property B says that the probability that there is no outcome at all i
 ::: {.column width="70%"}
 :::{style="font-size: .8em"}
 Note that according to property A the probability of a calamity at Verdant Roots in a certain year is simply equal to 
-$$1 - P(\text{no calamity}) = 1 - 0.6667 = 0.3333.$$
+$$\small{1 - P(\text{no calamity}) = 1 - 0.6667 = 0.3333.}$$
 :::
 :::
  
@@ -394,15 +407,15 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Property C</span>
         <p>
-        If \(A\) is contained in \(B\), then \(P(A) \leq P(B).\)
+        If \(\small{A}\) is contained in \(\small{B}\), then \(\small{P(A) \leq P(B).}\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-This property states that if $B$ occurs whenever $A$ occurs, then $P(A) \leq P(B).$ 
-__Example__: If whenever it rains ($A$) it is cloudy ($B$), then the probability that it rains is less than or equal to the probability that it is cloudy.<br>
+This property states that if $\small{B}$ occurs whenever $\small{A}$ occurs, then $\small{P(A) \leq P(B).}$ 
+__Example__: If whenever it rains ($\small{A}$) it is cloudy ($\small{B}$), then the probability that it rains is less than or equal to the probability that it is cloudy.<br>
 <br>
 
 The last fundamental property tells us about the union of two events that can co-occur.
@@ -414,7 +427,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Property D</span>
         <p>
-        \(P(A \cup B) = P(A) + P(B) - P(A,B).\)
+        \(\small{P(A \cup B) = P(A) + P(B) - P(A,B).}\)
         </p>
     </div>
     """
@@ -459,24 +472,121 @@ plt.show()
 :::
 
 :::{style="font-size: .8em"}
-$P(A \cup B)$ represents the probability that either event $A$, event $B$, or both occur. When we add $P(A)$ and $P(B)$, we include all outcomes in $A$ and all outcomes in $B$. However, the intersection $A \cap B,$ the outcomes that are common to both $A$ and $B$, are counted twice in this sum. To correct for this double-counting, we subtract  once the probability of the intersection.
+$\small{P(A \cup B)}$ represents the probability that either event $\small{A}$, event $\small{B}$, or both occur. When we add $\small{P(A)}$ and $\small{P(B)}$, we include all outcomes in $\small{A}$ and all outcomes in $\small{B}$. However, the intersection $\small{A \cap B,}$ the outcomes that are common to both $\small{A}$ and $\small{B}$, are counted twice in this sum. To correct for this double-counting, we subtract  once the probability of the intersection.
 :::
 
-## Holly Example
+## Properties
 :::{.columns}
-::: {.column width="50%"}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/sample spaces/logo.jpeg" width=400/>
+:::
+:::
+
+::: {.column width="70%"}
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        What Property (A, B, C, or D) tells us the probability of drought of degree 1 cannot be larger than the probability of drought and why? <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+ 
+
+:::
+
+## Working in Groups of 2–4
+:::{style="font-size: .78em"}
+
+<!-- 1. __Form groups of 2–4.__ Feel free to move around! -->
+1. __Before solving each (sub)question:__
+    - Identify what is _**given**_.
+    - Clarify the _**task**_ (i.e., what to compute/prove).
+    - Identify potential _**tools/methods**_.
+2. __While solving:__
+    - Discuss openly.
+    - Ask Prof. Wheelock and me questions as we circulate.
+3. __After solving:__ 
+    - Check if your result makes sense (sign, magnitude, units, etc.).
+    - Confirm that you’ve fully addressed the question or proved the statement.
+:::
+
+
+## Group Question 1
+:::{.columns}
+::: {.column width="32%"}
 :::{.center-text}
 <img src="images/axioms of probability/Holly_Leaves.png" width=400/>
 
 :::
 :::
 
-::: {.column width="50 K%"}
+::: {.column width="68 K%"}
 :::{style="font-size: .8em"}
-Holly the monkey is being observed for her preferences in different types of leaves. With a probability of 0.5, Holly will like the first type of leaf (leaves from teak trees); with a probability of 0.4, she will like the second type of leaf (leaves from ficus trees); and with a probability of 0.3, she will like both types of leaves. What is the probability that Holly likes neither type of leaf?
+ Holly the monkey is being observed for her preferences in different types of leaves. With a probability of 0.5, Holly will like the first type of leaf (leaves from teak trees); with a probability of 0.4, she will like the second type of leaf (leaves from ficus trees); and with a probability of 0.3, she will like both types of leaves. 
 :::
 :::
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        What is the probability that Holly likes neither type of leaf?<br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 :::
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        <br>
+        <br>        
+        <br>
+        <br>
+        <br>
+        <br>        
+        <br>
+        <br>
+        <br>        
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
 
 ## Holly Example
 :::{style="font-size: .8em"}
@@ -570,21 +680,7 @@ $$1 - P(L_1 \cup L_2) = 1 -0.6 = 0.4.$$
 0.4 is between 0 and 1. It is also less than 0.5 (1-the probability of L1), that would be the maximum estimate of P(L1 or L2).
 :::
 
-## Working in Groups of 2–4
-:::{style="font-size: .8em"}
 
-<!-- 1. __Form groups of 2–4.__ Feel free to move around! -->
-1. __Before solving each (sub)question:__
-    - Identify what is _given_.
-    - Clarify the _task_ (i.e., what to compute/prove).
-    - Identify potential _tools/methods_.
-2. __While solving:__
-    - Discuss openly.
-    - Ask me questions as I circulate.
-3. __After solving:__ 
-    - Check if your result makes sense (sign, magnitude, units, etc.).
-    - Confirm that you’ve fully addressed the question or proved the statement.
-:::
 
 ## Group Question 1
 :::{style="font-size: .8em"}
