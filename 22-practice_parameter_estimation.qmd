@@ -1,0 +1,26 @@
+---
+title: Parameter Estimation 
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Practice evaluating parameter estimators:
+    * Bias
+    * Variance
+    * Mean Squared Error 
+- Practice maximum likelihood estimation
+- Practice method of moments
+
+:::

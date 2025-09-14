@@ -1,0 +1,459 @@
+---
+title: Parameter Estimation 
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Life Better With a TV?
+:::{style="font-size: .8em"}
+A ladder with steps numbered 0 to 10:
+
+- 0 is the worst possible life
+- 1o is the best possible life
+
+Which step comes closest to the way you feel about your life?
+
+:::{.center-text}
+<img src="images/ci/Gallup_survey.png" width=700/>
+:::
+
+:::
+
+## Life Better With a TV?
+:::{style="font-size: .8em"}
+A survey that studied the relationship between TV ownership and well-being: "For the European data, one can say with 95% confidence that the true population for wellbeing among those without TVs is between 4.88 and 5.26."
+
+:::{.center-text}
+<img src="images/ci/couch_potato.png" width=300/>
+:::
+
+The survey does not tell us that watching TV is good for our well-being,  just that owning one is!
+
+The confidence interval: _between 4.88 and 5.26._
+
+:::
+
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Definition of confidence intervals
+- Confidence intervals for the mean of the normal distribution
+    * with a known variance
+    * with an unknown variance
+- The $t$ distribution
+- Confidence intervals for the mean of any distribution
+- Visualizing and reporting confidence intervals
+
+:::
+
+## Study Hours
+:::{style="font-size: .8em"}
+A random sample of 50 students was selected as part of a study on weekly study hours, and the number of
+hours was recorded for each student in the sample for the fall semester of 2024. The average study hours
+were found to be 15 hours. In a very large study in the fall semester of the previous year, it was found
+that the standard deviation of the study hours was 4 hours. This standard deviation can be assumed to
+be the population standard deviation.
+
+:::{.center-text}
+<img src="images/ci/Study_hours.jpeg" width=300/>
+:::
+
+
+__Question__: Assuming the standard deviation is unchanged, provide the 95% confidence interval for the mean study
+hours in the fall semester of 2024.
+:::
+
+## Confidence Intervals
+:::{style="font-size: .8em"}
+ Confidence intervals provide an alternative to using a point estimator $\hat{\theta}$ when we wish to estimate an unknown population parameter $\theta$. 
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Confidence Interval </span>
+        <p>
+        
+    A confidence interval is a random interval, calculated from the sample, that contains \(\theta\) with some specified probability.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+``` 
+
+That is, a 95% confidence interval for $\theta$ is a random interval that contains $\theta$ with probability 0.95.
+
+__Example__: Assume that a populaiton is normally distributed with mean $\mu$ and variance $\sigma$. For instance, we can think of SAT scores for students in Massachusetts.
+
+To estimate the true value of $\mu$ we repeat the sampling process 20 times and compute the confidence interval for paramter $\mu$ for each sample. 
+:::
+
+## Confidence Intervals
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+from scipy.stats import uniform
+from numpy.random import default_rng
+import scipy.stats as stats
+
+rng = default_rng(13)
+
+# Data from 2020 for SAT scores nationwide from above link
+mu = 1050
+sig = 216
+#
+# gaussian curve
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize = (10,5), gridspec_kw={'height_ratios': [2, 7]})
+x = np.linspace(norm.ppf(0.001, loc = mu, scale = sig), norm.ppf(0.999, loc = mu, scale = sig), 100)
+xmin, xmax = (x[0], x[-1])
+ax1.plot(x, norm.pdf(x, loc = mu, scale = sig),'k-', lw = 5, alpha = 0.6)
+#
+# points under the curve
+pop_x = norm.rvs(size = 1000, loc = mu, scale = sig)
+pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig)) for x_coord in pop_x]
+ax1.scatter(pop_x, pop_y, marker = '.', alpha = 0.5, color = 'darkblue')
+ax1.yaxis.set_major_locator(plt.NullLocator())
+ax1.set_ylabel('Density', size = 16)
+ax1.text(1400, np.sum(ax1.get_ylim())/2, 'Population', size = 16, color = 'darkblue')
+ax1.set_xlim(xmin, xmax)
+# xmin, xmax = ax1.get_xlim()
+#
+# samples
+#
+def contains(mu, M, f):
+    return (M < (mu + f) and M > (mu - f))
+
+samp_size = 15
+t_stat = stats.t.ppf(1-0.025, samp_size - 1)
+for samp in range (20):
+    samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
+    M = np.mean(samp_x)
+    std_err = np.std(samp_x) / np.sqrt(samp_size)
+    if contains(mu, M, t_stat * std_err):
+        col = 'g'
+    else:
+        col = 'orange'
+    #
+    ax2.scatter(M, samp, marker = 'o', facecolors = col, edgecolors=col, linewidths = 1.5, s = 64)
+    ax2.errorbar(M, samp, xerr = t_stat * std_err, fmt = 'None', ecolor = col, elinewidth = 1.5, capsize = 10, capthick = 1.5)
+#
+ax2.set_xlim(xmin, xmax)
+ax2.set_ylim(-1, 22)
+#
+ax2.vlines(mu, -1, 20, colors = 'darkblue')
+ax2.text(mu, 21, r'$\mu$', size = 20, color = 'darkblue', ha = 'center', va = 'center')
+#ax2.text(M+f, 1.75, r'$M + f$', size = 20, color = 'g', ha = 'left', va = 'center')
+#ax2.text(M-f, 1.75, r'$M - f$', size = 20, color = 'g', ha = 'right', va = 'center');
+ax2.yaxis.set_visible(False)
+ax2.xaxis.set_visible(False)
+for spine in ax2.spines.values():
+    spine.set_visible(False)
+#
+#ax1.set_title('SAT Scores', size=18)
+plt.tight_layout(h_pad = -2);
+```
+:::
+
+## Confidence Intervals
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+Note how the confidence intervals dance around, and how their sizes vary.
+Not every confidence interval contains the population mean $\mu$ -- the orange ones don't. However, roughly 95% of the confidence intervals do contain the true mean.
+
+Now that we understand how to interpret confidence intervals, the next question is how to compute them.
+:::
+
+## Mean of a Normal Distribution
+:::{style="font-size: .8em"}
+Let's assume that our population has a Gaussian (i.e., normal) distribution.
+
+That is, let $x_1, x_2, ..., x_n$ be a random sample from a population that has a _normal distribution_ with _unknown mean_ $\mu$ and _known variance_ $\sigma^2$. Let 
+
+$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x_i.$$ 
+
+For $0 \leq \alpha \leq 1$, let $z(\alpha)$ be that number such that the area under the standard normal density function to the right of $z(\alpha)$ is $\alpha$. Note that the symmetry of the standard normal density function about zero implies that $z(1-\alpha) = -z(\alpha)$.
+:::
+
+## Mean of a Normal Distribution
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/ci/Standard_normal_density_z.png" width=550/>
+:::
+:::
+
+## Mean of a Normal Distribution
+:::{style="font-size: .8em"}
+If random variable $Z$ follows standard normal distribution, then, by definition of $z(\alpha)$,
+
+$$\small{P\left(-z(\alpha/2) \leq Z \leq z(\alpha/2)\right) = 1-\alpha.}$$
+
+$\frac{M - \mu}{\sigma/\sqrt{n}}$ has a standard normal distribution, so
+
+$$\small{P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) = 1-\alpha.}$$
+
+Elementary manipulation of the inequalities gives 
+
+$$\small{P\left(M - z(\alpha/2) \frac{\sigma}{\sqrt{n}} \leq \mu \leq M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}} \right) = 1-\alpha.}$$
+:::
+
+## Mean of a Normal Distribution
+:::{style="font-size: .8em"}
+This implies that the probability that $\mu$ lies in the interval 
+
+$$\left[M - z(\alpha/2)  \frac{\sigma}{\sqrt{n}}, M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}}\right]$$
+
+is approximately $1-\alpha.$ In other words, this is a _$100(1-\alpha)\%$ confidence interval_ for the population mean, $\mu$.
+
+As we can see, when the population is normally distributed and has a known variance $\sigma^2$, finding confidence intervals for population mean  is a relatively straightforward task. However, the population variance, $\sigma^2$, is typically _not known_.
+
+How can we replace it?
+:::
+
+## Unknown Population Variance
+:::{style="font-size: .8em"}
+Of course, we can estimate $\sigma$ from the data. Since $ \sqrt{\frac{1}{n}\sum_i (x_i - M)^2}$ is known to be a __biased__ estimate of the true standard deviation, we typically apply _Bessel's correction_ to get an __unbiased__ estimate:
+
+$$ s = \sqrt{\frac{1}{n-1}\sum_i (x_i - M)^2}. $$
+
+This substitution has a far-reaching consequence. The distribution of $\frac{M - \mu}{s/\sqrt{n}}$ is a <br>
+$t$ _distribution_ with $n-1$ degrees of freedom.
+:::
+
+## The $t$ Distribution
+:::{style="font-size: .8em"}
+
+The history of the "t-distrubution" is quite interesting. A man named William Gosset worked at the Guinness Brewery in Ireland. He needed a way to determine if changes in the brewing processes made a difference. Unfortunately, he generally only had small samples sizes.
+
+:::{.center-text}
+<img src="images/ci/Guiness.jpg" width=550/>
+:::
+
+:::
+
+## The $t$ Distribution
+:::{style="font-size: .8em"}
+William Gosset introduced the $t$-distribution after realizing the normal distribution wasn't suitable for small samples. Its heavier tails reflect a higher chance of extreme values, especially with smaller sample sizes. <br>
+<br>
+As $\nu$ (the degres of freedom, $\nu=n-1$) goes to infinity, we get the normal distribution.
+
+:::{.center-text}
+<img src="images/ci/Student_t.png" width=450/>
+:::
+
+:::
+
+## The $t$ Distribution
+:::{style="font-size: .78em"}
+We assume again that $x_1, x_2, ..., x_n$ be a random sample from a normal distribution having mean $\mu$ and variance $\sigma^2$. Let $\tau_{n-1}(x)$ denote the PDF of the $t$ distribution with $n-1$ degrees of freedom and $t$ be a constant such that 
+
+$$\small{\int_{-t}^t \tau_{n-1}(x) dx = 1 - \alpha.}$$
+
+For every value of $n$, the value of $t$ can be found from the table of the $t$ distribution. For example, if $n = 12$ and $T_{11}(x)$ denotes the CDF of the $t$ distribution with 11 degrees of freedom, then
+
+$$\small{\int_{-t}^t \tau_{11}(x) dx = T_{11}(t) - T_{11}(-t) = T_{11}(t) - (1-T_{11}(t)) = 2T_{11}(t) - 1.}$$
+
+If $\alpha = 0.05$, it follows that $T_{11}(t) = 0.975$. It is found from the table that $t = 2.201$, the 0.975 quantile of the $t$ distribution with 11 degrees of freedom.  
+:::
+
+## The $t$ Distribution
+:::{style="font-size: .8em"}
+Thus, when the population standard deviation $\sigma$ is not known the $100(1-\alpha)\%$ confidence interval becomes 
+
+$$\left[M - t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}, M + t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}\right].$$ 
+
+Since people often prefer to use the normal distribution, and since the $t$-distribution becomes equivalent to the normal when the sample size $n$ becomes large, common practice is to use normal distribution instead of the $t$-distribution for $n \geq 30$. 
+
+For this course, we recommend using exclusively $t$-distribution when the population standard deviation is not known.
+:::
+
+## Mean of Any Distribution
+:::{style="font-size: .8em"}
+What happens if the type of the population distribution is not known?
+
+Let $x_1, x_2, ..., x_n$ be a random sample from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __known variance__ $\sigma^2$. Let 
+
+$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x_i.$$ 
+
+The central limit theorem tells us that the distribution of $\frac{M - \mu}{\sigma/\sqrt{n}}$ can be approximated by a standard normal distribution, so
+
+$$P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) = 1-\alpha.$$
+:::
+
+## Mean of Any Distribution
+:::{style="font-size: .8em"}
+This is the same expression as we found before. Thus, the $100(1-\alpha)\%$ confidence interval is simply 
+
+$$\left[M - z(\alpha/2)  \frac{\sigma}{\sqrt{n}}, M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}}\right].$$
+
+When the sample of size $n$ is from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __unknown variance__ $\sigma^2$, the $100(1-\alpha)\%$ confidence interval becomes 
+
+$$\left[M - t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}, M + t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}\right].$$ 
+
+
+Here, $s$ is again an unbiased estimate of the true standard deviation.
+:::
+
+## Mean of Any Distribution
+:::{style="font-size: .8em"}
+How large should $n$ be for us to be able to rely on the central limit theorem?
+
+The answer is that it depends on the population distribution. A highly skewed distribution, or one with a large ratio of standard deviation to mean, will require larger sample sizes.
+:::
+
+## Visualizing CIs
+:::{style="font-size: .8em"}
+For the SAT example, the figure below shows the 95% confidence intervals for the population mean based on a sample of size 15 and a sample of size 50.
+
+```{python}
+rng = default_rng(12)
+
+# Data from 2020 for SAT scores nationwide from above link
+mu = 1050
+sig = 216
+#
+# gaussian curve
+fig, (ax1, ax1a, ax2) = plt.subplots(3, 1, figsize = (14,6), gridspec_kw={'height_ratios': [8, 1, 8]})
+x = np.linspace(norm.ppf(0.001, loc = mu, scale = sig), norm.ppf(0.999, loc = mu, scale = sig), 100)
+xmin, xmax = (x[0], x[-1])
+ax1.plot(x, norm.pdf(x, loc = mu, scale = sig),'k-', lw = 5, alpha = 0.6)
+#
+# points under the curve
+pop_x = norm.rvs(size = 1000, loc = mu, scale = sig)
+pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig)) for x_coord in pop_x]
+ax1.scatter(pop_x, pop_y, marker = '.', alpha = 0.5, color = 'darkblue')
+ax1.yaxis.set_major_locator(plt.NullLocator())
+ax1.set_ylabel('Density', size = 16)
+ax1.text(1400, np.sum(ax1.get_ylim())/2, 'Population', size = 16, color = 'darkblue')
+ax1.set_xlim(xmin, xmax)
+# xmin, xmax = ax1.get_xlim()
+#
+# sample
+#
+samp_size = 15
+t_stat = stats.t.ppf(1-0.025, samp_size - 1)
+samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
+samp_y = [2.75 for x in samp_x]
+M = np.mean(samp_x)
+std_err = np.std(samp_x) / np.sqrt(samp_size)
+#
+ax2.set_xlim(xmin, xmax)
+ax2.set_ylim(0.5, 3)
+#
+ax2.scatter(samp_x, samp_y, marker = 'o', facecolors='none', edgecolors='red', linewidths = 1.5, s = 48)
+ax2.text(xmax, 2.75, 'Sample $n = 15$', size = 16, color = 'red', va = 'center', ha = 'right')
+ax2.scatter(M, 2.25, marker = 'o', facecolors = 'g', edgecolors='g', linewidths = 1.5, s = 64)
+ax2.errorbar(M, 2.25, xerr = t_stat * std_err, fmt = 'None', ecolor = 'g', elinewidth = 1.5, capsize = 10, capthick = 1.5)
+ax2.text(xmax, 2.25, 'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
+ax2.text(M, 2, 'M', size = 20, color = 'g', ha = 'center', va = 'center')
+#
+samp_size = 50
+samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
+samp_y = [1.25 for x in samp_x]
+M = np.mean(samp_x)
+std_err = np.std(samp_x) / np.sqrt(samp_size)
+#
+ax2.scatter(samp_x, samp_y, marker = 'o', facecolors='none', edgecolors='red', linewidths = 1.5, s = 48)
+ax2.text(xmax, 1.25, 'Sample $n = 50$', size = 16, color = 'red', va = 'center', ha = 'right')
+ax2.scatter(M, 0.75, marker = 'o', facecolors = 'g', edgecolors='g', linewidths = 1.5, s = 64)
+ax2.errorbar(M, 0.75, xerr = 1.96 * std_err, fmt = 'None', ecolor = 'g', elinewidth = 1.5, capsize = 10, capthick = 1.5)
+ax2.text(xmax, 0.75, 'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
+ax2.text(M, 0.5, 'M', size = 20, color = 'g', ha = 'center', va = 'center')
+
+#ax2.text(M+f, 1.75, r'$M + f$', size = 20, color = 'g', ha = 'left', va = 'center')
+#ax2.text(M-f, 1.75, r'$M - f$', size = 20, color = 'g', ha = 'right', va = 'center');
+ax2.yaxis.set_visible(False)
+ax2.xaxis.set_visible(False)
+for spine in ax2.spines.values():
+    spine.set_visible(False)
+#
+ax1a.text(mu, np.sum(ax1a.get_ylim())/2, '$\mu$', size = 20, color = 'darkblue', ha = 'center')
+# ax1a.text(mu+sig, np.sum(ax1a.get_ylim())/2, '$\mu+\sigma$', size = 20, color = 'darkblue', ha = 'left')
+ax1a.text(mu, ax1a.get_ylim()[1], '^', size = 20, color = 'darkblue', ha = 'center')
+# ax1a.text(mu+sig, ax1a.get_ylim()[1], '^', size = 20, color = 'darkblue', ha = 'left')
+ax1a.yaxis.set_visible(False)
+ax1a.xaxis.set_visible(False)
+for spine in ax1a.spines.values():
+    spine.set_visible(False)
+ax1a.set_xlim(xmin, xmax)
+#
+ax1.set_title('SAT Scores', size=18);
+```
+
+:::
+
+## Reporting CIs
+:::{style="font-size: .8em"}
+What is the role of confidence intervals in summarizing data?
+
+The simple answer is __confidence intervals are crucial.__
+
+You cannot communicate with clarity without reporting confidence intervals.
+
+__Any time__ you are reporting a statistic derived from a sample, such as the sample mean, you should report the associated confidence intervals.
+
+Confidence intervals combine information on location and precision.  
+
+They tell you (or your reader) both __how large__ is the quantity (location) and __how much information__ the estimate provides.
+
+:::
+
+## Reporting CIs
+:::{style="font-size: .8em"}
+There are standard ways for doing this.
+
+In text, it is standard to write in this format:
+
+$M = 30.5 \text{cm, 95% CI } [18.0, 43.0]$
+
+In a table, you should use this format:
+
+|   | height | 95% CI |
+|---|---|---|
+| men, n = 25 | 69.0 in | [68.1, 69.9]|
+| women, n = 23 | 61.1 in | [60.2, 62.0] |
+
+:::
+
+## Reporting CIs
+:::{style="font-size: .8em"}
+In this lecture we've computed 95% confidence intervals.   Some statisticians will suggest that you may want to use a different confidence level depending on the setting.
+
+If your results will be used to make life-or-death decisions, perhaps a 99% or even a 99.9% confidence interval should be used.  
+
+On the other hand, if we are not so concerned about an occasional miss, perhaps a 90% or 80% confidence interval should be used. 
+
+These are reasonable considerations, but in general work it's probably best to stick with 95% confidence intervals for consistency and ease of interpretation.
+:::
+
+## Study Hours
+:::{style="font-size: .8em"}
+- Sample size: $n = 50$
+- Sample mean: $M = 15$
+- Population standard deviation: $\sigma = 4$
+
+The 95% confidence interval is given by 
+
+\begin{align*}
+&\left[M - z(\alpha/2)  \frac{\sigma}{\sqrt{n}}, M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}}\right] = \\
+& \left[15 - 1.96  \frac{4}{\sqrt{50}}, 15 + 1.96  \frac{4}{\sqrt{50}}\right] = \\
+& [13.89, 16.11]
+\end{align*}
+:::
