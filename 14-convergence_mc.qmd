@@ -13,7 +13,48 @@ format:
         chalkboard: true 
 ---
 
-## Google's PageRank
+## PageRank (last time)
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Denoting the importance of the four pages by $x_1, x_2, x_3,$ and $x_4,$ and analyzing the situation for each page, we get the following system 
+
+$$\small{\begin{align*}
+x_1 & = x_3 + (1/2)x_4,\\
+x_2 & = (1/3) x_1,\\
+x_3 & = (1/3)x_1 + (1/2) x_2 + (1/2) x_4,\\
+x_4 & = (1/3) x_1 + (1/2).
+\end{align*}}$$
+
+:::
+
+## PageRank (last time)
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Using vector $\small{\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}}$ and the transition matrix
+$\small{P = \begin{bmatrix} 0 & 0 & 1 & 1/2 \\ 1/3 & 0 & 0 & 0 \\ 1/3 & 1/2 & 0 & 1/2 \\ 1/3 & 1/2 & 0 & 0 \end{bmatrix},}$
+the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
+:::
+
+
+## PageRank (last time)
+:::{style="font-size: .8em"}
+
+Using vector $\small{\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}}$ and the transition matrix
+$\small{P = \begin{bmatrix} 0 & 0 & 1 & 1/2 \\ 1/3 & 0 & 0 & 0 \\ 1/3 & 1/2 & 0 & 1/2 \\ 1/3 & 1/2 & 0 & 0 \end{bmatrix},}$
+the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
+
+<br><br>
+
+We found the PageRank of our websites is given by the stationary state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.38 \\ 0.12 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
+:::
+
+## PageRank - but messier
 :::{style="font-size: .8em"}
 
 This time suppose that we have a small Internet consisting of just 5 websites connected as suggested by the figure below.
@@ -22,10 +63,7 @@ This time suppose that we have a small Internet consisting of just 5 websites co
 <img src="images/markov/pagerank_disconnected.png" width=600/>
 :::
 
-__Questions__: 
-
-1. Is this chain regular?
-2. Is it possible to find a unique PageRank of each website using our old PageRank computation approach?
+__Questions__:  Is it possible to find a unique PageRank of each website using our old PageRank computation approach? How can we be sure it's possible or adapt our approach?
 
 :::
 
@@ -63,7 +101,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Communicating States</span>
         <p>
-        If \(P_{ij} (n) > 0\) for some \(n\), then state \(j\) reaches state \(i\). If state \(j\) reaches state \(i\) and state \(i\) reaches state \(j\), then states \(i\) and \(j\) communicate.
+        If \(P_{ij} (n) > 0\) for some \(n\), then state \(j\) <b>reaches</b> state \(i\). If state \(j\) reaches state \(i\) and state \(i\) reaches state \(j\), then states \(i\) and \(j\) <b>communicate</b>.
         </p>
     </div>
     """
@@ -86,7 +124,6 @@ __Example__:
 
 :::
 ::: {.column width="60%"}
-Consider the two-state Markov chain shown in the figure. 
 State 0 reaches state 1 and vice versa.
 :::
 :::
@@ -111,7 +148,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Irreducible Markov Chain</span>
         <p>
-       If all states of a Markov chain communicate, then the chain is irreducible.
+       If all states of a Markov chain communicate, then the chain is <b>irreducible</b>.
         </p>
     </div>
     """
@@ -164,7 +201,7 @@ No, only the first 2 states communicate.
 :::
 
 
-## Periodic and Aperiodic States
+## The period of a state
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -175,15 +212,23 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Period of a State</span>
         <p>
-       The period of state \(i\) is \(d\) if \(P_{ii}(n) = 0\) whenever \(n\) is not divisible by \(d\) and \(d\) is the largest integer with this property.
+       The <b>period</b> \(d\) of state \(i\) is the largest integer for which \(P_{ii}(n) = 0\) whenever \(n\) is NOT divisible by \(d\). 
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Note__: If $P_{ii}(n) = 0$ for all $n,$ then the period is not definied.
 
+That is, $P_{ii}(n) > 0$ for ONLY multiples of $d$. So starting at $i$, you only have a chance to revisit $i$ at multiples of $d$ steps.
+
+__Note__: If $P_{ii}(n) = 0$ for all $n,$ (you can never make it back to $i$) then the period is not definied.
+
+:::
+
+## Periodic and aperiodic
+
+:::{style="font-size: .8em"}
 
 ```{python}
 from IPython.core.display import HTML
@@ -193,7 +238,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Periodic State</span>
         <p>
-       If a state has period greater than 1, \(d > 1\), the state is periodic. 
+       If a state has period greater than 1, \(d > 1\), the state is <b>periodic</b>. 
         </p>
     </div>
     """
@@ -210,7 +255,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Aperiodic State</span>
         <p>
-      If a state has period equal to 1, \(d = 1\), the state is aperiodic. 
+      If a state has period equal to 1, \(d = 1\), the state is <b>aperiodic</b>. 
         </p>
     </div>
     """
@@ -218,36 +263,16 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Note__: A Markov chain is aperiodic if every state has period one.
+__Note__: A Markov chain is aperiodic if every state is aperiodic.
 :::
 
-## Periodic and Aperiodic States
+## Example of state periods
 
 :::{style="font-size: .8em"}
-__Examples__:
-
 
 - Figure a: both states have period 1 (aperiodic chain) 
 - Figure b: both states have period 2 
 - Figure c: all states have period 3.
-
-
-<!-- :::{.columns}
-::: {.column width="60%"}
-
-:::{.center-text}
-<img src="images/markov/mc-period.png" width=700/>
-:::
-
-:::
-::: {.column width="40%"}
-- Figure a: both states have period 1. The chain is aperiodic.
-- Figure b: both states have period 2. 
-- Figure c: all three states have period 3. 
-:::
-::: -->
-
-
 
 
 :::{.center-text}
@@ -276,7 +301,7 @@ display(HTML(html_content))
 ```
 
 :::{.center-text}
-<img src="images/markov/mc-period-question.jpg" width=350/>
+<img src="images/markov/mc-period-question.jpg" width=300/>
 :::
 
 
@@ -312,7 +337,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Regular Markov Chain</span>
         <p>
-        A Markov chain is a regular Markov chain if some matrix power of the transition matrix \(P^k\) contains only strictly positive entries.  
+        A Markov chain is a <b>regular</b> Markov chain if some matrix power of the transition matrix \(P^k\) contains only strictly positive entries.  
         </p>
     </div>
     """
@@ -320,29 +345,10 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Note__: The transition matrix satisfying the above definition is called primitive.
-__Example__: $\small{P =\left[\begin{array}{rrr}.5&.2&.3\\.3&.8&.3\\.2&0&.4\end{array}\right]}$ does not have every entry strictly positive.  
+__Note__: The transition matrix satisfying the above definition is called **primitive**.
 
-However, $\small{P^2 = \left[\begin{array}{rrr}.37&.26&.33\\.45&.70&.45\\.18&.04&.22\end{array}\right]}$ does. Since every entry in $P^2$ is positive, the corresponding Markov chain is a regular.
+__Intuition__: No matter where you start, if the chain is regular, after some warm-up period, there's always some chance you could be in any state at any time.
 
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-        <p>
-        If a Markov chain is regular, then it is also irreducible and aperiodic.
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
-:::{.notes}
-If a Markov chain is not irreducible (aperiodic), it cannot be regular.
 :::
 
 ## Regular Markov Chain
@@ -354,21 +360,123 @@ from IPython.core.display import HTML
 def generate_html():
     return r"""
     <div class="purple-box">
+     <span class="label">Regular Markov Chain</span>
         <p>
-        A regular Markov chain with transition matrix \(P\) has a unique steady-state distribution \({\boldsymbol{\pi}}.\)  Further, if \({\bf x_0}\) is any initial state distribution and \({\bf x_{k+1}} = P{\bf x_k}\) for \(k = 0, 1, 2,\dots,\) then the Markov chain \(\{{\bf x_k}\}\) converges to \({\boldsymbol{\pi}}\) as \(k \rightarrow \infty.\)  
+        A Markov chain is a <b>regular</b> Markov chain if some matrix power of the transition matrix \(P^k\) contains only strictly positive entries.  
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Example__: In the following chain, for each node, all transitions out of that node are equally probable. Does this Markov chain converge to a unique steady-state distribution?
+
+__Note__: The transition matrix satisfying the above definition is called **primitive**.
+
+__Example__: $\small{P =\left[\begin{array}{rrr}.5&.2&.3\\.3&.8&.3\\.2&0&.4\end{array}\right]}$ does not have every entry strictly positive.  
+
+However, $\small{P^2 = \left[\begin{array}{rrr}.37&.26&.33\\.45&.70&.45\\.18&.04&.22\end{array}\right]}$ does. 
+
+Since every entry in $P^2$ is positive, the corresponding Markov chain is a regular (and $\small{P}$ is primitive.)
+
+:::
+
+## Regular Markov Chain
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Regular Markov Chain</span>
+        <p>
+        A Markov chain is a <b>regular</b> Markov chain if some matrix power of the transition matrix \(P^k\) contains only strictly positive entries.  
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+Putting it together, we can show that:
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+        <p>
+        If a Markov chain is regular, then it is also irreducible and aperiodic.
+<br><br>
+        If a Markov chain is irreducible and aperiodic, it is regular
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## Markov Chain Convergence
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+        <p>
+        Every <b>regular</b> Markov chain has a unique steady-state distribution \({\boldsymbol{\pi}}.\)  
+        <br><br>
+        If \({\bf x_0}\) is any initial state distribution and \({\bf x_{k+1}} = P{\bf x_k}\) for \(k = 0, 1, 2,\dots\) then the Markov chain \(\{{\bf x_k}\}\) converges to \({\boldsymbol{\pi}}\) as \(k \rightarrow \infty.\)  
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: Does this Markov chain converge to a unique steady-state distribution?
 
 :::{.center-text}
 <img src="images/markov/mc-example-5.jpeg" width=250/>
 :::
 
 :::
+
+
+## Markov Chain Convergence
+
+:::{style="font-size: .8em"}
+
+__Example__: Does this Markov chain converge to a unique steady-state distribution?
+
+:::{.center-text}
+<img src="images/markov/mc-example-5.jpeg" width=250/>
+:::
+
+One approach would be to answer:
+
+- Is it aperiodic?
+- Is it irreducible?
+
+:::
+
+
+## Regular Markov Chain
+
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+
+We can also calculate it out.
+
+The transition matrix contains several zero entries:
+$$\small{P = \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix}.}$$
+
+::: 
 
 ## Regular Markov Chain
 
@@ -402,13 +510,11 @@ Hence, the Markov chain is regular. It converges to a unique steady state.
 - States 3, 4, and 5 cannot reach states 1 and 2
 :::
 :::
-The chain in not aperiodic:
+2. The chain in not aperiodic (States 1 and 2 have period 2)
 
-- States 1 and 2 have period 2
+3. Hence, this chain is not regular.
 
-Hence, this chain is not regular.
-
-2. Since the chain is not regular, there is no guarantee that we can find a unique PageRank vector.
+4. Since the chain is not regular, there is no guarantee that we can find a unique PageRank vector.
 
 
 :::
@@ -421,14 +527,86 @@ States 3, 4, 5 are aperiodic, but that does not matter
 :::{style="font-size: .8em"}
 Here, $\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1/2 & 1/2 \\0 & 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1/2 & 1/2 & 0 \end{bmatrix}}.$
 
-There are 2 steady state vectors satisfying $P\mathbf{x} = \mathbf{x}:$ $\small{\begin{bmatrix} 1/2 \\ 1/2 \\ 0 \\ 0 \\ 0\end{bmatrix}}$ and $\small{\begin{bmatrix} 0 \\ 0 \\ 1/3 \\ 1/3 \\ 1/3\end{bmatrix}}$
 
-The solution to this problem was proposed by Page and Brin.
+
 
 :::
 
-:::{.notes}
-https://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture3/lecture3.html
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+Here, $\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1/2 & 1/2 \\0 & 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1/2 & 1/2 & 0 \end{bmatrix}}.$
+
+There are 2 steady state vectors satisfying $P\mathbf{x} = \mathbf{x}:$ $\small{\begin{bmatrix} 1/2 \\ 1/2 \\ 0 \\ 0 \\ 0\end{bmatrix}}$ and $\small{\begin{bmatrix} 0 \\ 0 \\ 1/3 \\ 1/3 \\ 1/3\end{bmatrix}}$
+
+
+
+:::
+
+## PageRank Soln: Add Jumps
+
+:::{style="font-size: .65em"}
+
+The solution proposed by Page and Brin: introduce a small probability that a user randomly jumps to any page in the network, rather than following links.
+
+__The Google Matrix__:
+
+$$\small{G = \alpha P + (1-\alpha) \frac{1}{n} \mathbf{J}}$$
+
+- $P$ is the original transition matrix
+- $\alpha$ is the damping factor (typically $\alpha \approx 0.85$)
+- $n$ is the number of states (websites)
+- $\mathbf{J}$ is an $n \times n$ matrix of all ones
+
+__Interpretation__:
+
+- With probability $\alpha$, follow a link (use $P$)
+- With probability $(1-\alpha)$, jump to a random page
+
+:::
+
+## PageRank Solution: Example
+
+:::{style="font-size: .8em"}
+
+Recall our problematic 5-website network with transition matrix:
+
+$$\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1/2 & 1/2 \\0 & 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1/2 & 1/2 & 0 \end{bmatrix}}$$
+
+Using $\alpha = 0.99$ (1% chance of random jump):
+
+$$\small{G = 0.99 P + 0.01 \cdot \frac{1}{5} \begin{bmatrix} 1 & 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 & 1 \end{bmatrix}}$$
+
+:::
+
+## PageRank Solution: The Google Matrix
+
+:::{style="font-size: .8em"}
+
+$$\small{G = \begin{bmatrix} 0.002 & 0.992 & 0.002 & 0.002 & 0.002 \\ 0.992 & 0.002 & 0.002 & 0.002 & 0.002 \\ 0.002 & 0.002 & 0.002 & 0.497 & 0.497 \\ 0.002 & 0.002 & 0.497 & 0.002 & 0.497 \\ 0.002 & 0.002 & 0.497 & 0.497 & 0.002 \end{bmatrix}}$$
+
+__Key properties__:
+
+- Every entry is strictly positive
+- The matrix $G$ is primitive (hence the chain is regular!)
+- Therefore, a unique steady-state distribution exists
+
+:::
+
+## PageRank Steady State
+
+:::{style="font-size: .8em"}
+
+The Google matrix $G$ has a unique steady-state vector:
+
+$$\small{\boldsymbol{\pi} \approx \begin{bmatrix} 0.1603 \\ 0.1603 \\ 0.2265 \\ 0.2265 \\ 0.2265 \end{bmatrix}}$$
+
+__Observations__:
+
+- All pages now have non-zero PageRank
+- Pages 3, 4, and 5 have higher ranks (more interconnected)
+- The random jumps ensure regularity while preserving the link structure
+
 :::
 
 ## Group Question 1
@@ -451,10 +629,6 @@ def generate_html():
     <br>
     b. Find the period of each state of this Markov chain.
     <br>
-    <br>
-    <br>
-    <br>
-    
         </p>
     </div>
     """
@@ -464,9 +638,8 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-a. (0,1), (3,4), (6,7,8)
-b. 0: 1
-1+2: 1
+a. (1,2), (3,4), (6,7,8)
+b. 1+2: 1
 3+4: 2
 5: 1
 6+7+8: 1
@@ -476,9 +649,6 @@ b. 0: 1
 ## Group Question 2
 :::{style="font-size: .8em"}
 
-:::{.center-text}
-<img src="images/markov/mc-comm-period-question.jpg" width=450/>
-:::
 
 ```{python}
 from IPython.core.display import HTML
@@ -488,9 +658,12 @@ def generate_html():
     <div class="blue-box">
         <p>
     Consider a Markov chain with transition matrix given by
-    \(\small{P = \begin{bmatrix}0 & 0.8 & 0.5\\ 0.3 & 0 & 0.5 \\ 0.7 & 0.2 & 0 \end{bmatrix}}.\) Show by means of a computation that the chain is regular.
+    \(\small{P = \begin{bmatrix}0 & 0.8 & 0.5\\ 0.3 & 0 & 0.5 \\ 0.7 & 0.2 & 0 \end{bmatrix}}.\)
+    <br><br>
+    a.  Show by means of a computation that the chain is regular.
     <br>
     <br>
+    b. Draw the markov chain and use that to prove it another way.
     <br>
     <br>
     <br>
