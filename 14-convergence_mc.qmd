@@ -13,7 +13,48 @@ format:
         chalkboard: true 
 ---
 
-## Google's PageRank
+## PageRank (last time)
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Denoting the importance of the four pages by $x_1, x_2, x_3,$ and $x_4,$ and analyzing the situation for each page, we get the following system 
+
+$$\small{\begin{align*}
+x_1 & = x_3 + (1/2)x_4,\\
+x_2 & = (1/3) x_1,\\
+x_3 & = (1/3)x_1 + (1/2) x_2 + (1/2) x_4,\\
+x_4 & = (1/3) x_1 + (1/2).
+\end{align*}}$$
+
+:::
+
+## PageRank (last time)
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/markov/pagerank_example.png" width=300/>
+:::
+
+Using vector $\small{\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}}$ and the transition matrix
+$\small{P = \begin{bmatrix} 0 & 0 & 1 & 1/2 \\ 1/3 & 0 & 0 & 0 \\ 1/3 & 1/2 & 0 & 1/2 \\ 1/3 & 1/2 & 0 & 0 \end{bmatrix},}$
+the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
+:::
+
+
+## PageRank (last time)
+:::{style="font-size: .8em"}
+
+Using vector $\small{\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}}$ and the transition matrix
+$\small{P = \begin{bmatrix} 0 & 0 & 1 & 1/2 \\ 1/3 & 0 & 0 & 0 \\ 1/3 & 1/2 & 0 & 1/2 \\ 1/3 & 1/2 & 0 & 0 \end{bmatrix},}$
+the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
+
+<br><br>
+
+We found the PageRank of our websites is given by the stationary state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.38 \\ 0.12 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
+:::
+
+## PageRank - but messier
 :::{style="font-size: .8em"}
 
 This time suppose that we have a small Internet consisting of just 5 websites connected as suggested by the figure below.
@@ -22,7 +63,7 @@ This time suppose that we have a small Internet consisting of just 5 websites co
 <img src="images/markov/pagerank_disconnected.png" width=600/>
 :::
 
-__Question__:  Is it possible to find a unique PageRank of each website using our old PageRank computation approach? How can we be sure it's possible?
+__Questions__:  Is it possible to find a unique PageRank of each website using our old PageRank computation approach? How can we be sure it's possible or adapt our approach?
 
 :::
 
@@ -306,6 +347,8 @@ display(HTML(html_content))
 
 __Note__: The transition matrix satisfying the above definition is called **primitive**.
 
+__Intuition__: No matter where you start, if the chain is regular, after some warm-up period, there's always some chance you could be in any state at any time.
+
 :::
 
 ## Regular Markov Chain
@@ -404,10 +447,31 @@ __Example__: Does this Markov chain converge to a unique steady-state distributi
 
 :::
 
+
+## Markov Chain Convergence
+
+:::{style="font-size: .8em"}
+
+__Example__: Does this Markov chain converge to a unique steady-state distribution?
+
+:::{.center-text}
+<img src="images/markov/mc-example-5.jpeg" width=250/>
+:::
+
+One approach would be to answer:
+
+- Is it aperiodic?
+- Is it irreducible?
+
+:::
+
+
 ## Regular Markov Chain
 
 :::{style="font-size: .8em"}
 __Example (continued)__: 
+
+We can also calculate it out.
 
 The transition matrix contains several zero entries:
 $$\small{P = \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix}.}$$
@@ -458,6 +522,16 @@ Hence, the Markov chain is regular. It converges to a unique steady state.
 :::{.notes}
 States 3, 4, 5 are aperiodic, but that does not matter
 :::
+
+## Google's PageRank
+:::{style="font-size: .8em"}
+Here, $\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1/2 & 1/2 \\0 & 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1/2 & 1/2 & 0 \end{bmatrix}}.$
+
+
+
+
+:::
+
 
 ## Google's PageRank
 :::{style="font-size: .8em"}
@@ -584,9 +658,12 @@ def generate_html():
     <div class="blue-box">
         <p>
     Consider a Markov chain with transition matrix given by
-    \(\small{P = \begin{bmatrix}0 & 0.8 & 0.5\\ 0.3 & 0 & 0.5 \\ 0.7 & 0.2 & 0 \end{bmatrix}}.\) Show by means of a computation that the chain is regular.
+    \(\small{P = \begin{bmatrix}0 & 0.8 & 0.5\\ 0.3 & 0 & 0.5 \\ 0.7 & 0.2 & 0 \end{bmatrix}}.\)
+    <br><br>
+    a.  Show by means of a computation that the chain is regular.
     <br>
     <br>
+    b. Draw the markov chain and use that to prove it another way.
     <br>
     <br>
     <br>
