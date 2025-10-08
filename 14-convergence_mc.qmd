@@ -92,7 +92,7 @@ __Questions__:  Is it possible to find a unique PageRank of each website using o
 
 ## Communicating States
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 ```{python}
 from IPython.core.display import HTML
 
@@ -116,7 +116,7 @@ __Notation__:
 __Example__: 
 
 :::{.columns}
-::: {.column width="40%"}
+::: {.column width="35%"}
 
 :::{.center-text}
 <img src="images/markov/mc-example-3-new.jpg" width=450/>
@@ -549,7 +549,7 @@ There are 2 steady state vectors satisfying $P\mathbf{x} = \mathbf{x}:$ $\small{
 
 The solution proposed by Page and Brin: introduce a small probability that a user randomly jumps to any page in the network, rather than following links.
 
-__The Google Matrix__:
+__The Google Matrix__ (Don't memorize this! It's serving as an example):
 
 $$\small{G = \alpha P + (1-\alpha) \frac{1}{n} \mathbf{J}}$$
 
@@ -662,11 +662,7 @@ def generate_html():
     <br><br>
     a.  Show by means of a computation that the chain is regular.
     <br>
-    <br>
     b. Draw the markov chain and use that to prove it another way.
-    <br>
-    <br>
-    <br>
     <br>
     
         </p>
