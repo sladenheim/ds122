@@ -10,7 +10,10 @@ format:
         highlight-style: github
         slide-number: true
         show-slide-number: all
-        chalkboard: true 
+        chalkboard: true
+
+filters:
+    - pyodide
 ---
 
 ## Should You Play the Lottery?
@@ -60,7 +63,7 @@ In the remaining part of the course, we will rarely mention sample spaces and wo
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
-<img src="images/random variables/MA_lottery_logo.png" width=400/>
+<img src="images/random_variables/MA_lottery_logo.png" width=400/>
 :::
 :::
 ::: {.column width="60%"}
@@ -530,6 +533,12 @@ $$
 But 3.5 is a value that can _**never occur**_ for a roll of the die!
 :::
 
+:::{.notes}
+Less detail, but a good summary of how the values are centered.
+
+The sum of all possible values it can take, each multiplied by its probability.
+:::
+
 ## Variance
 :::{style="font-size: .8em"}
 ```{python}
@@ -565,7 +574,7 @@ $$ \small \mbox{Var} (X) = \sum_{x=1}^{6} (x-3.5)^2\; P(X=x)= 1/6\sum_{x=1}^{6} 
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
-<img src="images/random variables/MA_lottery_logo.png" width=400/>
+<img src="images/random_variables/MA_lottery_logo.png" width=400/>
 :::
 :::
 ::: {.column width="60%"}
@@ -581,7 +590,7 @@ Question 1: _**How did return rates differ between normal days and roll-down day
 
 \begin{align*}  
     \small{E[X]} &= \small{(10^6 - 2) \cdot 1/9366819 + 3998 \cdot 1/39028 +}\\
-    &\small{+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2*0.83 = -1.2}
+    &\small{+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2 \cdot 0.83 = -1.2}
 \end{align*} 
 :::
 
@@ -598,7 +607,14 @@ Prize distribution on February 7, 2005, a roll-down day:
 
 - Expected value of returns in \$ on February 7, 2005:
 
-$$ \small E[X] = (5 \cdot 10^4 - 2) \cdot 1/39028 + 2383 \cdot 1/801 + 58 \cdot 1/47 - 2*0.83 = 3.8$$
+$$ \small E[X] = (5 \cdot 10^4 - 2) \cdot 1/39028 + 2383 \cdot 1/801 + 58 \cdot 1/47 - 2 \cdot 0.83 = 3.8$$
+:::
+
+:::{.notes}
+Before: 5/6 - 4 000<br>
+4/6 - 150<br>
+3/6 - 5
+
 :::
 
 ## Cash WinFall Game
@@ -612,14 +628,8 @@ Keeping this in mind, MIT students, purchased thousands of Cash WinFall tickets 
 
 ## Group Question 1
 
-```{python}
-
+```{pyodide-python}
 import numpy as np
-```
-
-:::{.center-text}
-```{python}
-#| echo: true
 
 # Outcomes
 outcomes = np.array([1, 2, 3, 4, 5, 6])
@@ -635,7 +645,7 @@ print("Expected value: ", mean)
 variance = np.sum((outcomes-mean)**2 * probabilities)
 print("Variance: ",variance)
 ```
-:::
+
 
 :::{style="font-size: .8em"}
 ```{python}

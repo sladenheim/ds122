@@ -41,8 +41,8 @@ That question leads us to parameter estimation, the focus of the next three lect
     * Population
     * Sample
     * Statistic
-- Definition of parameter estimation
-- Poin estimation
+- Parameter estimation
+- Point estimation
 - Evaluation of an estimator:
     * Bias
     * Variance
@@ -86,7 +86,7 @@ You collect a dataset consisting of 100 swipes, each swipe from a different user
 
 __Questions__: 
 
-1. Can the the mean of the collected swipes be used to estimate $\theta$? 
+1. Can the mean of the collected swipes be used to estimate $\theta$? 
 2. How precise and accurate is this estimation?
 
 :::
@@ -111,7 +111,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Note__: A population is typically not directly observable.
+__Remark__: A population is typically not directly observable.
 
 A population is the universe of possible data for a specified object. It can be people, places, objects, and many other things.
 
@@ -195,7 +195,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Note__: A statistic must be observable. 
+__Remark__: A statistic must be observable. 
 
 ```{python}
 from IPython.core.display import HTML
@@ -282,9 +282,11 @@ We want to fit normal distribution $\mathcal{N}(\mu, \sigma^2)$ to this data. Pa
 ## Parameter Estimation
 
 :::{style="font-size: .8em"}
-Parameter estimation is needed when we are given some data and we want to treat it as an _independent and identically distributed (or i.i.d.)_ sample from some population distribution.
+Parameter estimation is needed when we are given some data and we want to treat it as an _**independent and identically distributed (or i.i.d.)**_ sample from some population distribution.
 
+<br><br>
 We will use $\theta$ (which can be a scalar or a vector) to represent the parameter(s).  
+
 
 
 __Example__: In the study of height of male students at BU, $\theta = (\mu, \sigma).$
@@ -303,7 +305,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Point Estimator </span>
         <p>
-        A point estimator is a statistic that is used to estimate the unknown population parameter and whose realisation is a single point.
+        A point estimator is a statistic that is used to estimate the unknown population parameter and whose realization is a single point.
         </p>
     </div>
     """
@@ -347,15 +349,15 @@ for spine in ax1.spines.values():
 ## Point Estimation
 
 :::{style="font-size: .8em"}
-Let's say our data is $\{x^{(1)}, \dots, x^{(m)}\}$. A point estimator can be any function $g$ of the data:
+Let's say our data is $\{x^{(1)}, \dots, x^{(m)}\}$. _**A point estimator can be any function $g$ of the data:**_
 
 $$ \hat{\theta}_m = g\left(x^{(1)}, \dots, x^{(m)}\right). $$
 
-We'll use the hat notation ($\hat{\theta}$) to indicate a point estimator of $\theta$.
+We use the _**hat notation**_ ($\hat{\theta}$) to indicate a point estimator of $\theta$.
 
-Note that the above description does not require that $g$ returns a value that is close to the parameter(s) $\theta$. 
-
- _Any function qualifies as an estimator_. However, a good estimator is a function whose output is close to $\theta$.
+__Remark__: The above description does not require that $g$ returns a value that is close to the parameter(s) $\theta$. 
+Any function qualifies as an estimator. However, a good estimator is a function whose output is close to $\theta$.
+<br><br>
 
 
 ```{python}
@@ -379,7 +381,7 @@ display(HTML(html_content))
 
 :::{style="font-size: .8em"}
 
-In the frequentist perspective on statistics, $\theta$ is _fixed but unknown,_ while $\hat{\theta}$ is a function of the data. Therefore, $\hat{\theta}$ is a _random variable_ which has a probability distribution referred to as its _sampling distribution_.
+__Frequentist perspective__: $\theta$ is _**fixed but unknown**_, while $\hat{\theta}$ is a function of the data. Therefore, $\hat{\theta}$ is a _**random variable**_ which has a probability distribution referred to as its **sampling distribution**.
 
 
 ```{python}
@@ -425,7 +427,7 @@ __Example__: Recall that Bernoulli random variable has
 :::
 :::
 
-Consider data sample $\small{\{x^{(1)}, \dots, x^{(m)}\}}$ drawn independently and identically from a Bernoulli distribution with mean $\theta.$
+Consider data sample (or realizations) $\small{\{x^{(1)}, \dots, x^{(m)}\}}$ drawn independently and identically from a Bernoulli distribution with mean $\theta.$
 <!-- 
 $$\small{p\left(x^{(i)}; \theta\right) = \theta^{x^{(i)}}\left(1-\theta\right)^{\left(1-x^{(i)}\right)}.} $$ -->
 
@@ -437,7 +439,7 @@ $$\small{\hat{\theta}_m = g\left(x^{(1)}, \dots, x^{(m)}\right) = \frac{1}{m}\su
 ## Bias and Variance
 
 :::{style="font-size: .8em"}
-We use _bias_ and _variance_ to describe an estimator.
+We use **bias** and **variance** to describe an estimator.
 Bias measures the difference between the expected value of the estimator and the true value of the parameter, while variance measures how much the estimator can vary as a function of the data sample. 
 
 :::{.center-text}
@@ -445,7 +447,264 @@ Bias measures the difference between the expected value of the estimator and the
 :::
 :::
 
-## Bias and Variance
+## Bias 
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Bias </span>
+        <p>
+        The bias of an estimator is defined as:
+    
+    $$ \operatorname{bias}\left(\hat{\theta}_m\right) = E\left[\hat{\theta}_m\right] - \theta, $$
+
+    where the expectation is over the data (seen as realizations of a random variable) and \(\theta\) is the true underlying value of \(\theta\) used to define the data-generating distribution.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: 
+An estimator is said to be __unbiased__ if $\operatorname{bias}\left(\hat{\theta}_m\right) = 0$, or in other words $E\left[\hat{\theta}_m\right] = \theta$.
+:::
+
+## Bias 
+
+:::{style="font-size: .8em"}
+__Example__: Let us return to our example for the mean of the Bernoulli.
+    
+$$\small{\operatorname{bias}\left(\hat{\theta}_m\right) = E\left[\hat{\theta}_m\right] - \theta \\
+= E\left[\frac{1}{m} \sum_{i=1}^m x^{(i)} \right] - \theta}$$
+
+$$\small{ = \frac{1}{m} \sum_{i=1}^m E\left[x^{(i)} \right] - \theta}$$
+
+$$\small{ = \frac{1}{m} \sum_{i=1}^m (\theta) - \theta\\
+= \theta - \theta = 0.}$$
+
+We have proven that this estimator of $\theta$ is unbiased.
+:::
+
+## Variance
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Variance </span>
+        <p>
+    The variance of an estimator is simply the variance
+
+    $$ \operatorname{Var}\left(\hat{\theta}\right) = \operatorname{Var}\left(g\left(x^{(1)}, \dots, x^{(m)}\right)\right)$$
+
+    where \(g\left(x^{(1)}, \dots, x^{(m)}\right)\) is a function of the data set.   
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+Remember that the data set is random; it is assumed to be an i.i.d. sample of some distribution.
+
+Recall: <br>
+I. If $\operatorname{Var}(X)$ exists and $Y=a+bX$, then $\operatorname{Var}(Y) = b^2\operatorname{Var}(X)$.<br>
+II. If $\{X_1, X_2, \dots, X_m\}$ are i.i.d., then $\operatorname{Var}\sum_{i=1}^m X_i = m\operatorname{Var}\left(X_1\right).$
+:::
+
+## Variance
+
+:::{style="font-size: .8em"}
+__Example__: Let us return again to our example where the sample is drawn from the Bernoulli distribution and the estimator $\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}$ is simply the mean of $m$ observations.
+
+We see that the variance of the mean is:
+
+$$\operatorname{Var}\left(\hat{\theta}_m\right) = \operatorname{Var}\left( \frac{1}{m} \sum_{i=1}^m x^{(i)} \right)
+=\frac{1}{m^2}\operatorname{Var}\left( \sum_{i=1}^m x^{(i)} \right) $$
+
+$$ = \frac{1}{m^2} m \operatorname{Var}\left(x^{(1)}\right)
+= \frac{1}{m}\theta (1-\theta).$$
+
+This has a desirable property: as the number of data points $m$ increases, the variance of the estimate decreases.
+:::
+
+## Mean Squared Error
+
+:::{style="font-size: .8em"}
+Consider two estimators, $g$ and $h$, each of which are used to estimate a certain parameter $\theta$.
+
+```{python}
+from scipy.stats import norm
+from scipy.stats import uniform
+from numpy.random import default_rng
+
+rng = default_rng(12)
+
+# just some numbers that make a nice plot
+mu = 1050
+sig = 209
+# MSE of estimator of k having dist (mu, sigma) is sigma^2 + (mu - k)^2
+mse1 = sig**2
+#
+offset = 200
+mu2 = mu + offset
+sig2 = 54
+mse2 = (offset**2) + (sig2**2)
+# print(mse1, mse2)
+#
+samp_size = 15
+#
+# gaussian curve
+fig, ax = plt.subplots(1, 1, figsize = (14,3))
+x = np.linspace(norm.ppf(0.001, loc = mu, scale = sig), norm.ppf(0.999, loc = mu, scale = sig), 100)
+ax.plot(x, norm.pdf(x, loc = mu, scale = sig),'b-', lw = 5, alpha = 0.6, label = '$g$')
+x = np.linspace(norm.ppf(0.001, loc = mu2, scale = sig2), norm.ppf(0.999, loc = mu2, scale = sig2), 100)
+ax.plot(x, norm.pdf(x, loc = mu2, scale = sig2),'r-', lw = 5, alpha = 0.6, label = '$h$')
+xmin, xmax = (x[0], x[-1])
+plt.legend(loc = 'best')
+# sample plot
+# turn off y axis entirely
+ax.yaxis.set_visible(False)
+#
+# vertical line
+ymin, ymax = ax.get_ylim()
+plt.vlines(x = mu, ymin = ymin, ymax = ymax-.003, color = 'k')
+plt.text(mu, ymax-0.003, r'$\theta$', size = 20, ha = 'center', va = 'bottom');
+# hide x axis but not its label
+# ax.xaxis.set_major_locator(plt.NullLocator())
+# remove the "box" around the plot
+#for spine in ax.spines.values():
+#    spine.set_visible(False)
+# ax.text(1600, np.sum(ax2.get_ylim())/2 - 0.03, 'Sample', size = 16, color = 'red')
+```
+
+- Estimator $h$ has low variance, but is biased.    
+- Estimator $g$ is unbiased, but has high variance.
+
+Which is better?
+
+:::
+
+## Mean Squared Error
+
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Mean Squared Error </span>
+        <p>
+        The mean squared error (MSE) measures the "average distance squared" between the estimator and the true value: 
+
+        $$\small{\operatorname{MSE}\left(\hat{\theta}_m\right) = E\left[\left(\hat{\theta}_m - \theta\right)^2\right]}.$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+The MSE is a good single number for evaluating an estimator, because it turns out that:
+    
+$$\small{\operatorname{MSE}\left(\hat{\theta}_m\right) = \operatorname{bias}\left(\hat{\theta}_m\right)^2 + \operatorname{Var}\left(\hat{\theta}_m\right)}.$$
+:::
+
+
+## Swipe Right or Left?
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="25%"}
+
+:::{.center-text}
+<img src="images/parameter_estimation/arrows.jpeg" width=500/>
+:::
+
+:::
+::: {.column width="75%"}
+__Question 1__:
+We can assume that each swipe is drawn independently from a Bernoulli distribution with unknown parameter $\theta,$ the chance of a right swipe.
+
+:::
+:::
+
+During the lecture we saw that the mean of the collected swipes    
+$$\small{\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}},$$ 
+
+can be used for the estimation of $\theta.$ 
+
+In our case, $m=100.$
+:::
+
+## Swipe Right or Left?
+:::{style="font-size: .8em"}
+
+__Question 2__:
+This estimation is 
+
+- accurate: $\small{\hat{\theta}_{100}}$ is unbiased;
+- relatively precise: $\small{\operatorname{Var}(\hat{\theta}_{100}}) = \frac{1}{100} \theta(1-\theta).$
+
+```{python}
+#| echo: true
+import random
+random.seed(2)
+
+# Assume that the true probability of a right swipe is 0.37
+true_theta = 0.37
+
+# Number of swipes per simulation
+n = 100
+
+# Number of simulations
+num_simulations = 1000
+
+# Store estimated thetas
+estimated_thetas = []
+
+
+# Perform simulations
+for _ in range(num_simulations):
+    swipes = np.random.binomial(1, true_theta, n)
+    estimated_theta = np.mean(swipes)
+    estimated_thetas.append(estimated_theta)
+
+```
+
+:::
+
+## Swipe Right or Left?
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+```{python}
+
+# Plot histogram of estimated thetas
+plt.figure(figsize=(8, 6))
+plt.hist(estimated_thetas, bins=30, color='lightgreen', edgecolor='black')
+plt.axvline(true_theta, color='red', linestyle='dashed', linewidth=2, label=f'True θ = {true_theta}')
+plt.title('Distribution of Estimated θ (True θ = 0.37)')
+plt.xlabel('Estimated θ')
+plt.ylabel('Frequency')
+plt.legend()
+plt.grid(True)
+plt.savefig("theta_simulation_037.png")
+plt.show()
+```
+:::
+:::
+
+## Group Question 1
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -509,181 +768,11 @@ for ax in axs.flat:
 ```
 :::
 
-## Bias 
-
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-     <span class="label"> Bias </span>
-        <p>
-        The bias of an estimator is defined as:
-    
-    $$ \operatorname{bias}\left(\hat{\theta}_m\right) = E\left[\hat{\theta}_m\right] - \theta, $$
-
-    where the expectation is over the data (seen as realizations of a random variable) and \(\theta\) is the true underlying value of \(\theta\) used to define the data-generating distribution.
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-__Note__: 
-An estimator is said to be __unbiased__ if $\operatorname{bias}\left(\hat{\theta}_m\right) = 0$, or in other words $E\left[\hat{\theta}_m\right] = \theta$.
+:::{.notes}
+b
 :::
 
-## Bias 
-
-:::{style="font-size: .8em"}
-__Example__: Let us return to our example for the mean of the Bernoulli.
-    
-$$\small{\operatorname{bias}\left(\hat{\theta}_m\right) = E\left[\hat{\theta}_m\right] - \theta \\
-= E\left[\frac{1}{m} \sum_{i=1}^m x^{(i)} \right] - \theta}$$
-
-$$\small{ = \frac{1}{m} \sum_{i=1}^m E\left[x^{(i)} \right] - \theta \\
-= \frac{1}{m} \sum_{i=1}^m \sum_{x^{(i)}=0}^1 \left(x^{(i)} \theta^{x^{(i)}}\left(1-\theta\right)^{\left(1-x^{(i)}\right)}\right) - \theta}$$
-
-$$\small{ = \frac{1}{m} \sum_{i=1}^m (\theta) - \theta\\
-= \theta - \theta = 0.}$$
-
-We have proven that this estimator of $\theta$ is unbiased.
-:::
-
-## Variance
-
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-     <span class="label"> Variance </span>
-        <p>
-    The variance of an estimator is simply the variance
-
-    $$ \operatorname{Var}\left(\hat{\theta}\right) = \operatorname{Var}\left(g\left(x^{(1)}, \dots, x^{(m)}\right)\right)$$
-
-    where \(g\left(x^{(1)}, \dots, x^{(m)}\right)\) is a function of the data set.   
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-Remember that the data set is random; it is assumed to be an i.i.d. sample of some distribution.
-
-Recall: <br>
-I. If $\operatorname{Var}(X)$ exists and $Y=a+bX$, then $\operatorname{Var}(Y) = b^2\operatorname{Var}(X)$.<br>
-II. If $\{X_1, X_2, \dots, X_m\}$ are i.i.d., then $\operatorname{Var}\sum_{i=1}^m X_i = m\operatorname{Var}\left(X_1\right).$
-:::
-
-## Variance
-
-:::{style="font-size: .8em"}
-__Example__: Let us return again to our example where the sample is drawn from the Bernoulli distribution and the estimator $\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}$ is simply the mean of $m$ observations.
-
-We see that the variance of the mean is:
-
-$$\operatorname{Var}\left(\hat{\theta}_m\right) = \operatorname{Var}\left( \frac{1}{m} \sum_{i=1}^m x^{(i)} \right)
-=\frac{1}{m^2}\operatorname{Var}\left( \sum_{i=1}^m x^{(i)} \right) $$
-
-$$ = \frac{1}{m^2} m \operatorname{Var}\left(x^{(1)}\right)
-= \frac{1}{m}\theta (1-\theta).$$
-
-This has a desirable property: as the number of data points $m$ increases, the variance of the estimate decreases.
-:::
-
-## Mean Squared Error
-
-:::{style="font-size: .8em"}
-Consider two estimators, $g$ and $h$, each of which are used as estimates of a certain parameter $\theta$.
-
-Let us say that these estimators show the following distributions:
-
-```{python}
-from scipy.stats import norm
-from scipy.stats import uniform
-from numpy.random import default_rng
-
-rng = default_rng(12)
-
-# just some numbers that make a nice plot
-mu = 1050
-sig = 209
-# MSE of estimator of k having dist (mu, sigma) is sigma^2 + (mu - k)^2
-mse1 = sig**2
-#
-offset = 200
-mu2 = mu + offset
-sig2 = 54
-mse2 = (offset**2) + (sig2**2)
-# print(mse1, mse2)
-#
-samp_size = 15
-#
-# gaussian curve
-fig, ax = plt.subplots(1, 1, figsize = (14,3))
-x = np.linspace(norm.ppf(0.001, loc = mu, scale = sig), norm.ppf(0.999, loc = mu, scale = sig), 100)
-ax.plot(x, norm.pdf(x, loc = mu, scale = sig),'b-', lw = 5, alpha = 0.6, label = '$g$')
-x = np.linspace(norm.ppf(0.001, loc = mu2, scale = sig2), norm.ppf(0.999, loc = mu2, scale = sig2), 100)
-ax.plot(x, norm.pdf(x, loc = mu2, scale = sig2),'r-', lw = 5, alpha = 0.6, label = '$h$')
-xmin, xmax = (x[0], x[-1])
-plt.legend(loc = 'best')
-# sample plot
-# turn off y axis entirely
-ax.yaxis.set_visible(False)
-#
-# vertical line
-ymin, ymax = ax.get_ylim()
-plt.vlines(x = mu, ymin = ymin, ymax = ymax-.003, color = 'k')
-plt.text(mu, ymax-0.003, r'$\theta$', size = 20, ha = 'center', va = 'bottom');
-# hide x axis but not its label
-# ax.xaxis.set_major_locator(plt.NullLocator())
-# remove the "box" around the plot
-#for spine in ax.spines.values():
-#    spine.set_visible(False)
-# ax.text(1600, np.sum(ax2.get_ylim())/2 - 0.03, 'Sample', size = 16, color = 'red')
-```
-
-The figure shows that estimator $h$ has low variance, but is biased.   Meanwhile, estimator $g$ is unbiased, but has high variance.
-
-Which is better?
-
-:::
-
-## Mean Squared Error
-
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-     <span class="label"> Mean Squared Error </span>
-        <p>
-        The mean squared error (MSE) measures the "average distance squared" between the estimator and the true value: 
-
-        $$\small{\operatorname{MSE}\left(\hat{\theta}_m\right) = E\left[\left(\hat{\theta}_m - \theta\right)^2\right]}.$$
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-The MSE is a good single number for evaluating an estimator, because it turns out that:
-    
-$$\small{\operatorname{MSE}\left(\hat{\theta}_m\right) = \operatorname{bias}\left(\hat{\theta}_m\right)^2 + \operatorname{Var}\left(\hat{\theta}_m\right)}.$$
-:::
-
-## Mean Squared Error
+## Group Question 2
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -693,7 +782,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Consider again data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean $\theta$:
+    Consider again data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean \(\theta:\)
 
     $$ p\left(x^{(i)}; \theta\right) = \theta^{x^{(i)}}\left(1-\theta\right)^{\left(1-x^{(i)}\right)} $$
 
@@ -709,86 +798,4 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-:::
-
-## Swipe Right or Left?
-:::{style="font-size: .8em"}
-
-:::{.columns}
-::: {.column width="25%"}
-
-:::{.center-text}
-<img src="images/parameter_estimation/arrows.jpeg" width=500/>
-:::
-
-:::
-::: {.column width="75%"}
-__Question 1__:
-We can assume that each swipe is drawn independently from a Bernoulli distribution with unknown parameter $\theta,$ the chance of a right swipe.
-
-:::
-:::
-
-During the lecture we saw that the mean of the collected swipes    
-$$\small{\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}},$$ 
-
-can be used for the estimation of $\theta.$ 
-
-In our case, $m=100.$
-:::
-
-## Swipe Right or Left?
-:::{style="font-size: .8em"}
-
-__Question 2__:
-This estimation is 
-
-- accurate: $\small{\hat{\theta}_{100}}$ is unbiased;
-- relatively precise: $\small{\operatorname{Var}(\hat{\theta}_{100}}) = \frac{1}{100} \theta(1-\theta).$
-
-```{python}
-#| echo: true
-
-# True probability of a right swipe
-true_theta = 0.37
-
-# Number of swipes per simulation
-n = 100
-
-# Number of simulations
-num_simulations = 1000
-
-# Store estimated thetas
-estimated_thetas = []
-
-
-# Perform simulations
-for _ in range(num_simulations):
-    swipes = np.random.binomial(1, true_theta, n)
-    estimated_theta = np.mean(swipes)
-    estimated_thetas.append(estimated_theta)
-
-```
-
-:::
-
-## Swipe Right or Left?
-:::{style="font-size: .8em"}
-
-:::{.center-text}
-```{python}
-
-# Plot histogram of estimated thetas
-plt.figure(figsize=(8, 6))
-plt.hist(estimated_thetas, bins=30, color='lightgreen', edgecolor='black')
-plt.axvline(true_theta, color='red', linestyle='dashed', linewidth=2, label=f'True θ = {true_theta}')
-plt.title('Distribution of Estimated θ (True θ = 0.37)')
-plt.xlabel('Estimated θ')
-plt.ylabel('Frequency')
-plt.legend()
-plt.grid(True)
-plt.savefig("theta_simulation_037.png")
-plt.show()
-```
-:::
 :::

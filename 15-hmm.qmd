@@ -15,7 +15,7 @@ format:
 
 ## HMMs in Real Life
 :::{style="font-size: .8em"}
-_Hidden Markov Models_ (HMMs) deal with Markov processes in which the states are unobservable or _hidden_ but influence an _observable_ process.
+**Hidden Markov Models** (HMMs) deal with Markov processes in which the states are unobservable or _**hidden**_ but influence an _**observable**_ process.
 
 :::{.center-text}
 <img src="images/hmm/HMM_chain.png" width=900/>
@@ -27,9 +27,28 @@ HMMs are used in various fields that include bioinformatics, finance, robotics, 
 ## HMMs in Real Life
 :::{style="font-size: .8em"}
 
+
 - A concrete example from a developmental study is modelling of infant-free-play regimes. While it is not possible to directly observe if an infant is focused or exploring, a prediction can be made based on the number of toys they were interacting during a certain period of time.
 
+:::{.center-text}
+<img src="images/hmm/baby_focus.png" width=400/>
+:::
+
+:::
+
+## HMMs in Real Life
+:::{style="font-size: .8em"}
+
 - One of the applications of HMMs in computational finance is for modeling stock market states, such as a bull market (it occurs when the stock prices are rising and investors are optimistic) and a bear market (it happends when the prices decline). It is impossible to directly observe the state of the market but put/call ratios, which are indicators of investor sentiment and are associated with short-term stock market returns, can be used to predict them.
+
+:::{.center-text}
+<img src="images/hmm/bear_bull.png" width=400/>
+:::
+
+:::
+
+:::{.notes}
+Hard to identify in real time
 :::
 
 ## HMMs in Real Life
@@ -53,7 +72,12 @@ We will look into HMMs for POS tagging in more detail in the next lecture.
     - state-transition diagram
 * Types of questions that HMMs are useful for
 * Brute-force approach
+* Application to the umbrella problem
 
+:::
+
+:::{.notes}
+at least 3 lectures needed!
 :::
 
 ## Umbrella Problem
@@ -111,9 +135,9 @@ display(HTML(html_content))
 
 Furthermore, we need the following assumptions to create an HMM.
 
-1. _Markov property_: the weather at day $n+1$ depends only on the weather at day $n$. 
-2. _Stationarity_: the probability of transitioning from one hidden state to another is the same for every time step.
-3. _Output independence_: the observation at day $n+1$ depends only on the hidden state at day $n+1$.
+1. _**Markov property**_: the weather at day $n+1$ depends only on the weather at day $n$. 
+2. _**Stationarity**_: the probability of transitioning from one hidden state to another is the same for every time step.
+3. _**Output independence**_: the observation at day $n+1$ depends only on the hidden state at day $n+1$.
 
 :::
 
@@ -127,7 +151,7 @@ Let us visualize the model and assign the probabilities.
 :::
 
 The diagram shows that, for instance, the probability of the housemate brining an umbrella on a sunny day is 0.2. <br>
-In addition, we assume that the intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day, respectively.
+In addition, we assume that the _**intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day**_, respectively.
 
 :::
 
@@ -135,13 +159,13 @@ In addition, we assume that the intial probabilities are 0.6 and 0.4 for a sunny
 :::{style="font-size: .8em"}
 In general, there are three types of questions that can be asked about the HMMs.
 
-1. _Evaluation_: What is the probability of an observed sequence?
-2. _Decoding_: What is the most likely series of states to generate an observed sequence?
-3. _Learning_: How can we learn the parameters of HMM given some data?
+1. **Evaluation**: What is the probability of an observed sequence?
+2. __Decoding__: What is the most likely series of hidden states to generate an observed sequence?
+3. __Learning__: How can we learn the parameters of HMM given some data?
 
 We will focus on decoding problems.
 In particular, the question we are going to address in this and next lecture is the following:<br>
-Given the model depicted in the state-transition diagram and a sequence of observations $O=\left(o_1,o_2,o_3,o_4\right)=(0,1,1,0)$. Find the sequence of hidden states $X=\left(x_1,x_2,x_3,x_4\right)$ that best describes the observations $O$.
+Given the model depicted in the state-transition diagram and a sequence of observations $O=\left(o_0,o_1,o_2,o_3\right)=(0,1,1,0)$. Find the sequence of hidden states $X=\left(x_0,x_1,x_2,x_3\right)$ that best describes the observations $O$.
 :::
 
 ## Transition Matrix
@@ -156,9 +180,9 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Transition Matrix </span>
         <p>
-        For \(N\) hidden states, \(Q=\left\{q_1, q_2, \dots, q_{N}\right\}\), the transition matrix \(A\) is an \(N\times N\) matrix with transition probabilities equal to
+        For \(\small N\) hidden states, \(\small Q=\left\{q_1, q_2, \dots, q_{N}\right\}\), the transition matrix \(\small A\) is an \(\small N\times N\) matrix with transition probabilities equal to
 
-        $$A_{ij} = P\left(\text{state } q_i \text{ at time } n+1 | \text{ state } q_j \text{ at time } n \right).$$
+        $$\small A_{ij} = P\left(\text{state } q_i \text{ at time } n+1 \:| \text{ state } q_j \text{ at time } n \right).$$
         </p>
     </div>
     """
@@ -172,7 +196,7 @@ __Remark__: A transition matrix is column stochastic: each of its columns sums u
 :::{style="font-size: .8em"}
 __Example__: The transition matrix for the umbrella problem is equal to
 
-$$A = 
+$$\small A = 
 \begin{bmatrix}
 0.7 & 0.4 \\
 0.3 & 0.6
@@ -180,11 +204,11 @@ $$A =
 <br>
 
 
-The _initial transition probabilities_ are typically stored in vector $\pi.$
+The __initial transition probabilities__ are typically stored in vector $\pi.$
 
 __Example__: For the umbrella problem, the initial probabilities are given by 
 
-$$\pi = \begin{bmatrix} 0.6 \\ 0.4 \end{bmatrix}.$$
+$$ \small \pi = \begin{bmatrix} 0.6 \\ 0.4 \end{bmatrix}.$$
 :::
 
 ## Emission Matrix
@@ -197,9 +221,9 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Emission Matrix </span>
         <p>
-        For a general set of possible observations \(V = \left\{v_1, v_2, \dots, v_{M} \right\},\) the emission matrix \(B\) is an \(M\times N\) matrix with observation probabilities equal to
+        For a general set of possible observations \(\small V = \left\{v_1, v_2, \dots, v_{M} \right\},\) the emission matrix \(\small B\) is an \(\small M\times N\) matrix with observation probabilities equal to
 
-        $$B_{ij} = P\left( \text{observation } v_i \text{ at time } n | \text{ state } q_j \text{ at time } n \right).$$
+        $$\small B_{ij} = P\left( \text{observation } v_i \text{ at time } n \: | \text{ state } q_j \text{ at time } n \right).$$
         </p>
     </div>
     """
@@ -207,12 +231,12 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Remark__: $B$ is column stochastic.<br>
-__Remark__: Together $A, B,$ and $\pi$ fully define an HMM.
+__Remark__: $\small B$ is column stochastic.<br>
+__Remark__: Together $\small A, B,$ and $\small \pi$ fully define an HMM.
 
-__Example__: For the umbrella example $B$ becomes
+__Example__: For the umbrella example $\small B$ becomes
 
-$$B = 
+$$\small B = 
 \begin{bmatrix}
 0.8 & 0.4\\
 0.2 & 0.6
@@ -220,9 +244,9 @@ $$B =
 :::
 
 ## Brute-Force Approach
-:::{style="font-size: .8em"}
+:::{style="font-size: .75em"}
 Recall that we want to decode the following sequence of observations $\small{O=(0,1,1,0).}$<br> 
-It is possible to answer this question by directly computing the joint probability of $O$ with each sequence of hidden states of length 4. This strategy is called the _brute-force_ approach. <br>
+It is possible to answer this question by directly computing the joint probability of $\small O$ with each sequence of hidden states of length 4. This strategy is called the _brute-force_ approach. <br>
 Let's find an expression for the joint probability for a general sequence of observations of length 4, $\small{O=(o_0,o_1,o_2,o_3)}$, and a corresponding sequence of hidden states, $\small{X = (x_0, x_1, x_2, x_3).}$ 
 
 $$\small{P(O,X) = P(o_0, o_1, o_2, o_3, x_0, x_1, x_2, x_3)}$$ 
@@ -238,8 +262,7 @@ $$ \small{= P(o_3 | x_3)P(o_2 | x_2)P(o_0, o_1, x_0, x_1, x_2, x_3) = \dots }$$
 $$ \small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_0, x_1, x_2, x_3)}$$
 $$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_0, x_1, x_2) P(x_0, x_1, x_2)}$$
 $$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_0, x_1, x_2)= \dots}$$
-$$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_0, x_1, x_2) P(x_0, x_1, x_2)}$$
-$$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_0, x_1, x_2)= \dots}$$
+$$ \small  = P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_2 | x_1) P(x_1 | x_0)P(x_0).$$ 
 
 This can be written as 
 
@@ -250,7 +273,7 @@ $$\small{P(O,X) = \prod_{n=0}^3 P(o_n | x_n) \prod_{n=1}^3 P(x_n | x_{n-1})P(x_0
 
 ## Brute-Force Approach
 :::{style="font-size: .8em"}
-Similarly, for $O$ and $X$ of length $T$, the expression becomes
+Similarly, for $\small O$ and $\small X$ of length $\small T$, the expression becomes
 
 $$\small{P(O,X) = \prod_{n=0}^{T-1} P(o_n | x_n) \prod_{n=1}^{T-1} P(x_n | x_{n-1})P(x_0).}$$
 
@@ -279,13 +302,13 @@ display(HTML(html_content))
 ```
 
 
-Imagine a problem with $N=10$ hidden states and an observation sequence of length $T=100$. We would have to compute $10^{100}$ joint probabilities! <br>
+Imagine a problem with $\small N=10$ hidden states and an observation sequence of length $\small T=100$. We would have to compute $\small 10^{100}$ joint probabilities! <br>
 <br>
 
 In general, the brute-force approach is infeasible. <br>
 <br>
 
-Solution? The Viterbi algorithm - the topic of our next lecture!
+_**Solution? The Viterbi algorithm - the topic of our next lecture!**_
 
 :::
 
@@ -312,8 +335,6 @@ def generate_html():
     Hidden states are ordered alphabetically, and observable states are listed as 0 followed by 1 when defining \(\pi, A, B,\) and \(O.\)<br>
 
 a. What are the dimensions of the corresponding transition matrix?
-    <br>
-    <br>
     <br>
     <br>
         </p>

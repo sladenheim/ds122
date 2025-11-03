@@ -11,6 +11,8 @@ format:
         slide-number: true
         show-slide-number: all
         chalkboard: true 
+filters:
+    - pyodide
 ---
 
 ## Google's PageRank
@@ -29,6 +31,7 @@ In the last lecture, we said that PageRank uses Markov chains to find the import
 - Existence of a steady state 
 - Definition of detailed balance
 - Connection between steady state and detailed balance
+- Application: Markov chains in the PageRank algorithm
 :::
 
 ## Google's PageRank
@@ -39,7 +42,7 @@ Suppose that we have a small Internet consisting of just 4 websites referencing 
 <img src="images/markov/pagerank_example.png" width=300/>
 :::
 
-Each page should transfer evenly its importance to the pages that it links to. For example, node 1 has 3 outgoing edges, so it will pass on  of its importance to each of the other 3 nodes.
+Each page should transfer evenly its importance to the pages that it links to. For example, node 1 has 3 outgoing edges, so it will pass on  its importance to each of the other 3 nodes.
 
 __Question__: Find the PageRank of each website.
 :::
@@ -55,22 +58,20 @@ Let's consider the long run behavior of Boston weather.
 
 We know that the one-step transition matrix for this problem is
 
-$$P = \begin{bmatrix}0.8 & 0.4\\0.2 & 0.6\end{bmatrix}$$
+$$\small P = \begin{bmatrix}0.8 & 0.4\\0.2 & 0.6\end{bmatrix}$$
 
 We can calculate the probabilty of a sunny day in 2 days or in 10 days by using the powers of $P$. Can we say anything interesting about the weather in 100 or 1,000 days?
+
+Let us assume that day 0 is sunny, and let the chain "run" for a while:
 :::
 
 ## Long Term Behavior
-:::{style="font-size: .8em"}
+<!-- :::{style="font-size: .8em"}
 Let us assume that day 0 is sunny, and let the chain "run" for a while:
-```{python}
+::: -->
+```{pyodide-python}
 import numpy as np
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-```
-```{python}
-#| echo: true
+
 # day 0 is sunny
 x = np.array([1, 0])
 
@@ -81,7 +82,6 @@ for i in range(10):
     print (f'On day {i}, state is {x}')
     x = P @ x
 ```
-:::
 
 ## Steady State
 :::{style="font-size: .8em"}
@@ -104,7 +104,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Steady State</span>
         <p>
-        A vector \(\mathbf{x}\) for which \(P \mathbf{x} = \mathbf{x}\) is called a steady state of the Markov chain corresponding to \(P\).
+        A vector \(\small \mathbf{x}\) for which \(\small P \mathbf{x} = \mathbf{x}\) is called a steady state of the Markov chain corresponding to \(\small P\).
         </p>
     </div>
     """
@@ -116,7 +116,7 @@ display(HTML(html_content))
 
 ## Steady State
 :::{style="font-size: .8em"}
-__Example__: If the Markov chain below is in state $\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}$, is it in a steady state?
+__Example__: If the Markov chain below is in state $\small \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}$, is it in a steady state?
 
 :::{.center-text}
 <img src="images/markov/mc-example-4.jpeg" width=400/>
@@ -129,7 +129,7 @@ __Example__: If the Markov chain below is in state $\begin{bmatrix}\frac{6}{11}\
 
 __Example (continued)__: The transition matrix $\small{P=\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and the state $\small{\mathbf{x}=\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$
 
-We just need to check if $P\mathbf{x}=\mathbf{x}.$
+We just need to check if $\small P\mathbf{x}=\mathbf{x}.$
 
 $$\small{\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix} \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}= \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$$  
 
@@ -141,11 +141,11 @@ Hence, the chain is in a steady state.
 
 Does every Markov chain have a steady state?<br>
 
-In general, no. However, if the chain has a finite set of states, then it can be represented by a column stochastic matrix $P$.
+In general, no. However, if the chain has a finite set of states, then it can be represented by a column stochastic matrix $\small P$.
 
-Since each column of $P$ sums to 1, $P^\top \mathbf{1} = \mathbf{1}.$ Recall from DS121 that 1 is called an eigenvalue of $P^\top$. There is a theorem that says that  $P^\top$ and $P$ have the same eigenvalues.
+Since each column of $\small P$ sums to 1, $\small P^\top \mathbf{1} = \mathbf{1}.$ Recall from DS-121 that 1 is called an eigenvalue of $\small P^\top$. There is a theorem that says that  $\small P^\top$ and $\small P$ have the same eigenvalues.
 
-Hence, 1 is always an eigenvalue of $P$. This implies that there exists a vector $\mathbf{x}$ such that $P\mathbf{x} = \mathbf{x}.$
+Hence, 1 is always an eigenvalue of $\small P$. This implies that there exists a vector $\small \mathbf{x}$ such that $\small P\mathbf{x} = \mathbf{x}.$
 
 
 ```{python}
@@ -155,6 +155,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
         <p>
+        <span class="label">Theorem</span>
         Each finite-state Markov chain has at least one steady state.
         </p>
     </div>
@@ -185,7 +186,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Remark__: The above equations are called the  _detailed balance equations._
+__Remark__: The above equations are called the  __detailed balance equations.__
 
 __Remark__: For a Markov chain with $n$ states, there are $n^2$ of the detailed balance equations. However, due to the symmetry of these equations not all of them need to be checked.
 
@@ -196,6 +197,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
         <p>
+        <span class="label">Theorem</span>
         If a Markov chain satisfies detailed balance with respect to \(\ \boldsymbol{\pi}\), then 
         \(\ \boldsymbol{\pi}\) is one of its steady states.
         </p>
@@ -253,7 +255,7 @@ $$\small{\begin{align*}
 x_1 & = x_3 + (1/2)x_4,\\
 x_2 & = (1/3) x_1,\\
 x_3 & = (1/3)x_1 + (1/2) x_2 + (1/2) x_4,\\
-x_4 & = (1/3) x_1 + (1/2).
+x_4 & = (1/3) x_1 + (1/2) x_2.
 \end{align*}}$$
 
 :::
@@ -306,7 +308,92 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Consider \(\small{P = \begin{bmatrix} 1/2 & 1/3 & 1/2 \\ 1/2 & 1/3 & 1/2\\ 0 & 1/3 & 1/3 \end{bmatrix}}\) and \( \small{\mathbf{x} = \begin{bmatrix} 1/3 \\ 1/3 \\ 1/3 \end{bmatrix}} \).<br>
+    We classify the women in a country according to whether they live in an urban (U), suburban (S), or rural (R) area.
+    Each woman has just one daughter, who also has just one daughter, and so on.<br>
+    Suppose further that the following is true:<br>
+
+    - For urban women, 10% of the daughters settle in rural areas, and 50% in suburban areas.<br>
+    - For suburban women, 20% of the daughters settle in rural areas, and 30% in urban areas.<br>
+    - For rural women, 20% of the daughters settle in the suburbs, and 70% in rural areas.<br>
+    a. Give the transition matrix for this Markov chain, taking states in the order U, S, R.
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    b. Find the proportion of urban women whose granddaughters are suburban women.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    c. Find the proportion of rural women whose granddaughters are rural women.
+    <br>
+    <br>
+    <br>
+    <br>
+    
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    d. If the initial population distribution vector for all the women is \(\small \begin{bmatrix} 0.4 \\ 0.5 \\ 0.1 \end{bmatrix}\), find the population distribution vector for the next generation.
+    <br>
+    <br>
+    <br>
+    <br>
+    e. Is \( \small \frac{1}{43} \begin{bmatrix} 11 \\ 17 \\ 15 \end{bmatrix}\) a steady-state vector for this Markov chain?
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Consider \(\small{P = \begin{bmatrix} 0.2 & 0.4 & 0.4 \\ 0.5 & 0.3 & 0.2\\ 0.3 & 0.3 & 0.4 \end{bmatrix}}\) and \( \small{\mathbf{x} = \begin{bmatrix} 1/3 \\ 1/3 \\ 1/3 \end{bmatrix}} \).<br>
     a. Does the Markov chain corresponding to \(P\) satisfy detailed balance with respect to \( \mathbf{x} \)?
     <br>
     <br>
@@ -330,7 +417,7 @@ display(HTML(html_content))
 No, Yes
 :::
 
-## Group Question 2
+## Group Question 3
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML

@@ -21,6 +21,7 @@ format:
     1. Initialization
     2. Forward pass
     3. Backward pass
+- Example: baby-noise problem
 
 :::
 
@@ -169,7 +170,7 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Question 1
+<!-- ## Group Question 1
 :::{style="font-size: .8em"}
 Recall a problem we solved in the first HMM lecture.
 
@@ -184,9 +185,9 @@ The veterinarian assumes three possible activity levels:<br>
 The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
 
 
-:::
+::: -->
 
-## Group Question 1
+<!-- ## Group Question 1
 :::{style="font-size: .8em"}
 :::{.columns}
 ::: {.column width="35%"}
@@ -206,7 +207,115 @@ We found previously that the model can be described as
 $$\small{A = \begin{bmatrix} 0.9 & 0.3\\ 0.1 & 0.7 \end{bmatrix}, B = \begin{bmatrix} 0.2 & 0.6 \\ 0.6 & 0.3\\ 0.2 & 0.1 \end{bmatrix}, \pi = \begin{bmatrix}0.9 \\ 0.1 \end{bmatrix}.}$$
 
 We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet.
+::: -->
+
+## Group Question 1
+:::{style="font-size: .7em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
 :::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A veterinarian is monitoring a dog’s health state by asking the dog owner about its activity levels over the last 3 days. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+The veterinarian assumes three possible activity levels:<br>
+
+-1: quiet, 0: usual, 1: restless.<br> 
+
+The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
+
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time. We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Draw the corresponding state-transition diagram.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Define \(\pi, A,\) \(B\), and \(O\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
 
 ## Group Question 1
 :::{style="font-size: .8em"}
@@ -217,11 +326,10 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-a. Define the observed sequence, \(O\).
-<br>
-<br>
-<br>
 b. Perform the initialization stage of the Viterbi algorithm.
+<br>
+<br>
+<br>
 <br>
 <br>
 <br>

@@ -66,6 +66,7 @@ Nowadays, manual annotation is typically used on a small portion of a text to cr
 - Calculation of transition probabilities 
 - Calculation of emission probabilities 
 - Pre-processing
+- Application of HMMs for POS-tagging for an 8-word corpus 
 
 :::
 
@@ -90,8 +91,8 @@ __Question__: Use the provided corpus to annotate _Will can spot Mary._
 
 ##  Hidden and Observable States
 :::{style="font-size: .8em"}
-When we use HMMs for POS tagging, the _tags serve as the hidden states_ and the _words represent the observable states_. If we distinquish only between<br> _nouns_ ($NN$), _verbs_
-($VB$), and _other_ ($O$) tags, then $NN$, $VB$, and $O$ represent the hidden states. The observable states can be _going_, _to_, _walk_, etc.
+When we use HMMs for POS tagging, the _**tags serve as the hidden states**_ and the _**words represent the observable states**_. If we distinquish only between<br> _**nouns**_ ($NN$), _**verbs**_
+($VB$), and _**other**_ ($O$) tags, then $NN$, $VB$, and $O$ represent the hidden states. The observable states can be _**going, to, walk**_, etc.
 
 :::{.center-text}
 <img src="images/hmm/POS_diagram.svg" width=600/>
@@ -108,7 +109,7 @@ We will introduce the computation of the probabilities based on the following to
 <img src="images/hmm/toy_corpus_plain.svg" width=500/>
 :::
 
-For simplicity we will distinquish only between _nouns_ ($NN$), _verbs_ ($VB$), and _other_ ($O$)  tags.
+For simplicity we will distinquish only between _**nouns**_ ($NN$), _**verbs**_ ($VB$), and _**other**_ ($O$)  tags.
 
 :::
 
@@ -127,17 +128,17 @@ In other words, $P(VB|O) = \frac{2}{3}$ for this example.
 ## Transition Probabilities 
 :::{style="font-size: .8em"}
 More formally, the transition probabilities are computed in two steps. <br>
-Step 1: Count the occurences of tag pairs
+__Step 1__: Count the occurences of tag pairs
 
 $$\small{L(t_{i-1}, t_i) \quad \forall i \in \{1,\dots, N\}.}$$
 
 Here, $N$ is the total number of POS tags.<br>
 That is, for each pair of tags $(t_{i-1}, t_i)$, we count how many times tag $t_{i-1}$ is followed by tag $t_i$.<br>
-Step 2: Calculate the conditional probabilities using the obtained counts
+__Step 2__: Calculate the conditional probabilities using the obtained counts
 
-$$\small{P(x_n = t_i|x_{n-1} = t_{i-1}) = \frac{L(t_{i-1}, t_i)}{\sum_{j=1}^{N} L\left(t_{i-1}, t_j\right)}.}$$
+$$\small{P(X_n = t_i|X_{n-1} = t_{i-1}) = \frac{L(t_{i-1}, t_i)}{\sum_{j=1}^{N} L\left(t_{i-1}, t_j\right)}.}$$
 
-That it, we normalize the number of times that tag $t_{i-1}$ is followed by tag $t_i$ by the total number of tag pairs that start with tag $t_{i-1}$.
+That is, we normalize the number of times that tag $t_{i-1}$ is followed by tag $t_i$ by the total number of tag pairs that start with tag $t_{i-1}$.
 :::
 
 ## Transition Probabilities 
@@ -179,15 +180,15 @@ To compute the emission probabilities we need to count the co-occurrences of a p
 ## Emission Probabilities 
 :::{style="font-size: .8em"}
 The emission probabilities are also computed in two steps.<br>
-Step 1:  Count the co-occurences of tags and words
+__Step 1__:  Count the co-occurences of tags and words
 
 $$\small{L(t_{i}, w_k) \quad \forall i \in \{1,\dots, N\} \text{ and} \: \: \forall k \in \{1,\dots, K\}.}$$
 
 Here, $K$ is the total number of words. <br>
 That is, for each tag-word pair $(t_{i}, w_k)$, we count how many times the word $w_k$ is associated with the tag $t_i$. <br>
-Step 2:  Calculate the conditional probabilities using the obtained counts
+__Step 2__:  Calculate the conditional probabilities using the obtained counts
 
-$$\small{P(o_n = w_k|x_n = t_{i}) = \frac{L(t_{i}, w_k)}{\sum_{j=1}^{K} L\left(t_{i}, w_j\right)}.}$$
+$$\small{P(O_n = w_k|X_n = t_{i}) = \frac{L(t_{i}, w_k)}{\sum_{j=1}^{K} L\left(t_{i}, w_j\right)}.}$$
 
 That is, to find the conditional probabilities we divide $L(t_{i}, w_k)$ by the total number of words associated with the same tag.
 :::
@@ -235,12 +236,12 @@ Before we can construct the HMM, we need to identify the beginning of each sente
 ## 8-Word Corpus
 :::{style="font-size: .8em"}
 ### Manual annotation
-Since the training set is relatively small, we can assign the tags manually, using color coding. Nouns are shown in red color, modal verbs in cyan, non-modal verbs in blue, and all other tags in green.
+Since the training set is relatively small, we can assign the tags manually, using color coding. Nouns are shown in red color, modal verbs in black, non-modal verbs in blue, and all other tags in green.
 
-- ```<s>``` <font color='red'>mary jane</font> <font color='cyan'>can</font> <font color='blue'>see</font> <font color='red'>will</font><font color='green'>.</font>
-- ```<s>``` <font color='green'>today</font> <font color='red'>spot</font> <font color='cyan'>will</font> <font color='blue'>see</font> <font color='red'>mary</font><font color='green'>.</font>
-- ```<s>``` <font color='cyan'>will</font> <font color='red'>jane</font> <font color='blue'>spot</font> <font color='red'>mary</font><font color='green'>?</font>
-- ```<s>``` <font color='red'>mary</font> <font color='cyan'>will</font> <font color='blue'>pat</font> <font color='red'>spot</font><font color='green'>.</font>
+- ```<s>``` <font color='red'>mary jane</font> <font color='black'>can</font> <font color='blue'>see</font> <font color='red'>will</font><font color='green'>.</font>
+- ```<s>``` <font color='green'>today</font> <font color='red'>spot</font> <font color='black'>will</font> <font color='blue'>see</font> <font color='red'>mary</font><font color='green'>.</font>
+- ```<s>``` <font color='black'>will</font> <font color='red'>jane</font> <font color='blue'>spot</font> <font color='red'>mary</font><font color='green'>?</font>
+- ```<s>``` <font color='red'>mary</font> <font color='black'>will</font> <font color='blue'>pat</font> <font color='red'>spot</font><font color='green'>.</font>
 :::
 
 ## 8-Word Corpus
@@ -316,7 +317,7 @@ Together $A, B$ and $\pi$ define the HMM.
 
 ## 8-Word Corpus
 :::{style="font-size: .8em"}
-To assign POS tags to a sentence, we will use the Python implementation of the Viterbi algorithm that we introduced earlier.
+To assign POS tags to a sentence, we will use the Python implementation of the Viterbi algorithm.
 
 ```{python}
 import numpy as np
@@ -404,6 +405,42 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
+   Consider one of the poems that was written by Ezra Pound:<br><br>
+
+In a Station of the Metro<br>
+The apparition of these faces in the crowd:<br>
+Petals on a wet, black bough.<br>  <br>
+
+a. Construct the transition matrix for POS tagging based on this poem.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+b. Is there anything unusual about this transition matrix?
+    <br><br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+1/3
+:::
+
+<!-- ## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
    Consider the following corpus that consists of one sentence (including the punctuation):<br>
 <br>
 <em>May the Force be with you.</em> <br>
@@ -423,5 +460,5 @@ display(HTML(html_content))
 
 :::{.notes}
 1/3
-:::
+::: -->
 

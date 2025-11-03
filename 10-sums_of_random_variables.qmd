@@ -1,5 +1,5 @@
 ---
-title: From Sums of Random Variables to the Central Limit Theorem
+title: Sums of Random Variables 
 author: "CDS DS-122<br>Boston University"
 format: 
     revealjs:
@@ -15,14 +15,21 @@ format:
 
 ## Brain Cancer
 :::{style="font-size: .8em"}
-_Which parts of the USA have the biggest brain cancer problem?_
+
+_**Which states have the biggest brain cancer problem?**_
+
+:::{.center-text}
+<img src="images/sums of random variables/USA_map.png" width=350/>
+:::
 
 
 - Most deaths: California, Texas, New York, Florida. 
 
-- Highest rates per 100,000 people: Nebraska, Alaska, Delaware, Maine.<br>
-Lowest rates: Wyoming, Vermont, North Dakota, Hawaii, D.C.
+- Highest death rates per 100,000 people: South Dakota, Nebraska, Alaska, Delaware, Maine.<br>
+(Lowest death rates: Wyoming, Vermont, North Dakota, Hawaii, D.C.)
+:::
 
+:::{.notes}
 _What can we conclude?_
 
 - Rates per capita are more meaningful: States like California and Texas have the most brain cancer deaths simply because they have the largest populations.
@@ -37,16 +44,29 @@ One of today's topics, the _Law of Large Numbers_, explains why small population
 ## Learning Objectives
 
 :::{style="font-size: .8em"}
-
-* Law of the Unconscious Statistician
-* Linearity of Expectation
+:::{.columns}
+::: {.column width="70%"}
+* Law of the Unconscious Statistician (LOTUS)
+* Linearity of Expectation (LOE)
 * Additional properties of variance and covariance:
     - New expression for variance and covariance
-    - Variance of a linear function of a random variable
+    - Variance of a linear function 
     - Variance of a sum
 * The Weak Law of Large Numbers
 * An Introduction to the Central Limit Theorem 
+:::
+::: {.column width="30%"}
+:::{.center-text}
+<img src="images/sums of random variables/white_lotus.png" width=500/>
+:::
+:::
+:::
+* Application of above concepts to song classification
+:::
 
+:::{.notes}
+
+All the rules and concepts can be extended to continuous random variables.
 :::
 
 ## Classifying Songs
@@ -76,8 +96,8 @@ __Question__: Approximate the probability that Anush will be able to process at 
 
 ## LOTUS
 :::{style="font-size: .8em"}
-To study a function $g(X)$ of a random variable $X$, we use the _Law of the Unconscious Statistician (LOTUS)_. 
-Examples of $g(x)$ include $X^2, e^X$, or $\log X.$  
+To study a function $\small g(X)$ of a random variable $\small  X$, we use the __Law of the Unconscious Statistician (LOTUS)__. 
+<!-- Examples of $g(x)$ include $X^2, e^X$, or $\log X.$   -->
 
 
 
@@ -89,9 +109,9 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Law of the Unconscious Statistician (LOTUS) </span>
         <p>
-    For a discrete random variable \( X \) and a function \( g(x) \) defined for all values that \( X \) can take,
+    For a discrete random variable \(\small  X \) and a function \(\small  g(x) \) defined for all values that \(\small  X \) can take,
      \[
-    \small{E[g(X)] = \sum_x g(x) \cdot P(X = x).}
+    \small{E[g(X)] = \sum_{x=-\infty}^{\infty} g(x) p(x).}
      \]
         </p>
     </div>
@@ -102,7 +122,16 @@ display(HTML(html_content))
 
 __Remark__: The same principle extends to continuous random variables using integration.
 
-__Example__: $$\small{E[X^2] = \sum_x x^2 p(x) \quad \text{ and } \quad E[e^X] = \sum_x e^x p(x).}$$
+__Examples__: $\small{E[X^2] = \sum_{x=-\infty}^{\infty} x^2 p(x) \quad \text{ and } \quad E[e^X] = \sum_{x=-\infty}^{\infty} e^x p(x).}$
+:::
+
+:::{.notes}
+
+NOTATION:
+
+Write g(X)
+
+Sum over x
 :::
 
 ## LOTUS 
@@ -176,7 +205,7 @@ $$
 :::{style="font-size: .8em"}
 __Remark__: Suppose we have $n$ random variables with the same distribution. Then 
 
-$$ E\left[\sum_i X_i\right] = n E[X_1] $$
+$$ E\left[\sum_i X_i\right] = E[X_1] + E[X_2] +\dots + E[X_n] = n E[X_1] $$
 
 That is, if you have $n$ random variables, and each has mean $\mu$, then the mean of the sum is $n\mu$.
 :::
@@ -184,7 +213,7 @@ That is, if you have $n$ random variables, and each has mean $\mu$, then the mea
 ## Linearity of Expectation
 
 :::{style="font-size: .8em"}
-__Example__: Suppose two people are playing Roulette. They each first bet on red three times in a row.  Note that in Roulette, 18 of the 38 numbers are red. The first player leaves, but the second player bets two more times on red. How many more times is player 2 expected to win than player one?
+__Example__: Suppose two people are playing Roulette. Note that in Roulette, 18 of the 38 numbers are red. They each first bet on red three times in a row. The first player leaves, but the second player bets two more times on red. How many more times is player 2 expected to win than player one?
 
 Note that the number of times player 2 wins is not independent from the number of times player 1 wins, because every time player 1 wins, player 2 also wins.
 
@@ -200,13 +229,13 @@ Note that the number of times player 2 wins is not independent from the number o
 __Example (continued)__:
 Let $X$ be the number of times player one wins and $Y$ be the number of times player 2 wins, we want to calculate $E[Y-X].$ 
 
-$X$ is Binomial with $n=3$ and $p=18/38.$ Similarly, $Y$ is Binomial with $n=5$ and $p=18/38.$
-
 Then 
 
 $$\small{E[Y−X]=E[Y]+E[−1⋅X]=E[Y]+(−1)E[X]=E[Y]−E[X].}$$
 
-We just saw in an earlier lecture that the expect value of a Binomail is $np$ so putting it all together: 
+$X$ is Binomial with $N=3$ and $p=18/38.$ Similarly, $Y$ is Binomial with $N=5$ and $p=18/38.$
+
+We saw in an earlier lecture that the expect value of a Binomail is $Np$ so putting it all together: 
 
 $$\small{E[Y−X]=E[Y]−E[X]=5*18/38−3*18/38=2*18/38 = 18/19.}$$
 
@@ -234,10 +263,30 @@ $$
 
 :::
 
+## Covariance
+
+:::{style="font-size: .8em"}
+__Example__: Recall the group question from last lecture. $\small X$ and $\small Y$ are discrete random variables. Both $\small X$ and $\small Y$ can assume values 0, 1, and 2. The incomplete table above is meant to depict the joint distribution of $\small X$ and $\small Y$, and the marginal distributions of $\small X$ and $\small Y.$ Let us compute $\small \operatorname{Cov}(X,Y)$.
+
+:::{.center-text}
+<img src="images/sums of random variables/covariance_table.png" width=700/>
+:::
+
+- $\small E[X] = E[Y] = (0+1+2)\cdot\frac{1}{3} = 1.$
+- $\small E[XY] = 1 \cdot 1 \cdot \frac{4}{36} + 1\cdot 2 \cdot \frac{8}{36} + 2 \cdot 1 \cdot \frac{2}{36} + 2 \cdot 2 \cdot \frac{3}{36} = 1.$
+- $\small \operatorname{Cov}(X,Y) = E[XY]−E[X]E[Y] = 1 - 1 = 0.$
+
+:::
+
+:::{.notes}
+Earlier $\operatorname{Cov}(X_1, X_2) = E[(X_1 - \overline{X_1})(X_2 - \overline{X_2})]=$
+$= \sum_{(x_1,x_2)\in S} (x_1 - \overline{X_1})(x_2 - \overline{X_2}) p(x_1,x_2)$
+:::
+
 ## Variance and Covariance
 
 :::{style="font-size: .8em"}
-From $\operatorname{Cov}(X, Y) = E[XY]−E[X]E[Y]$ and $\operatorname{Cov}(X, X) = \operatorname{Var}(X),$ it follows that $$ \small{\operatorname{Var}(X) = E[X^2] - E[X]^2.} $$
+From $\small \operatorname{Cov}(X, Y) = E[XY]−E[X]E[Y]$ and $\small \operatorname{Cov}(X, X) = \operatorname{Var}(X),$ it follows that $$ \small{\operatorname{Var}(X) = E[X^2] - E[X]^2.} $$
 
 ```{python}
 from IPython.core.display import HTML
@@ -286,16 +335,26 @@ __Example__: It is commonly believed that if a fair coin is tossed many times an
  Imagine we are repeatedly flipping a certain number of coins at time and keep track of the number of head counts. The results can look as follows.
 :::
 
+:::{.notes}
+The Weak Law of Large Numbers says that for any small non-negative number 
+$\varepsilon,$ the probability that the average $X_n$
+differs from the true mean $\mu$
+by more than $\varepsilon$ goes to zero as $n$ becomes very large.
+
+Mathematician John Kerrich tested this belief empirically while detained as a prisoner during World War II. He tossed a coin 10,000 times and observed heads 5067 times
+:::
+
 ## Weak Law of Large Numbers
 :::{style="font-size: .8em"}
 
-__Example (continued)__: <br>
+__Example (continued)__:
+
 - **10 coins** per trial:  
   `4, 4, 5, 6, 5, 4, 3, 3, 4, 5, 5, 9, 3, 5, 7, 4, 5, 7, 7, 9`  
   → Wide variability (30%–90% heads)
 
 - **100 coins** per trial:  
-  `46, 54, 48, 45, 52, 49, 47, 58, 40, 57, 46, 45, 51, 52...`  
+  `46, 54, 48, 45, 52, 49, 47, 60, 40, 57, 46, 45, 51, 52...`  
   → Narrower range (40%–60%)
 
 - **1000 coins** per trial:  
@@ -306,6 +365,10 @@ __Example (continued)__: <br>
 As the number of coins per trial increases, the proportion of heads converges toward 50%.  
 
 
+:::
+
+:::{.notes}
+Connect to brain cancer!
 :::
 
 ## Central Limit Theorem
@@ -326,11 +389,11 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> The Central Limit Theorem (CLT) </span>
         <p>
-        Let \(X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\mu\) and variance \(\sigma^2.\) Let \(S_n = \sum_{i=1}^n X_i.\) Then 
+        Let \(\small X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\small \mu\) and variance \( \small \sigma^2.\) Let \( \small S_n = \sum_{i=1}^n X_i.\) Then 
 
-    $$\frac{S_n - n\mu}{\sigma\sqrt{n}}$$
+    $$\small \frac{S_n - n\mu}{\sigma\sqrt{n}}$$
 
-    tends to the standard normal distribution as \(n \to \infty.\)
+    tends to the standard normal distribution as \(\small n \to \infty.\)
         </p>
     </div>
     """
@@ -375,34 +438,6 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Use \(\small{\operatorname{Var}(X) = E[X^2] - E[X]^2}\) to show that \(\small{\operatorname{Var}(X+Y) = \operatorname{Var}(X) + \operatorname{Var}(Y) + 2 \operatorname{Cov}(X, Y).}\)
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
-## Group Question 2
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
     You roll a 4-sided die and a 6-sided die.  <br>
     a. What is the expected value of the sum of two die rolls?
     <br>
@@ -427,3 +462,32 @@ display(HTML(html_content))
 :::{.notes}
 Q5 HW 3 Fall 25
 :::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Use \(\small{\operatorname{Var}(X) = E[X^2] - E[X]^2}\) to show that \(\small{\operatorname{Var}(X+Y) = \operatorname{Var}(X) + \operatorname{Var}(Y) + 2 \operatorname{Cov}(X, Y).}\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+

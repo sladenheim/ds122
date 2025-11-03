@@ -28,19 +28,24 @@ Common discrete distributions help us answer questions like:
 ## Learning Objectives
 
 :::{style="font-size: .8em"}
+- Introduce common discrete distributions:
 
-- Bernoulli distribution
-- Binomial distribution
-- Geometric distribution
-- Poisson distribution
-- Uniform distribution
+    - Bernoulli
+    - Binomial
+    - Geometric 
+    - Poisson 
+    - Uniform 
+
+- For each, discuss intuition, PMF, mean, variance, and Python implementation
+
+- Apply the knowledge to horse-kick fatalities problem
 
 :::
 
 ## Horse-Kick Fatalities 
 :::{style="font-size: .8em"}
 
-In 1898, Ladislaus Bortkiewicz analyzed deaths caused by horse kicks in the Prussian army. He found that in a certain year, a single corps experienced up to 4 such deaths.
+In 1898, Ladislaus Bortkiewicz analyzed deaths caused by horse kicks in the Prussian army. He found that in a certain year, a single corps experienced 4 such deaths.
 
 | Number of Deaths     | Observed  Instances|
 |----------------------|--------------------|
@@ -51,7 +56,7 @@ In 1898, Ladislaus Bortkiewicz analyzed deaths caused by horse kicks in the Prus
 | 4          | 1        |
 | 5+         | 0        |
 
-Question: Do the observed fatalities follow a random pattern?
+__Question__: Do the observed fatalities follow a random pattern?
 :::
 
 
@@ -80,8 +85,8 @@ These outcomes are typically decoded as 0 and 1.
 :::
 
 :::{style="font-size: .8em"}
-Each distributions has at least one parameter. Parameters are settings that control the distribution. 
-A Bernoulli distribution has one parameter: $p$, which is the probability that the random variable is equal to 1.
+Each distribution has at least one parameter that defines its behavior. The Bernoulli distribution has a single _**parameter**_
+$p$, representing _**the probability that the random variable equals 1**_.
 :::
 
 ## Bernoulli Distribution
@@ -94,8 +99,8 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Bernoulli Distribution </span>
         <p>
-       A random variable \(X\) has a Bernoulli distribution with parameter \(p\) \((0\leq p \leq 1)\) if \(X\) can take only the values 0 and 1 and the corresponding probabilities are 
-       \(P(X=1) = p \: \text{ and } \: P(X=0) = 1-p.\)
+       A random variable \(\small X\) has a Bernoulli distribution with parameter \(\small  p\) \((\small  0\leq p \leq 1)\) if \(\small X\) can take only the values 0 and 1 and the corresponding probabilities are 
+       \(\small  P(X=1) = p\) and \(\small P(X=0) = 1-p.\)
         </p>
     </div>
     """
@@ -103,9 +108,8 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Remark__: The mean of a $X$ is $p$ and the variance of $X$ is $p(1-p)$. <br>
-__Example__: A canonical example is flipping a weighted coin.  
-The coin comes up "heads" (aka "success", aka "1") with probability $p.$ If the coin is fair, $p=\frac{1}{2}.$ 
+__Remark__: The mean of a $\small X$ is $\small p$ and its variance is $\small p(1-p)$. <br>
+__Example__: A canonical example is flipping a weighted coin. The coin comes up "heads" (aka "success", aka "1") with probability $p.$ If the coin is fair, $\small p=\frac{1}{2}.$ 
 
 ```{python}
 from IPython.core.display import HTML
@@ -116,7 +120,7 @@ def generate_html():
      <span class="label"> Bernoulli Trials </span>
         <p>
        Independent experiments that result in a success with
-    probability \(p\) and a failure with probability \(1−p\) are called Bernoulli trials.
+    probability \(\small p\) and a failure with probability \(\small 1−p\) are called Bernoulli trials.
         </p>
     </div>
     """
@@ -126,9 +130,9 @@ display(HTML(html_content))
 :::
 
 ## Binomial Distribution
-:::{style="font-size: .75em"}
-The binomial distribution considers $N$ Bernoulli trials. Each trial has the probability of a success equal to $p$. 
-The binomial distribution answers the question "What is the probability there will be $k$ successes in $N$ trials?"
+:::{style="font-size: .8em"}
+The binomial distribution considers $\small N$ Bernoulli trials. Each trial has the probability of a success equal to $\small p$. 
+This distribution answers the question "_**What is the probability there will be $\small k$ successes in $\small N$ trials?**_"
 
 ```{python}
 from IPython.core.display import HTML
@@ -138,23 +142,23 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Bernoulli Trials </span>
         <p>
-       If \(X\) is the number of successes that occur in \(N\) trials, then \(X\) has a binomial distribution with parameters \(N\) and \(p\) \((0\leq p \leq 1),\) \(X \sim Bin(N,p).\) The PMF of a binomial random variable is given by
-    $$p(k) = P(X=k) = \binom{N}{k}\; p^k\; (1-p)^{N-k} \: \text{ for } k=0,1,...,N.$$
+       If \(\small X\) is the number of successes that occur in \(\small N\) trials, then \(\small X\) has a binomial distribution with parameters \(\small N\) and \(\small p\) \((\small 0\leq p \leq 1),\) \(\small X \sim Bin(N,p).\) The PMF of a binomial random variable is given by
+    $$\small p(k) = P(X=k) = \binom{N}{k}\; p^k\; (1-p)^{N-k} \: \text{ for } k=0,1,...,N.$$
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean of the Binomial distribution is $pN$, and its variance is $p(1-p)N$. <br>
-__Remark__: A Bernoulli random variable is just $Bin(1,p).$
+__Remark__: The mean of $\small X$ is $\small pN$, and its variance is $\small p(1-p)N$. <br>
+__Remark__: A Bernoulli random variable is just $\small Bin(1,p).$
 :::
 
 ## Binomial Distribution
 :::{style="font-size: .8em"}
-__Example__: A fair coin is flipped 10 times. What is the probability of getting exactly 6 heads?<br>
-Let $X$ represent the number of heads. Then $\small{X \sim Bin(10,0.5)}.$
-$$\small{P(X=6) = \binom{10}{6}\; 0.5^6\; (1-0.5)^{10-6} = \binom{10}{6}\; 0.5^{10} = 0.2051.}$$
+__Example__: A biased coin that comes up heads 30% of the time is flipped 10 times. What is the probability of getting exactly 6 heads?<br>
+Let $\small X$ represent the number of heads. Then $\small{X \sim Bin(10,0.3)}.$
+$$\small{P(X=6) = \binom{10}{6}\; 0.3^6\; (1-0.3)^{10-6} = 0.0368.}$$
 :::
 
 ```{python}
@@ -163,24 +167,46 @@ from scipy.stats import binom
 
 # Parameters
 n = 10       # number of trials
-p = 0.5      # probability of success
+p = 0.3      # probability of success
 
 # Calculate the probability
-k = 6        # number of successes
-probability = binom.pmf(k, n, p)
+probability = binom.pmf(6, n, p)
 print(f"The probability of getting exactly 6 heads is {probability:.4f}")
 ```
 
+:::{.notes}
+ Import the binomial distribution from the scipy.stats library
+:::
+
+
 ## Binomial Distribution
-:::{.center-text}
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    What is the most probable number of heads?
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.fragment .center-text}
 ```{python}
 import numpy as np
 import matplotlib.pyplot as plt
 
 p = 0.3
 x = np.arange(binom.ppf(0.01, 10, p), binom.ppf(0.9995, 10, p))
-plt.figure(figsize=(10, 6.5))
-plt.ylim([0, 0.4])
+plt.figure(figsize=(10, 5))
+plt.ylim([0, 0.3])
 plt.xlim([-0.5, max(x)+0.5])
 plt.plot(x, binom.pmf(x, 10, p), 'bo', ms=8, label = 'binom pmf')
 plt.vlines(x, 0, binom.pmf(x, 10, p), colors='b', lw = 5, alpha=0.6)
@@ -194,9 +220,9 @@ plt.ylabel(r'$P[X = k]$', size=18);
 
 ## Geometric Distribution
 :::{style="font-size: .8em"}
-The geometric distribution concerns Bernoulli trials as well. It has only one parameter $p$, the probability of success.
+The geometric distribution concerns Bernoulli trials as well. It has only one parameter $\small p$, the probability of success.
 
-The geometric distribution answers the question: "What is the probability it takes $k$ trials to obtain the first success?"
+The geometric distribution answers the question: "_**What is the probability it takes $\small k$ trials to obtain the first success?**_"
 
 
 ```{python}
@@ -207,15 +233,15 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Geometric Distribution </span>
         <p>
-       A random variable \(X\) has a geometric distribution with parameter \(p\) \((0\leq p \leq 1)\), \(X \sim Geo(p)\), if \(X\) has a discrete distribution with 
-       $$ p(k) = P(X = k) = p(1-p)^{k-1} \: \:\text{for} \: k \geq 1.$$ 
+       A random variable \(\small X\) has a geometric distribution with parameter \(\small p\) \((\small 0\leq p \leq 1)\), \(\small X \sim Geo(p)\), if \(\small X\) has a discrete distribution with 
+       $$ \small p(k) = P(X = k) = p(1-p)^{k-1} \: \:\text{for} \: k \geq 1.$$ 
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean of the geometric distribution is equal to $\frac{1}{p}$ and its variance is $\frac{1-p}{p^2}$. 
+__Remark__: The mean of $X$ is equal to $\small \frac{1}{p}$ and its variance is $\small \frac{1-p}{p^2}$. 
 :::
 
 
@@ -225,12 +251,18 @@ __Example__: A basketball player has a 30% chance of making a free throw. <br>
 a. What is the probability that he makes his first successful shot on the 4th attempt?<br>
 b. What is the expected number of attempts until he makes his first successful free throw?<br>
 
-a. Let $X$ represent the trial number on which the first success occurs. Then 
-$$P(X = 4) = 0.3(1-0.3)^{4-1} = 0.1029.$$
+a. Let $\small X$ represent the trial number on which the first success occurs. Then 
+$$\small P(X = 4) = 0.3(1-0.3)^{4-1} = 0.1029.$$
 
-b. We also know that for a geometrically distributed random variable $E[X] = \frac{1}{p}.$ Hence,
+b. We also know that for a geometrically distributed random variable $\small E[X] = \frac{1}{p}.$ Hence,
+$$\small E[X] = \frac{1}{0.3} \approx 3.33.$$
 
-$$E[X] = \frac{1}{0.3} \approx 3.33.$$
+:::
+
+:::{.notes}
+$P(X = k) = p(1-p)^{k-1}$
+
+$E[X]=\small \frac{1}{p}$
 :::
 
 ## Geometric Distribution
@@ -245,17 +277,38 @@ p = 0.3  # probability of success
 
 # Compute the probability
 probability = geom.pmf(4, p)
-print(f"The probability of the first successful shot on the 4th attempt is {probability:.4f}")
 
-# Calculate the expected value
-expected_value = 1 / p
+# Calculate the expected value using the mean method
+expected_value = geom.mean(p)
+print(f"The probability of the 1st success on the 4th attempt is {probability:.4f}. The expected number of attempts until the 1st success is {expected_value:.2f}.")
 
-print(f"The expected number of trials until the first success is: {expected_value:.2f}")
+```
 
+
+:::{.center-text}
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+from scipy.stats import geom
+p = 0.3
+x = np.arange(geom.ppf(0.01, p), geom.ppf(0.995, p))
+plt.figure(figsize=(10, 2))
+plt.ylim([0, 0.35])
+plt.xlim([0.5, 10.5])
+plt.plot(x, geom.pmf(x, p), 'bo', ms=8, label = 'geom pmf')
+plt.vlines(x, 0, geom.pmf(x, p), colors='b', lw = 5, alpha = 0.6)
+plt.title(f'Geometric PMF, $p$ = {p}', size=20)
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+plt.xlabel(r'$k$', size=18)
+plt.ylabel(r'$P[X = k]$', size=18);
 ```
 :::
 
-## Geometric Distribution
+:::
+
+<!-- ## Geometric Distribution
 :::{.center-text}
 ```{python}
 import numpy as np
@@ -275,12 +328,12 @@ plt.xticks(fontsize=16)
 plt.xlabel(r'$k$', size=18)
 plt.ylabel(r'$P[X = k]$', size=18);
 ```
-:::
+::: -->
 
 ## Poisson Distribution
 :::{style="font-size: .8em"}
 The Poisson distribution is not connected to Bernoulli trials. 
-It arises from a Poisson process, which models the number of events occurring in fixed intervals of time or space, assuming the events happen independently and at a constant average rate.
+It arises from a _**Poisson process**_, which models _**the number of independent events occurring in fixed intervals at a constant average rate**_.
 
 For example, the Poisson distribution can be used to model:
 
@@ -298,7 +351,7 @@ For example, the Poisson distribution can be used to model:
 :::
 :::
 :::
-It answers the question: "How many successes occur in a fixed amount of time?"
+It answers the question: "_**How many successes occur in a fixed amount of time?**_"
 
 
 
@@ -314,9 +367,9 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Poisson Distribution </span>
         <p>
-       A random variable \(X\) has a Poisson distribution with parameter \(\lambda > 0\), \(X \sim Pois(\lambda)\), if it has a discrete distribution with 
+       A random variable \(\small X\) has a Poisson distribution with parameter \(\small \lambda > 0\), \(\small X \sim Pois(\lambda)\), if it has a discrete distribution with 
        \[
-       P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}, \quad k = 0, 1, 2, \dots
+       \small P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}, \quad k = 0, 1, 2, \dots
        \]
         </p>
     </div>
@@ -324,13 +377,13 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean and variance of a Poisson distribution are both equal to $\lambda.$
+__Remark__: The mean and variance of $X$ are both equal to $\lambda.$ <br>
 __Example__: A small café receives an average of 5 online orders per hour. What is the probability that exactly 3 orders arrive in the next hour?<br>
 
-Let $X \sim Pois(λ = 5).$ Then
+Let $\small X \sim Pois(λ = 5).$ Then
 
 $$
-\small{P(X = 3) = \frac{e^{-5} 5^3}{3!} ≈ 0.1404.}
+\small \small{P(X = 3) = \frac{e^{-5} 5^3}{3!} ≈ 0.1404.}
 $$
 
 :::
@@ -350,12 +403,12 @@ print(f"The probability of receiving exactly 3 orders in an hour is {probability
 :::{.center-text}
 ```{python}
 from scipy.stats import poisson
-mu = 3
+mu = 5
 x = np.arange(poisson.ppf(0.01, mu), poisson.ppf(0.9995, mu))
 # plt.ylim([0,1])
 plt.figure(figsize=(10, 2.8))
-plt.xlim([-0.5, max(x)+0.5])
-plt.ylim(ymax = 0.4)
+plt.xlim([0.5, 12.5])
+plt.ylim(ymax = 0.2)
 plt.plot(x, poisson.pmf(x, mu), 'bo', ms=8, label='poisson pmf')
 plt.vlines(x, 0, poisson.pmf(x, mu), colors='b', lw=5, alpha=0.6)
 plt.title(f'Poisson PMF,  $\lambda$ = {mu}', size=20)
@@ -368,7 +421,7 @@ plt.ylabel(r'$P[X = k]$', size=18);
 
 ## Uniform Distribution
 :::{style="font-size: .8em"}
-The uniform distribution models the case in which all outcomes are equally probable. This distribution can be a discrete or continuous. We will introduce the continuous version of the uniform distribution in the next lecture.
+The uniform distribution models the case in which all outcomes are equally probable. This distribution _**can be a discrete or continuous**_. We will introduce the continuous version of the uniform distribution in the next lecture.
 
 We have already seen the discrete uniform distribution in the case of rolls of a fair die:
 :::
@@ -399,23 +452,66 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> (Discrete) Uniform Distribution</span>
         <p>
-       A random variable is said to be uniformly distributed on interval \([a,b]\), if it has the PMF equal to 
+       A random variable is said to be uniformly distributed on interval \(\small [a,b]\), if it has the PMF equal to 
 
-    $$p(x) = \frac{1}{n} \: \text{ with } n = b-a+1 \: \text{ and  } x = 1, 2, 3,..., n.$$ 
+    $$\small p(x) = \frac{1}{n} \: \text{ with } n = b-a+1 \: \text{ and  } x = a, a+1,..., a+n-1.$$ 
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: $a$ and $b$ are the parameters of the uniform distribution.
-__Remark__: The expected value of a discrete uniform distribution is equal to $\frac{a+b}{2}$ and its variance is given by $\frac{n^2 - 1}{12}.$
+__Remark__: $a$ and $b$ are the parameters of the uniform distribution.<br>
+__Remark__: The expected value of a discrete uniform distribution is equal to $\small \frac{a+b}{2}$ and its variance is given by $\small \frac{n^2 - 1}{12}.$
+:::
+
+## Uniform Distribution
+:::{style="font-size: .8em"}
+__Example__: Compute the probability of rolling at most 4 points using a fair six-sided die using Python. 
+
+```{python}
+#| echo: true
+from scipy.stats import randint
+
+# Define a fair six-sided die
+die = randint(1, 7)  # upper bound is exclusive
+
+# Compute the probability of rolling at most 4 points
+cdf_value = die.cdf(4)
+print(f"The probability of rolling at most 4 points is {cdf_value}")
+
+```
+<br>
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Which probability distribution can be used for modeling the number of horse-kick fatalities?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+
+imports the randint class from the scipy.stats module
+
+creates a random variable die that represents a fair six-sided die.
+
+
 :::
 
 ## Horse-Kick Fatalities 
 :::{style="font-size: .8em"}
 
-The Poisson distribution fits the data if its parameter is carefully chosen.
+The Poisson distribution fits the data well when its parameter is set to 0.61. We will learn how to compute this value in Unit 3.
 :::
 
 :::{.center-text}
@@ -438,6 +534,10 @@ plt.xlabel("Number of Deaths Per Year", size=18)
 plt.ylabel("Count", size=18);
 plt.legend(prop={'size': 18})
 ```
+:::
+
+:::{.notes}
+cliff-hanger Maximum Likelihood Estimation
 :::
 
 ## Group Question 1

@@ -1,5 +1,5 @@
 ---
-title: Parameter Estimation 
+title: Confidence Intervals 
 author: "CDS DS-122<br>Boston University"
 format: 
     revealjs:
@@ -15,30 +15,35 @@ format:
 
 ## Life Better With a TV?
 :::{style="font-size: .8em"}
-A ladder with steps numbered 0 to 10:
-
-- 0 is the worst possible life
-- 1o is the best possible life
-
-Which step comes closest to the way you feel about your life?
+A survey studied the relationship between TV ownership and well-being. 
 
 :::{.center-text}
-<img src="images/ci/Gallup_survey.png" width=700/>
-:::
+<img src="images/ci/couch_potato.png" width=300/>
+::: 
+
+Participants were presented with a ladder where steps numbered 0 to 10:
+
+- 0 is the worst possible life
+- 10 is the best possible life
+
+They were asked which step came closest to the way they felt about their life.
+
 
 :::
 
 ## Life Better With a TV?
 :::{style="font-size: .8em"}
-A survey that studied the relationship between TV ownership and well-being: "For the European data, one can say with 95% confidence that the true population for wellbeing among those without TVs is between 4.88 and 5.26."
 
 :::{.center-text}
-<img src="images/ci/couch_potato.png" width=300/>
+<img src="images/ci/Gallup_survey.png" width=700/>
 :::
 
-The survey does not tell us that watching TV is good for our well-being,  just that owning one is!
+_"For the European data, one can say with 95% confidence that the true population for wellbeing among those without TVs is between 4.88 and <br> 5.26 [...]"_
 
 The confidence interval: _between 4.88 and 5.26._
+
+**The survey does not tell us that watching TV is good for our well-being,  just that owning one is!**
+
 
 :::
 
@@ -58,8 +63,7 @@ The confidence interval: _between 4.88 and 5.26._
 
 ## Study Hours
 :::{style="font-size: .8em"}
-A random sample of 50 students was selected as part of a study on weekly study hours, and the number of
-hours was recorded for each student in the sample for the fall semester of 2024. The average study hours
+A random sample of 50 students was selected as part of a study on weekly study hours. The average study hours
 were found to be 15 hours. In a very large study in the fall semester of the previous year, it was found
 that the standard deviation of the study hours was 4 hours. This standard deviation can be assumed to
 be the population standard deviation.
@@ -69,8 +73,7 @@ be the population standard deviation.
 :::
 
 
-__Question__: Assuming the standard deviation is unchanged, provide the 95% confidence interval for the mean study
-hours in the fall semester of 2024.
+__Question__: Provide the 95% confidence interval for the mean study hours in the new study.
 :::
 
 ## Confidence Intervals
@@ -97,9 +100,9 @@ display(HTML(html_content))
 
 That is, a 95% confidence interval for $\theta$ is a random interval that contains $\theta$ with probability 0.95.
 
-__Example__: Assume that a populaiton is normally distributed with mean $\mu$ and variance $\sigma$. For instance, we can think of SAT scores for students in Massachusetts.
+__Example__: Assume that a populaiton is normally distributed with mean $\mu$ and variance $\sigma^2$. For instance, we can think of SAT scores for students in Massachusetts.
 
-To estimate the true value of $\mu$ we repeat the sampling process 20 times and compute the confidence interval for paramter $\mu$ for each sample. 
+To estimate the true value of $\mu$ we repeat the sampling process 20 times and compute the confidence interval for parameter $\mu$ for each sample. 
 :::
 
 ## Confidence Intervals
@@ -175,21 +178,26 @@ plt.tight_layout(h_pad = -2);
 ## Confidence Intervals
 :::{style="font-size: .8em"}
 __Example (continued)__: 
-Note how the confidence intervals dance around, and how their sizes vary.
-Not every confidence interval contains the population mean $\mu$ -- the orange ones don't. However, roughly 95% of the confidence intervals do contain the true mean.
+
+Note: 
+
+- The confidence intervals dance around and their sizes vary.
+- The orange intervals do not contain the population mean $\mu.$
+- Roughly 95% of the confidence intervals do contain the true mean.
 
 Now that we understand how to interpret confidence intervals, the next question is how to compute them.
 :::
 
 ## Mean of a Normal Distribution
 :::{style="font-size: .8em"}
-Let's assume that our population has a Gaussian (i.e., normal) distribution.
+_**Assume that our population has a Gaussian (i.e., normal) distribution.**_
 
-That is, let $x_1, x_2, ..., x_n$ be a random sample from a population that has a _normal distribution_ with _unknown mean_ $\mu$ and _known variance_ $\sigma^2$. Let 
+Let $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a population that has a _**normal distribution with unknown mean**_ $\mu$ _**and known variance**_ $\sigma^2$. <br>
+Denote the _**sample mean**_ as
 
-$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x_i.$$ 
+$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x^{(i)}.$$ 
 
-For $0 \leq \alpha \leq 1$, let $z(\alpha)$ be that number such that the area under the standard normal density function to the right of $z(\alpha)$ is $\alpha$. Note that the symmetry of the standard normal density function about zero implies that $z(1-\alpha) = -z(\alpha)$.
+Let $z(\alpha)$ be the number for which the area under the standard normal density function to the right of $z(\alpha)$ is $\alpha$ with $0 \leq \alpha \leq 1$. Note that the symmetry of the standard normal density function about zero implies that $z(1-\alpha) = -z(\alpha)$.
 :::
 
 ## Mean of a Normal Distribution
@@ -201,11 +209,11 @@ For $0 \leq \alpha \leq 1$, let $z(\alpha)$ be that number such that the area un
 
 ## Mean of a Normal Distribution
 :::{style="font-size: .8em"}
-If random variable $Z$ follows standard normal distribution, then, by definition of $z(\alpha)$,
+If random variable $Z$ follows the standard normal distribution, then, by definition of $z(\alpha)$,
 
 $$\small{P\left(-z(\alpha/2) \leq Z \leq z(\alpha/2)\right) = 1-\alpha.}$$
 
-$\frac{M - \mu}{\sigma/\sqrt{n}}$ has a standard normal distribution, so
+$\frac{M - \mu}{\sigma/\sqrt{n}}$ has the standard normal distribution, so
 
 $$\small{P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) = 1-\alpha.}$$
 
@@ -220,27 +228,31 @@ This implies that the probability that $\mu$ lies in the interval
 
 $$\left[M - z(\alpha/2)  \frac{\sigma}{\sqrt{n}}, M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}}\right]$$
 
-is approximately $1-\alpha.$ In other words, this is a _$100(1-\alpha)\%$ confidence interval_ for the population mean, $\mu$.
+is approximately $1-\alpha.$ In other words, this is a _**$100(1-\alpha)\%$ confidence interval**_ for the population mean, $\mu$.
 
-As we can see, when the population is normally distributed and has a known variance $\sigma^2$, finding confidence intervals for population mean  is a relatively straightforward task. However, the population variance, $\sigma^2$, is typically _not known_.
+<br><br>
+
+What happens when the population variance, $\sigma^2$, is _**not known**_?
 
 How can we replace it?
 :::
 
 ## Unknown Population Variance
 :::{style="font-size: .8em"}
-Of course, we can estimate $\sigma$ from the data. Since $ \sqrt{\frac{1}{n}\sum_i (x_i - M)^2}$ is known to be a __biased__ estimate of the true standard deviation, we typically apply _Bessel's correction_ to get an __unbiased__ estimate:
+Of course, we can estimate $\sigma$ from the data. 
+ 
+$\sqrt{\frac{1}{n}\sum_i (x_i - M)^2}$ is a __biased__ estimate of the true standard deviation, so we typically apply _**Bessel's correction**_ to get an __unbiased__ estimate:
 
 $$ s = \sqrt{\frac{1}{n-1}\sum_i (x_i - M)^2}. $$
 
-This substitution has a far-reaching consequence. The distribution of $\frac{M - \mu}{s/\sqrt{n}}$ is a <br>
-$t$ _distribution_ with $n-1$ degrees of freedom.
+This substitution has a far-reaching consequence: _**the distribution of $\frac{M - \mu}{s/\sqrt{n}}$ is a <br>
+$t$ distribution with $n-1$ degrees of freedom.**_
 :::
 
 ## The $t$ Distribution
 :::{style="font-size: .8em"}
 
-The history of the "t-distrubution" is quite interesting. A man named William Gosset worked at the Guinness Brewery in Ireland. He needed a way to determine if changes in the brewing processes made a difference. Unfortunately, he generally only had small samples sizes.
+ A man named William Gosset worked at the Guinness Brewery in Ireland. He needed a way to determine if changes in the brewing processes made a difference. Unfortunately, he generally only had small samples sizes.
 
 :::{.center-text}
 <img src="images/ci/Guiness.jpg" width=550/>
@@ -255,14 +267,14 @@ William Gosset introduced the $t$-distribution after realizing the normal distri
 As $\nu$ (the degres of freedom, $\nu=n-1$) goes to infinity, we get the normal distribution.
 
 :::{.center-text}
-<img src="images/ci/Student_t.png" width=450/>
+<img src="images/ci/Student_t.png" width=350/>
 :::
 
 :::
 
-## The $t$ Distribution
+<!-- ## The $t$ Distribution
 :::{style="font-size: .78em"}
-We assume again that $x_1, x_2, ..., x_n$ be a random sample from a normal distribution having mean $\mu$ and variance $\sigma^2$. Let $\tau_{n-1}(x)$ denote the PDF of the $t$ distribution with $n-1$ degrees of freedom and $t$ be a constant such that 
+We assume again that $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a normal distribution having mean $\mu$ and variance $\sigma^2$. Let $\tau_{n-1}(x)$ denote the PDF of the $t$ distribution with $n-1$ degrees of freedom and $t$ be a constant such that 
 
 $$\small{\int_{-t}^t \tau_{n-1}(x) dx = 1 - \alpha.}$$
 
@@ -271,28 +283,28 @@ For every value of $n$, the value of $t$ can be found from the table of the $t$ 
 $$\small{\int_{-t}^t \tau_{11}(x) dx = T_{11}(t) - T_{11}(-t) = T_{11}(t) - (1-T_{11}(t)) = 2T_{11}(t) - 1.}$$
 
 If $\alpha = 0.05$, it follows that $T_{11}(t) = 0.975$. It is found from the table that $t = 2.201$, the 0.975 quantile of the $t$ distribution with 11 degrees of freedom.  
-:::
+::: -->
 
 ## The $t$ Distribution
 :::{style="font-size: .8em"}
-Thus, when the population standard deviation $\sigma$ is not known the $100(1-\alpha)\%$ confidence interval becomes 
+When the population standard deviation $\sigma$ is not known the $100(1-\alpha)\%$ confidence interval becomes 
 
 $$\left[M - t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}, M + t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}\right].$$ 
 
 Since people often prefer to use the normal distribution, and since the $t$-distribution becomes equivalent to the normal when the sample size $n$ becomes large, common practice is to use normal distribution instead of the $t$-distribution for $n \geq 30$. 
 
-For this course, we recommend using exclusively $t$-distribution when the population standard deviation is not known.
+_**For this course, we recommend using exclusively $t$-distribution when the population standard deviation is not known.**_
 :::
 
 ## Mean of Any Distribution
 :::{style="font-size: .8em"}
 What happens if the type of the population distribution is not known?
 
-Let $x_1, x_2, ..., x_n$ be a random sample from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __known variance__ $\sigma^2$. Let 
+Let $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __known variance__ $\sigma^2$. Let 
 
 $$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x_i.$$ 
 
-The central limit theorem tells us that the distribution of $\frac{M - \mu}{\sigma/\sqrt{n}}$ can be approximated by a standard normal distribution, so
+The Central Limit Theorem tells us that the distribution of $\frac{M - \mu}{\sigma/\sqrt{n}}$ can be approximated by a standard normal distribution, so
 
 $$P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) = 1-\alpha.$$
 :::
@@ -314,6 +326,7 @@ Here, $s$ is again an unbiased estimate of the true standard deviation.
 ## Mean of Any Distribution
 :::{style="font-size: .8em"}
 How large should $n$ be for us to be able to rely on the central limit theorem?
+<br><br>
 
 The answer is that it depends on the population distribution. A highly skewed distribution, or one with a large ratio of standard deviation to mean, will require larger sample sizes.
 :::
@@ -330,7 +343,7 @@ mu = 1050
 sig = 216
 #
 # gaussian curve
-fig, (ax1, ax1a, ax2) = plt.subplots(3, 1, figsize = (14,6), gridspec_kw={'height_ratios': [8, 1, 8]})
+fig, (ax1, ax1a, ax2) = plt.subplots(3, 1, figsize = (14,5), gridspec_kw={'height_ratios': [8, 1, 8]})
 x = np.linspace(norm.ppf(0.001, loc = mu, scale = sig), norm.ppf(0.999, loc = mu, scale = sig), 100)
 xmin, xmax = (x[0], x[-1])
 ax1.plot(x, norm.pdf(x, loc = mu, scale = sig),'k-', lw = 5, alpha = 0.6)
@@ -399,7 +412,7 @@ ax1.set_title('SAT Scores', size=18);
 
 :::
 
-## Reporting CIs
+<!-- ## Reporting CIs
 :::{style="font-size: .8em"}
 What is the role of confidence intervals in summarizing data?
 
@@ -413,17 +426,17 @@ Confidence intervals combine information on location and precision.
 
 They tell you (or your reader) both __how large__ is the quantity (location) and __how much information__ the estimate provides.
 
-:::
+::: -->
 
 ## Reporting CIs
 :::{style="font-size: .8em"}
-There are standard ways for doing this.
+There are standard ways for reporting confidence intervals.
 
-In text, it is standard to write in this format:
+In text, we write:
 
 $M = 30.5 \text{cm, 95% CI } [18.0, 43.0]$
 
-In a table, you should use this format:
+In a table, we can use this format:
 
 |   | height | 95% CI |
 |---|---|---|
@@ -445,6 +458,21 @@ These are reasonable considerations, but in general work it's probably best to s
 
 ## Study Hours
 :::{style="font-size: .8em"}
+A random sample of 50 students was selected as part of a study on weekly study hours. The average study hours
+were found to be 15 hours. In a very large study in the fall semester of the previous year, it was found
+that the standard deviation of the study hours was 4 hours. This standard deviation can be assumed to
+be the population standard deviation.
+
+:::{.center-text}
+<img src="images/ci/Study_hours.jpeg" width=300/>
+:::
+
+
+__Question__: Provide the 95% confidence interval for the mean study hours in the new study.
+:::
+
+## Study Hours
+:::{style="font-size: .8em"}
 - Sample size: $n = 50$
 - Sample mean: $M = 15$
 - Population standard deviation: $\sigma = 4$
@@ -456,4 +484,36 @@ The 95% confidence interval is given by
 & \left[15 - 1.96  \frac{4}{\sqrt{50}}, 15 + 1.96  \frac{4}{\sqrt{50}}\right] = \\
 & [13.89, 16.11]
 \end{align*}
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   A random sample of 40 households was selected as part of a study on electricity usage, and the number of kilowatt-hours (kWh) was recorded for each household in the sample for the first quarter of 2023. The average usage was found to be 310 kWh. In a very large study in the first quarter of the previous year, it was found that the standard deviation of the usage was 89 kWh.<br>
+    a. 
+    Assuming the standard deviation is unchanged, provide the 95% confidence interval for the mean usage in the first quarter of 2023.<br>
+    <br>
+    <br>
+    b. Repeat the previous question for a 99% confidence interval.<br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. In this problem the sample size $n$ is equal to 40, the sample mean $\overline{X}$ is equal to 310 kWh, and the population standard deviation $\sigma$ is 89 kWh. Then from the CLT we know that
+$$\overline{X} \sim N\left(310, \left( \frac{89}{\sqrt{40}}\right)^2\right).$$ Since the population standard deviation is provided, we can use the $Z$-score of 1.96 for the 95\% confidence interval computation (see the $Z$-table). The desired interval is then given by 
+$$\left[\overline{X}-1.96\:\frac{\sigma}{n}, \overline{X}+1.96\:\frac{\sigma}{n}\right] = \left[310 - 1.96 \frac{89}{\sqrt{40}}, 310 + 1.96 \frac{89}{\sqrt{40}}\right]=\left[282.4, 337.6\right].$$
+b. For the 99\% confidence interval the $Z$-score is equal to 2.58 (see the $Z$-table). Thus, we obtain
+$$\left[\overline{X}-2.58\:\frac{\sigma}{n}, \overline{X}+2.58\:\frac{\sigma}{n}\right] = \left[310 - 2.58 \frac{89}{\sqrt{40}}, 310 + 2.58 \frac{89}{\sqrt{40}}\right]=\left[273.7, 346.3\right].$$
 :::

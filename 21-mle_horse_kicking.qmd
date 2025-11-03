@@ -1,0 +1,373 @@
+---
+title: MLE Examples
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Applying MLE to 
+    - the train problem
+    - the horse-kicking example
+- Practice solving MLE questions
+<!-- - The definition of the $k$th moment
+- The definition of the $k$th sample moment
+- The method of moments (for one variable) -->
+
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+__Example__: A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+
+:::{.center-text}
+<img src="images/train/train60.jpeg" width=350/>
+:::
+
+__Question__: Estimate how many trains the railroad has using maximum likelihood estimation.
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+
+__Example (continued)__: We assume:
+
+- Each train is equally likely to be seen.
+- Train numbers range from 1 to $N$.
+- We observed train #60.
+
+
+Let $\theta = N$. The likelihood of seeing train 60 is:
+
+$$
+p(X_s; \theta) = \frac{1}{\theta}, \quad \text{for } \theta \geq 60.
+$$
+
+This function decreases as $\theta$ increases.  
+
+
+:::
+
+## Train Problem
+:::{.center-text}
+<img src="images/mle/inverse_theta.png" width=700/>
+:::
+
+:::{style="font-size: .8em"}
+Hence, the maximum likelihood estimate is: $\hat{\theta} = 60.$
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example__: Recall that Bortkiewicz studied deaths by horse-kick in the Prussian army over 200 years to see if they occurred at a constant rate. He modeled the data using a Poisson distribution, estimating the parameter $\lambda.$  
+
+```{python}
+import pandas as pd
+import numpy as np
+
+# note that this data is available in 'data/HorseKicks.txt'
+horse_kicks = pd.DataFrame(
+data = np.array([
+[0, 108.67, 109],
+[1, 66.29, 65],
+[2, 20.22, 22],
+[3, 4.11, 3],
+[4, 0.63, 1],
+[5, 0.08, 0],
+[6, 0.01, 0]]),
+columns = ["Deaths Per Year","Predicted Instances (Poisson)","Observed Instances"])
+horse_kicks["Deaths Per Year"] = horse_kicks["Deaths Per Year"].astype('int')
+horse_kicks["Observed Instances"] = horse_kicks["Observed Instances"].astype('int')
+horse_kicks[["Deaths Per Year","Observed Instances"]].style.hide(axis='index')
+```
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: We are interested in one-year intervals. The parameter $\lambda$ is the rate of deaths per year. Let $\theta = \lambda.$
+
+The likelihood of a particular number of deaths $x^{(i)}$ in year $i$ is:
+
+$$ p(x^{(i)}; \theta) = \theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!}$$
+
+The likelihood and log-likelihood functions then become
+
+$$p(X_s;\theta) = \prod_{i=1}^{m} \theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!},$$
+
+$$ \log p(X_s; \theta) = \sum_{i=0}^m \log \left(\theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!}\right).$$ 
+
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: Note that the log-likelihood of a particular number of deaths $x^{(i)}$ in year $i$ is equal to
+
+$$ \log p(x^{(i)}; \theta) = \log \left(\theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!}\right) = x^{(i)} \log \theta - \theta - \log x^{(i)}! $$
+
+Using this we can express the log-likelihood of the data as
+    
+$$ \log p(X_s; \theta) =  \sum_{i=0}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right) $$
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: The log-likelihood function looks like this as we vary $\theta$:
+
+```{python}
+from scipy.stats import poisson
+import matplotlib.pyplot as plt
+
+# assumes data is a list of counts for various values starting at zero
+def ll(data, lam):
+    return np.sum(data * poisson.logpmf(range(len(data)), lam))
+
+xvals = np.linspace(0.01, 3, 1000)
+ll_vals = [ll(horse_kicks['Observed Instances'], xval) for xval in xvals]
+
+fig, ax = plt.subplots(1, 1, figsize = (14,3))
+plt.plot(xvals, ll_vals, lw = 3, color = 'blue')
+plt.ylabel('Log-Likelihood', size = 16)
+plt.xlabel(r'$\theta$', size = 16)
+ax.tick_params(axis='both', which='major', labelsize=14)
+plt.title('Log-Likelihood of Poisson Model for Horse-Kick Data', size = 18);
+```
+To find the maximum of the log-likelihood of the data as a function of $\theta$, we need to compute the derivative w.r.t. $\theta$.
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+$$\small{\frac{\partial}{\partial\theta}\log p(X_s; \theta) = \frac{\partial}{\partial\theta} \sum_{i=0}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right)}$$
+
+$$\small{=\sum_{i=0}^m \left(x^{(i)} \frac{1}{\theta} - 1 \right)
+= \frac{1}{\theta}\sum_{i=0}^m x^{(i)} - m.}$$
+
+Setting the derivative to zero, we get the expression for the ML estimator 
+
+$$\small{\frac{1}{{\theta}}\sum_{i=0}^m x^{(i)} - m = 0,}$$
+
+$$\small{{\hat{\theta}} = \frac{1}{m}\sum_{i=0}^m x^{(i)}.}$$
+
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__:  This is just the mean of the data, that is, the average number of deaths per year! From the available data we can compute that the mean is 0.61. 
+
+```{python}
+# assumes data is a list of counts for various values starting at zero
+def ll(data, lam):
+    return np.sum(data * poisson.logpmf(range(len(data)), lam))
+
+xvals = np.linspace(0.01, 3, 1000)
+ll_vals = [ll(horse_kicks['Observed Instances'], xval) for xval in xvals]
+
+mle = np.sum((horse_kicks['Observed Instances'] 
+    * np.array(range(len(horse_kicks['Observed Instances'])))) /
+       np.sum(horse_kicks['Observed Instances']))
+
+fig, ax = plt.subplots(1, 1, figsize = (14,3))
+plt.plot(xvals, ll_vals, lw = 3, color = 'blue')
+
+ymin = np.min(ll_vals)
+ax.set_ylim(ymin = ymin)
+mle_ll = np.sum(horse_kicks['Observed Instances'] *  
+                     poisson.logpmf(range(len(horse_kicks['Observed Instances'])), mle))
+plt.vlines(x = mle, ymin = ymin, ymax = mle_ll, linestyles = 'dashed', color = 'g')
+plt.plot(mle, ymin, 'o', color = 'g', markersize = 14, clip_on = False)
+plt.text(mle+0.05, ymin+20, r'$\hat{\theta} = 0.61$', size = 16, ha = 'left', va = 'bottom')
+
+plt.ylabel('Log-Likelihood', size = 16)
+plt.xlabel(r'$\theta$', size = 16)
+plt.title('MLE of theta for Poisson Model applied to Horse-Kick Data', size = 18);
+```
+
+The plot confirms that 0.61 is indeed a maximum. Therefore, the MLE for $\theta$, $\hat{\theta}$ = 0.61.
+
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+Using this estimate for $\theta$, we can ask what the expected number of deaths per year would be, if deaths by horse-kick really followed the assumptions of the Poisson distribution.
+
+:::{.center-text}
+```{python}
+# note that this data is available in 'data/HorseKicks.txt'
+horse_kicks = pd.DataFrame(
+data = np.array([
+[0, 108.67, 109],
+[1, 66.29, 65],
+[2, 20.22, 22],
+[3, 4.11, 3],
+[4, 0.63, 1],
+[5, 0.08, 0],
+[6, 0.01, 0]]),
+columns = ["Deaths Per Year","Predicted Instances (Poisson)","Observed Instances"])
+horse_kicks["Deaths Per Year"] = horse_kicks["Deaths Per Year"].astype('int')
+horse_kicks["Observed Instances"] = horse_kicks["Observed Instances"].astype('int')
+horse_kicks[["Deaths Per Year","Observed Instances"]].style.hide(axis='index')
+horse_kicks[["Predicted Instances (Poisson)","Observed Instances"]].plot.bar(figsize = (10,4))
+plt.xlabel("Number of Deaths Per Year", size=14)
+plt.ylabel("Count", size=14);
+```
+:::
+
+:::
+
+## Horse-Kick Fatalities
+:::{style="font-size: .8em"}
+__Example (continued)__: 
+The figure shows that the Poisson model is indeed a very good fit to the data!
+<br><br>
+
+From this, Bortkeiwicz concluded that there was nothing particularly unusual about the years when there were many deaths by horse-kick.  They could be just what is expected if deaths occurred at a constant rate.
+:::
+
+## Group Quesiton 1
+:::{style="font-size: .8em"}
+
+| $x$ | $1$ | $2$ |
+| :---: | :---: | :---: |
+| $p(x;\theta)$ | $\theta$ | $1-\theta$|
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
+
+Three independent oservations are made from this distribution:
+\(x_1 = 1, x_2 = 2, x_3 = 2.\)<br>
+
+    a. Find the likelihood function.<br>
+    <br>
+    <br>
+    b. Find the log-likelihood function.
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Quesiton 1
+:::{style="font-size: .8em"}
+```{python}
+def qloglik(theta):
+    return np.log(theta)+2*np.log(1-theta)
+
+fig = plt.figure(figsize = (14,3))
+ax = plt.axes()
+
+x = np.linspace(0.01, 0.99, 500)
+ax.plot(x, qloglik(x), lw = 3, color = 'blue')
+ax.set_xlabel(r'$\theta$', size = 16)
+ax.set_ylabel('Log-Likelihood', size = 16);
+ax.set_xticks(np.arange(0, 1, 0.1))
+plt.title(r'$\log \theta + 2\log (1-\theta)$', size = 18);
+plt.show()
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   c. Find the maximum likelihood estimate of \(\theta.\) 
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Quesiton 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Consider the random variable \(X\) with probability density function (PDF)
+
+    $$f(x) = \begin{cases}
+    c \: \theta^{1/3}e^{-\theta x^3} & \text{ for } x > 0\\
+    0 & \text{ otherwise.}
+    \end{cases}$$
+    Here \(\theta\) is an unknown positive parameter and \(c \approx 0.77\) is a constant that does not depend on \(\theta.\) Five independent observations are made from this distribution:
+
+$$X_s = \{0.2, 0.3, 0.4, 0.5, 0.8\}.$$
+
+a. Find the likelihood function.<br>
+<br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Group Quesiton 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Find the corresponding log-likelihood function. <br>
+<br>
+<br>
+<br>
+<br>
+c. Find the maximum likelihood estimate (MLE) of \(\theta.\)<br>
+<br>
+<br>
+<br>
+<br>
+d. Explain in full sentences how you can confirm that the critical point is indeed a maximum. <br>
+<br>
+<br>
+       <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+

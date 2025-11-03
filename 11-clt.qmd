@@ -15,7 +15,7 @@ format:
 
 ## CLT: Recap
 :::{style="font-size: .8em"}
-TThe Central Limit Theorem (CLT) is a foundational result in probability theory. While there are many versions, varying in degrees of abstraction and generality, this is the one we introduced in the last lecture.
+The Central Limit Theorem (CLT) is a foundational result in probability theory. While there are many versions, varying in degrees of abstraction and generality, this is the one we introduced in the last lecture.
 ```{python}
 from IPython.core.display import HTML
 
@@ -24,11 +24,11 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> The Central Limit Theorem (CLT) </span>
         <p>
-        Let \(X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\mu\) and variance \(\sigma^2.\) Let \(S_n = \sum_{i=1}^n X_i.\) Then 
+        Let \(\small X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\small \mu\) and variance \(\small \sigma^2.\) Let \(\small S_n = \sum_{i=1}^n X_i.\) Then 
 
-    $$\frac{S_n - n\mu}{\sigma\sqrt{n}}$$
+    $$\small \frac{S_n - n\mu}{\sigma\sqrt{n}}$$
 
-    tends to the standard normal distribution as \(n \to \infty.\)
+    tends to the standard normal distribution as \(\small n \to \infty.\)
         </p>
     </div>
     """
@@ -42,6 +42,7 @@ display(HTML(html_content))
 * Discuss less formal versions of the CLT
 * Learn how to use the CLT
 * Practice solving CLT questions 
+* Application of the CLT to song classification
 :::
 
 ## Classifying Songs
@@ -73,12 +74,12 @@ __Question__: Approximate the probability that Anush will be able to process at 
 :::{style="font-size: .8em"}
 Loosely put, the CLT tells us the following:
 
-If $X_1,X_2,...,X_n$ are independent random variables with mean $\mu$ and standard deviation $\sigma$, and if $n$ is large, then, $X_1+...+X_n$ is approximately normally distributed with mean $n\mu$ and standard deviation $\sqrt{n}\sigma$.<br>
+_**If $\small X_1,X_2,...,X_n$ are independent random variables with mean $\small \mu$ and standard deviation $\small \sigma$, and if $n$ is large, then, $\small X_1+...+X_n$ is approximately normally distributed with mean $\small n\mu$ and standard deviation $\small \sqrt{n}\sigma$.**_<br>
 <br>
 
-Another version of the CLT concerns averages of random variables. This version states that 
+Another version of the CLT concerns averages of random variables. This version states the following:
 
-If $X_1,X_2,...,X_n$ are independent random variables with mean $\mu$ and standard deviation $\sigma$, and if $n$ is large, then, $\frac{1}{n}(X_1+...+X_n)$ is approximately normally distributed with mean $\mu$ and standard deviation $\frac{σ}{\sqrt{n}}$.
+_**If $\small X_1,X_2,...,X_n$ are independent random variables with mean $\small \mu$ and standard deviation $\small \sigma$, and if $\small  n$ is large, then, $\small \frac{1}{n}(X_1+...+X_n)$ is approximately normally distributed with mean $\mu$ and standard deviation $\small  \frac{σ}{\sqrt{n}}.$**_
 :::
 
 ## Does CLT Always Work?
@@ -88,7 +89,7 @@ For practical purposes, the limiting results in itself are not of primary intere
 
 It is impossible to give a concise and definitive statement of how good the approximation is for what value of $n$. However, some general guidelines are available. 
 
-_How fast the approximation becomes good depends on the distribution of the summands_, the $X_i$s. 
+_**How fast the approximation becomes good depends on the distribution of the summands**_, the $X_i$s. 
 
 If the distribution is fairly symmetric and has tails that die off rapidly, the approximation becomes good for relatively small values of $n$. If the distribution is very skewed or if the tails die down very slowly, a larger value of $n$ is needed for a good approximation.
 :::
@@ -98,7 +99,23 @@ If the distribution is fairly symmetric and has tails that die off rapidly, the 
 :::{style="font-size: .8em"}
 __Example__: The CLT tells us that a random variable defined as the sum of a large number of Bernoulli random variables should be approximately normally distributed.
 
-Let us look at the distributions obtained for $p = 0.5$ and different values of $n$, the number of random variables. 
+- **10 coins** per trial:  
+  `4, 4, 5, 6, 5, 4, 3, 3, 4, 5, 5, 9, 3, 5, 7, 4, 5, 7...`  
+
+- **40 coins** per trial: <br>
+  `22, 17, 18, 22, 19, 26, 16, 22, 27, 24, 16, 21, 26, 24...`
+
+- **100 coins** per trial:  
+  `46, 54, 48, 45, 52, 49, 47, 60, 40, 57, 46, 45, 51, 52...`  
+
+Let us look at the distributions obtained for $\small p = 0.5$ and different values of $\small n$, the number of random variables. 
+
+:::
+
+## CLT
+
+:::{style="font-size: .8em"}
+__Example (continued)__: 
 
 :::{.center-text}
 ```{python}
@@ -107,8 +124,13 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 
+
+# Set a fixed random seed
+np.random.seed(0)
+
+
 def plot_distributions(ns, num_samples=1000, p=0.5):
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(10, 5))
     for n in ns:
         counts = np.array([sum(np.random.binomial(n=1, p=p, size=n)) for _ in range(num_samples)])
         sns.histplot(pd.DataFrame({"counts": counts}), x="counts", binwidth=1, binrange=[0, max(ns)], label=f'n={n}')
@@ -131,7 +153,7 @@ plot_distributions([10, 40, 100])
 
 ## Holly Example
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .78em"}
 
 :::{.columns}
 ::: {.column width="30%"}
@@ -156,6 +178,9 @@ b. Approximate the probability that Holly slept at most 3602 hours last year bas
 ## Holly Example
 
 :::{style="font-size: .8em"}
+:::{.center-text}
+<span style="color:gray;">This page is intentionally left blank.</span>
+:::
 
 :::
 
@@ -227,16 +252,16 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Let \(X_1, X_2, \ldots, X_{10}\) be independent continuous random variables, each uniformly distributed over \([0,1].\) <br>
+    Let \(\small X_1, X_2, \ldots, X_{10}\) be independent continuous random variables, each uniformly distributed over \(\small  [0,1].\) <br>
 
-    a. Use the CLT to approximate the distribution of \(S_{10} = \sum_{i=1}^{10} X_i.\) <br>
+    a. Use the CLT to approximate the distribution of \(\small  S_{10} = \sum_{i=1}^{10} X_i.\) <br>
     <br>
     <br>
     <br>
     <br>
     <br>
     
-    b. Calculate an approximation to \(P(S_{10} > 6).\)
+    b. Calculate an approximation to \(\small  P(S_{10} > 6).\)
     <br>
     <br>
     <br>
