@@ -1,0 +1,320 @@
+---
+title: Method of Moments
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Oldest Point Estimation Method
+
+:::{style="font-size: .8em"}
+In the last lectures, we discussed the maximum likelihood estimation.
+
+:::{.center-text}
+<img src="images/mle/Karl_Pearson.png" width=200/>
+:::
+
+Today we will learn a different technique for estimating parameters called the method of moments. It was introduced in 1894 by Karl Pearson and is the oldest method for deriving point estimators.
+:::
+
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+- The definition of the $k$th moment
+- The definition of the $k$th sample moment
+- The method of moments (MoM) for one variable
+- Application of MoM to the train problem
+<!-- - Practice parameter estimation questions
+    - Parameter evaluation
+    - MLE
+    - MoM -->
+
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+
+:::{.center-text}
+<img src="images/train/train60.jpeg" width=300/>
+:::
+
+__Question__: Estimate how many trains the railroad has using the method of moments.
+:::
+
+## Moments
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> \(k\)th Moment </span>
+        <p>
+        
+    Let \(\small X\) be a random variable. Then, the \(\small k\)th moment of \(X\) is defined as
+
+    $$\small \mu_k = E[X^k].$$ 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: The $\small k$th moment of $\small X$ about scalar $\small c$ is equal to $\small E[(X-c)^k].$
+
+Often, we are interested in the first moment of $\small X$: 
+$$\small \mu_1 = E[X],$$ 
+and the second moment of $\small X$ about $\small \mu_1$: 
+$$\small \operatorname{Var}(X) = E[(X − \mu_1)^2.$$
+:::
+
+## Moments
+:::{style="font-size: .75em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> \(k\)th Sample Moment </span>
+        <p>
+        
+    Let \(\small X\) be a random variable and \(\small x^{(1)}, x^{(2)}, ..., x^{(m)}\) be i.i.d. realizations from \(\small X\). Then, the \(\small k\)th sample moment of \(X\) is defined as
+
+    $$\small \hat{\mu}_k = \frac{1}{m} \sum_{i=1}^m (x^{(i)})^k.$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+<!-- The $\small k$th sample moment of $X$ about scalar $c$ is equal to
+
+$$\small \frac{1}{m} \sum_{i=1}^m (x^{(i)}-c)^k.$$ -->
+
+__Remark__: The $\small k$th sample moment of $X$ about scalar $c$ is equal to
+
+$$\small \frac{1}{m} \sum_{i=1}^m (x^{(i)}-c)^k.$$ 
+
+That is, the first sample moment is just the **sample mean**, the average value of a sample. 
+The second sample moment about the sample mean is the **sample variance**.
+:::
+
+## Method of Moments
+:::{style="font-size: .8em"}
+
+_**The method of moments assumes that to find a good estimator, we should have the true and sample moments match as best we can.**_ 
+
+If we only need to estimate one parameter that denoted as $\theta$, then we should choose the parameter $\theta$ such that the first true moment $\mu_1$ is equal to the first sample moment $\hat{\mu}_1$. (In this case, we frequently drop the subscript.)
+<br><br>
+
+__Example__: Let $x^{(1)}, x^{(1)}, ..., x^{(m)}$ be an i.i.d. sample from a continuous uniform distribution on $(0,\theta)$. What is the method of moments estimate of $\theta$?
+
+Let $X$ be continuous random variable that is uniformly distributed on $(0,\theta)$. Then $x^{(1)}, x^{(1)}, ..., x^{(m)}$ are i.i.d. realizations from $X$. 
+
+We know that $E[X] = \frac{0+\theta}{2} = \frac{\theta}{2}.$ Thus, $\frac{\theta}{2}$ is the first true moment. 
+:::
+
+## Method of Moments
+:::{style="font-size: .8em"}
+__Example (continued)__:
+
+The method of moments approach requires us to match this value with the first sample moment:
+
+$$\frac{\theta}{2} = \frac{1}{m} \sum_{i=1}^m x^{(i)}.$$
+
+Solving for $\theta$ we obtain our MoM estimator
+
+$$\hat{\theta} = \frac{2}{m} \sum_{i=1}^m x^{(i)}.$$
+
+:::
+
+## Method of Moments
+:::{style="font-size: .8em"}
+__Example__: 
+
+:::{.center-text}
+<img src="images/mle/mobile_app.png" width=400/>
+:::
+
+A data science team is analyzing user engagement in a mobile app. To understand how frequently users interact with a specific feature (e.g., a notification panel), they collect data from 23 randomly selected users. For each user, they count how many times the feature was accessed over the course of one week.
+
+:::
+
+## Method of Moments
+:::{style="font-size: .8em"}
+__Example (continued)__:
+The weekly counts are:
+
+\begin{align*}
+& 31 \quad   29  \quad   19  \quad   18  \quad    31  \quad   28 \\
+& 34 \quad   27  \quad   34  \quad   30  \quad    16  \quad   18 \\
+& 26 \quad   27  \quad   27  \quad   18  \quad    24   \quad  22 \\
+& 28  \quad  24  \quad   21  \quad   17  \quad   24
+\end{align*}
+
+The Poisson distribution is a reasonable choice for modeling how often users access the feature in a week because it is commonly used for count independent events that occur at a roughly constant rate over a fixed time interval.
+
+:::
+
+## Method of Moments
+:::{style="font-size: .8em"}
+__Example (continued)__: Since for the Poisson distribution with parameter $\theta$ the expected value is also $\theta$, we find that 
+
+$$\mu_1 = E[X] = \theta.$$
+
+The method of moments tells us that $\theta = \mu_1 = \hat{\mu}_1$, where $\hat{\mu}_1$ is the sample mean. Hence, to find the method of moments estimate of $\theta$ we simply need to find the mean of the counts.
+
+```{python}
+#| echo: true
+import numpy as np
+counts = [31, 29, 19, 18, 31, 28, 34, 27, 34, 30, 16, 18, 26, 27, 27, 18,
+          24, 22, 28, 24, 21, 17, 24]
+mean_counts = np.mean(counts)
+
+print(f"The mean of the given counts is {mean_counts:.3g}.")
+```
+Thus, the estimate of $\theta$ for this particular dataset is simply 24.9.
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+Let $\theta = N$ be the total number of trains. <br>
+Let $X$ represent the train number. Then $X$ has a discrete uniform distribution on $[1,\theta]$. 
+
+- First true moment:  $\mu = E[X] = \frac{1 + \theta}{2}$
+
+- First sample moment:  $\hat{\mu} = \frac{60}{1} = 60$
+
+- Matching true and sample moments: $\frac{1 + \theta}{2} = 60 \Rightarrow \theta = 119$
+
+_Estimated number of trains: 119._
+
+Note: this is a different result than what we found previously using MLE!
+
+
+<!-- $\mu = E[X] = \frac{N+1}{2}.$ 
+$\hat{\mu} = \frac{60}{1} = 60.$
+$\frac{N+1}{2} = 60$. Thus, $\hat{N} = 119.$\\ -->
+:::
+
+## Group Quesiton 1
+:::{style="font-size: .8em"}
+
+| $x$ | $1$ | $2$ |
+| :---: | :---: | :---: |
+| $p(x;\theta)$ | $\theta$ | $1-\theta$|
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
+
+Three independent oservations are made from this distribution:
+\(x^{(1)} = 1, x^{(2)} = 2, x^{(3)} = 2.\)<br>
+
+    a. Find the first true moment.<br>
+    <br>
+    <br>
+    b. Find the first sample moment.
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Quesiton 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   c. Find the method of moments estimate of \(\theta.\) 
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/intro/Netflix.png" width=400/>
+::: 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   A student notices their roommate watching episode 8 of a TV series on Netflix. The show looks interesting, and the student wonders if they will have enough time to watch the entire series over the Thanksgiving break. <br>
+   
+   a. Help the student estimate the total number of episodes in the series using the method of moments.
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Help the student estimate the total number of episodes in the series using the maximum likelihood estimation.
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::

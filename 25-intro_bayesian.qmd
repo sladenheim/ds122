@@ -1,0 +1,519 @@
+---
+title: Introduction to Bayesian Statistics
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+Let's consider a famously unintuitive problem in probability, the Monty Hall Problem. Many of you may have heard of this one.
+
+:::{.center-text}
+<img src="images/bayesian_intro/Monty_open_door.svg" width=400/>
+:::
+
+What do you think, should we switch doors or stick with our original choice? Or does it make no difference?
+:::
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Basics of Bayesian statistics:
+    - Prior
+    - Likelihood
+    - Posterior
+    - Normalizing constant
+- Bayesian update
+- Bayes tables
+    - Python implementation
+- Application to the cookie problem
+
+:::
+
+## The Cookie Problem
+:::{style="font-size: .8em"}
+
+Suppose there are two bowls of cookies:
+
+- The first bowl contains 30 vanilla cookies and 10 chocolate cookies.
+- The second contains 20 vanilla cookies and 20 chocolate cookies.
+
+:::{.center-text}
+<img src="images/bayesian_intro/cookie_problem.png" width=300/>
+:::
+
+__Question:__ If you choose a bowl at random, and then grab a cookie at random and get a vanilla cookie, what is the probability it came from the first bowl?
+
+:::
+
+## Review: Bayes' Rule
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Bayes' Rule</span>
+        <p>
+        For any events \(\small{A}\) and \(\small{B}\) such that \(\small{P(B)>0,}\)  \(\small{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: From the law of total probability it follows that, if we let $\small{P(B)>0}$ and let $\small{A_1, \dots, A_n}$ be events where $\small{A_i}$'s are disjoint and form the entire sample space, then 
+$$\small{P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.}$$ 
+:::
+
+## The Cookie Problem
+:::{style="font-size: .8em"}
+Intuitively, we know that the first bowl had more vanilla cookies, so we should expect it to be more than a 50% chance.
+
+Let's solve this using Bayes' Rule. What we want to solve for is:
+
+$$ P(\text{1st bowl} \vert \text{vanilla cookie}). $$
+
+Using Bayes':
+
+$$P(\text{1st bowl} \vert \text{vanilla cookie})\ = \frac{P(\text{vanilla cookie} \vert \text{1st bowl})\;P(\text{1st bowl})}{P(\text{vanilla cookie})}.$$
+:::
+
+## The Cookie Problem
+:::{style="font-size: .8em"}
+
+We now have three probabilities we need to determine:
+
+- $\small P(\text{1st bowl})$ which is one bowl out of two, so 1/2.
+- $\small P(\text{vanilla cookie} \vert \text{1st bowl})$ which is 30 out of 40 cookies, so 3/4.
+- $\small P(\text{vanilla cookie})$ which is a litte tougher, since it's the combined probability of vanillia cookies from either bowl. So let's use the law of total probability:
+
+$$\small \begin{align*}
+ & P(\text{vanilla cookie})  = \\
+ & = P(\text{vanilla cookie} \vert \text{1st bowl})\;P(\text{1st bowl}) +  P(\text{vanilla cookie} \vert \text{2nd bowl})P(\text{2nd bowl}) \\
+& = (3/4)(1/2)+(1/2)(1/2) =5/8 
+\end{align*}$$
+
+:::
+
+## The Cookie Problem
+:::{style="font-size: .8em"}
+Let's put it all together now:
+
+$$\small \begin{align*}
+P(\text{first bowl} \vert \text{vanilla cookie})\ & = \frac{P(\text{vanilla cookie} \vert \text{first bowl})P(\text{first bowl})}{P(\text{vanilla cookie})}\\
+& = \frac{(3/4)(1/2)}{5/8} = 3/5.
+\end{align*}$$
+
+<br><br>
+
+Just like we suspected, because the first bowl had more vanillia cookies, it was more likely that our cookie came from the first bowl.
+:::
+
+## Basic Bayesian Concepts
+:::{style="font-size: .8em"}
+
+The main way Bayes' Rule is used in Bayesian statistics is as a way to update the probability of a hypothesis $H$, given some data $D$.
+
+<br>
+
+As a general framework, we re-write Bayes' Rule as follows.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Bayes' Rule</span>
+        <p> For \(\small P(D)>0\),
+
+        $$\small P(H \,\vert\, D)\; =  \frac{P(H)P(D\,\vert\,H) \; }{P(D)}. $$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+``` 
+
+
+:::
+
+## Basic Bayesian Concepts
+:::{style="font-size: .8em"}
+
+
+
+- $P(H)$ is the probability of the hypothesis before we see the data, called the **prior** probability.
+- $P(H \vert D)$ is the probability of the hypothesis after we see the data, called the **posterior** probability.
+- $P(D \vert H)$ is the probabilitiy of the data under the hypothesis, called the **likelihood**.
+- $P(D)$ is the **total probability of the data** under any hypothesis (it is also known as the **normalizing constant**).
+
+
+:::
+
+## Prior and Likelihood
+:::{style="font-size: .8em"}
+
+The _**prior**_ is often the trickiest portion of the Bayes' Rule to pin down. 
+
+Sometimes it can be computed exactly as in the cookie bowl problem, where we were equally likely to pick each bowl. 
+
+But what if we chose bowls proportinally to their size? We would need to guess at their sizes to establish the prior. 
+
+Other times, people might disagree about which background information is relevent to the problem at hand. 
+
+<br><br>
+
+The _**likelihood**_ is usually well defined and can be computed directly. In the cookie problem we know the numbers of different cookies in each bowl, so we can compute the probabilites under each hypothesis.
+
+:::
+
+## Total Probability
+:::{style="font-size: .8em"}
+
+
+Finally, determining the **total probability** of the data is often a lot more difficult than you might expect because we often don't know what every possible hypothesis is. 
+
+However, usually the goal is to pin down a set of **mutually exclusive** and **collectively exhaustive** hypotheses, meaning a set of hypotheses where only one of them can be true, and one of them must be true.
+
+Then, over a set of *i* hypotheses, we say:
+
+$$\small P(D) = \sum_i{P(H_i)P(D \vert H_i)}. $$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Bayesian Update</span>
+        <p>
+         A Bayesian update is the process of generating a posterior probability from a prior probability using data.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+``` 
+
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Bayes Table</span>
+        <p> For \(\small P(D)>0\),
+
+         A Bayes table is table that keeps track of the probabilities of all hypotheses as we update them using our data.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+``` 
+
+Let's go step by step to create a Bayes table for the cookie problem. First, we need a table of all our hyptheses, one row for each hypothesis:
+
+```{python}
+#| echo: true
+import pandas as pd
+
+table = pd.DataFrame(index=['first bowl', 'second bowl'])
+table
+```
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+Next, we add the prior probabilities of each hypothesis. Our prior is that it was equally likely to get a vanilla cookie from either bowl:
+
+```{python}
+#| echo: true
+table['prior'] = 1/2, 1/2
+table
+```
+
+The likelihood of each hypothesis is the fraction of cookies in each bowl that is vanilla.   For example, 
+
+$$\small P(D\,\vert\,\text{1st bowl}) = \frac{30}{40} = 0.75.$$
+
+
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+table['likelihood'] = 30/40, 20/40
+table
+```
+
+Next, let's compute the **unnormalized posteriors**. This is just the prior multiplied by the likelihood.
+
+```{python}
+#| echo: true
+table['unnormalized'] = table['prior'] * table['likelihood']
+table
+```
+
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+The final missing piece is to divide by the total probability of the data. 
+
+What we are doing is _**normalizing**_ the posteriors so that they sum up to 1.
+
+To find the total probability of the data we directly sum over the unnormalized posteriors:
+
+```{python}
+#| echo: true
+prob_data = table['unnormalized'].sum()
+prob_data
+```
+
+This gives us 5/8, just like we calculated before. 
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+
+Finally, we can use the total probability of the data to get the posterior probability of each hypthesis.
+
+```{python}
+#| echo: true
+table['posterior'] = table['unnormalized'] / prob_data
+table
+```
+
+The posterior probability of the first bowl, given that we observed a vanilla cokie, is 0.6, the same as when we used Bayes' theorem directly before. 
+
+Notice that the posteriors add up to 1 (as we should expect given mutually exclusive and collectivly exhaustive hypotheses).
+
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
+We can simplify things going forward by introducing an update function.
+
+```{python}
+#| echo: true
+def update(table):
+    table['unnormalized'] = table['prior'] * table['likelihood']
+    prob_data = table['unnormalized'].sum()
+    table['posterior'] = table['unnormalized'] / prob_data
+    return table
+
+table = pd.DataFrame(index=['first bowl', 'second bowl'])
+table['prior'] = 1/5, 1/5,
+table['likelihood'] = 3/4, 1/2
+
+update(table)
+```
+
+:::
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+Now let's return to the Monty Hall Problem. 
+
+:::{.center-text}
+<img src="images/bayesian_intro/Monty_open_door.svg" width=400/>
+:::
+
+What do you think, should we switch doors or stick with our original choice? Or does it make no difference?
+:::
+
+<!-- ## The Monty Hall Problem
+:::{style="font-size: .8em"}
+Most people will say there's now a 50/50 chance the remaining doors have the prize, so it doesn't matter. 
+
+But it turns out that's wrong! You actually have a 2/3 chance of finding the prize if you switch doors. 
+
+Let's see why using a Bayes table.
+
+::: -->
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+
+Each door starts with an equal prior probability of holding the prize:
+```{python}
+#| echo: true
+table = pd.DataFrame(index=['Door 1', 'Door 2', 'Door 3'])
+table['prior'] = 1/3, 1/3, 1/3
+table
+```
+
+What is our data in this scenario? 
+
+Without loss of generality, suppose we originally picked door 1. Now Monty opens a door (let's say door 3, again without loss of generality) to reveal a gag prize. So what is the **likelihood** of the data under each hypothesis? 
+:::
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+
+__**Hypothesis 1:**__ The prize is behind door 1
+
+In this case Monty chose door 2 or door 3 at random, so he was equally likely to open door 2 and 3, so the observation that he opened door 3 had a 50/50 chance of occuring.
+
+__**Hypothesis 2:**__ The prize is behind door 2
+
+In this case Monty _**must**_ open door 3, so the observation that he opened door 3 was guaranteed to happen.
+
+__**Hypothesis 3:**__ The prize is behind door 3
+
+Monty could not have opened a door with the prize behind it, so the probability of seeing him open door 3 under this hypothesis is 0.
+
+:::
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+table['likelihood'] = 1/2, 1, 0
+table
+```
+
+```{python}
+#| echo: true
+table['likelihood'] = 1/2, 1, 0
+table
+```
+:::
+
+## The Monty Hall Problem
+:::{style="font-size: .8em"}
+
+And now let's run our update function and see what the posterior probabilities are:
+
+```{python}
+#| echo: true
+update(table)
+```
+
+Turns out there is a 2/3 probability the prize is behind door 2! We should switch doors.
+:::
+
+## Prior and Posterior Distributions
+:::{style="font-size: .8em"}
+
+The set of _**prior probabilities**_ are in reality a _**prior distribution**_. Likewise, the set of _**posterior probabilities**_ are in reality a _**posterior distribution**_ across hypotheses. 
+
+Let's reformulate the cookie problem using distributions.
+
+We will use a uniform probability distribution as a prior (a "**uniform prior**"):
+
+```{python}
+import numpy as np
+```
+
+```{python}
+#| echo: true
+from scipy.stats import randint
+distribution = pd.DataFrame(index=['first bowl', 'second bowl'])
+#uniform prior distribution
+distribution['probs'] = randint(1, 3).pmf(np.arange(1,3)) 
+distribution
+```
+
+:::
+
+## Prior and Posterior Distributions
+:::{style="font-size: .8em"}
+
+
+:::{.center-text}
+```{python}
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+distribution.plot(kind = 'bar', ax = ax, ylim = [0, 1], legend = False, ylabel = 'Probability', fontsize = 16)
+plt.xticks(rotation='horizontal')
+ax.yaxis.label.set_fontsize(16)
+plt.title('Prior Distribution (Uniform Prior)', size = 16);
+```
+:::
+:::
+
+## Prior and Posterior Distributions
+:::{style="font-size: .8em"}
+Now let's introduce an update function like before, but this time it updates our probability distribution based on likelihoods.
+
+```{python}
+#| echo: true
+def update(distribution, likelihood):
+    '''perform a Bayesian update on distribution using likelihood'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+```
+Let's use it to compute the posterior probabilities.
+
+```{python}
+#| echo: true
+likelihood_vanilla = [0.75, 0.5]
+update(distribution, likelihood_vanilla)
+```
+
+:::
+
+## Prior and Posterior Distributions
+:::{style="font-size: .8em"}
+:::{.center-text}
+```{python}
+old_posterior = distribution.copy()
+fig, ax = plt.subplots()
+distribution.plot(kind = 'bar', ax = ax, ylim = [0, 1], legend = False, ylabel = 'Probability', fontsize = 16)
+plt.xticks(rotation='horizontal')
+ax.yaxis.label.set_fontsize(16)
+plt.title('Posterior Distribution', size = 16);
+```
+:::
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose we have a box with a 6-sided die, an 8-sided die, and a 12-sided die. We choose one of the dice at random, roll it, and report that the outcome is a 1. Make a Bayes table to compute the probability that we chose the 6-sided die.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::

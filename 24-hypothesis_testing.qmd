@@ -56,7 +56,7 @@ The table below sums up the results of the simulations, each simulating a sample
 :::
 
 ## Left-Handedness at BU
-:::{style="font-size: .65em"}
+:::{style="font-size: .6em"}
 
 | Simulated Percentage of Left-Handed Students | Frequency |
 |---------------------------------------------|-----------|
@@ -95,7 +95,7 @@ The problem of hypothesis testing centers on the question of _**identifying stat
 The first strategy for answering this question was developed by Ronald Fisher in the 1920s.
 
 :::{.center-text}
-<img src="images/hypothesis_testing/Fisher.jpg" width=200/>
+<img src="images/hypothesis_testing/Fisher.jpg" width=160/>
 :::
 
 Fisher cast the decision framework as deciding whether "something surprising" has occurred. 
@@ -164,9 +164,9 @@ Fisher proposed to give Ms. Bristol eight cups:
 The order of the cups was unknown to Ms. Bristol. Her task was to identify the four in which she thinks the milk was poured first.
 
 <br>
-_**The test statistic**_ $t$ _**is equal the number of cups (out of four) correctly identified by Ms. Bristol**_.
+_**The test statistic**_ $t$ _**is equal to the number of cups (out of four) correctly identified by Ms. Bristol**_.
 
-We can then ask: what is _**the probability that Ms. Bristol would correctly identify four or more cups just by chance**_? This probability is the p-value of the experiment.
+We can then ask: what is _**the probability that Ms. Bristol would correctly identify four cups just by chance**_? This probability is the p-value of the experiment.
 :::
 
 ##  The Lady Tasting Tea
@@ -207,7 +207,7 @@ Given this result, Fisher was willing to conclude that the lady's tea identifica
 _**What if she had failed? What if the lady had chosen instead two cups of each kind of tea?**_   
 
 
-In this case, the $p$-value would have been $p \approx 0.75$ or 75%.
+In this case, the probability of such outcome is 75%.
 
 Should we then conclude that the null hypothesis is _**true**_?
 
