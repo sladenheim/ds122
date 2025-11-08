@@ -24,6 +24,16 @@ Let's consider a famously unintuitive problem in probability, the Monty Hall Pro
 What do you think, should we switch doors or stick with our original choice? Or does it make no difference?
 :::
 
+:::{.notes}
+On his TV Show "Let's Make a Deal", Monty Hall would present contestants with three doors. Behind one was a prize, and behind the other two were gag gifts such as goats. The goal is to pick the door with the prize. After picking one of the three doors, Monty will open one of the other two doors revealing a gag prize, and then ask if you'd like to switch doors now.
+
+Most people will say there's now a 50/50 chance the remaining doors have the prize, so it doesn't matter. 
+
+But it turns out that's wrong! You actually have a 2/3 chance of finding the prize if you switch doors. 
+
+Let's see why using a Bayes table.
+::: 
+
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
@@ -169,7 +179,7 @@ The _**prior**_ is often the trickiest portion of the Bayes' Rule to pin down.
 
 Sometimes it can be computed exactly as in the cookie bowl problem, where we were equally likely to pick each bowl. 
 
-But what if we chose bowls proportinally to their size? We would need to guess at their sizes to establish the prior. 
+But what if we chose bowls proportinally to their size? We would need to include that into our analysis. 
 
 Other times, people might disagree about which background information is relevent to the problem at hand. 
 
@@ -219,8 +229,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
      <span class="label">Bayes Table</span>
-        <p> For \(\small P(D)>0\),
-
+        <p> 
          A Bayes table is table that keeps track of the probabilities of all hypotheses as we update them using our data.
         </p>
     </div>
@@ -229,7 +238,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ``` 
 
-Let's go step by step to create a Bayes table for the cookie problem. First, we need a table of all our hyptheses, one row for each hypothesis:
+Let's go step by step to create a Bayes table for the cookie problem. First, we need a table that contains all possible hyptheses, one row for each hypothesis:
 
 ```{python}
 #| echo: true
@@ -242,7 +251,7 @@ table
 
 ## Bayes Table
 :::{style="font-size: .8em"}
-Next, we add the prior probabilities of each hypothesis. Our prior is that it was equally likely to get a vanilla cookie from either bowl:
+Next, we add the prior probabilities of each hypothesis. Our prior is that it was equally likely to get a vanilla cookie from either bowl.
 
 ```{python}
 #| echo: true
@@ -342,15 +351,7 @@ Now let's return to the Monty Hall Problem.
 What do you think, should we switch doors or stick with our original choice? Or does it make no difference?
 :::
 
-<!-- ## The Monty Hall Problem
-:::{style="font-size: .8em"}
-Most people will say there's now a 50/50 chance the remaining doors have the prize, so it doesn't matter. 
 
-But it turns out that's wrong! You actually have a 2/3 chance of finding the prize if you switch doors. 
-
-Let's see why using a Bayes table.
-
-::: -->
 
 ## The Monty Hall Problem
 :::{style="font-size: .8em"}
@@ -363,9 +364,11 @@ table['prior'] = 1/3, 1/3, 1/3
 table
 ```
 
-What is our data in this scenario? 
+What is our _**data**_ in this scenario? 
 
-Without loss of generality, suppose we originally picked door 1. Now Monty opens a door (let's say door 3, again without loss of generality) to reveal a gag prize. So what is the **likelihood** of the data under each hypothesis? 
+Without loss of generality, suppose we originally picked door 1. Now Monty opens a door (let's say door 3, again without loss of generality) to reveal a gag prize. So the door that is open gives us the data.
+
+What are the _**hypotheses**_? And what is the _**likelihood**_ of the data under each hypothesis? 
 :::
 
 ## The Monty Hall Problem
@@ -386,7 +389,7 @@ Monty could not have opened a door with the prize behind it, so the probability 
 :::
 
 ## The Monty Hall Problem
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 
 ```{python}
 #| echo: true
@@ -394,17 +397,7 @@ table['likelihood'] = 1/2, 1, 0
 table
 ```
 
-```{python}
-#| echo: true
-table['likelihood'] = 1/2, 1, 0
-table
-```
-:::
-
-## The Monty Hall Problem
-:::{style="font-size: .8em"}
-
-And now let's run our update function and see what the posterior probabilities are:
+Now let's find the posterior probabilities using the update function. 
 
 ```{python}
 #| echo: true
@@ -413,6 +406,7 @@ update(table)
 
 Turns out there is a 2/3 probability the prize is behind door 2! We should switch doors.
 :::
+
 
 ## Prior and Posterior Distributions
 :::{style="font-size: .8em"}
