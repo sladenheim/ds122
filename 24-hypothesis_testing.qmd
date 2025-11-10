@@ -207,7 +207,7 @@ Given this result, Fisher was willing to conclude that the lady's tea identifica
 _**What if she had failed? What if the lady had chosen instead two cups of each kind of tea?**_   
 
 
-In this case, the probability of such outcome is 75%.
+In this case, the probability of an outcome as extreme as that is 75%.
 
 Should we then conclude that the null hypothesis is _**true**_?
 

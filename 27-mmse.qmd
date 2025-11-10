@@ -1,0 +1,605 @@
+---
+title: Minimum Mean Squared Error Estimator
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Minimum mean squared error (MMSE) estimator
+- Sensitivity to the prior
+- Credible intervals
+- Bayesian vs frequentist views on statistics
+- Application to the train problem
+
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+
+:::{.center-text}
+<img src="images/train/train60.jpeg" width=300/>
+:::
+
+__Question__: Estimate how many trains the railroad has using Minimum Mean Squared Error (MMSE) estimation.
+:::
+
+## Train Problem
+:::{style="font-size: .8em"}
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+
+To apply Bayesian reasoning, we can break this problem into two steps:
+
+* What did we know about $N$ before we saw the data?
+
+* For any given value of $N$, what is the likelihood of seeing the data (a train with number 60)?
+
+<br>
+
+The answer to the first question is the prior.  
+
+The answer to the second question is the likelihood.
+
+:::
+
+## Train Problem: Prior
+:::{style="font-size: .8em"}
+
+Assuming that there are at most 1000 trains, we get the following prior distribution.
+```{python}
+#| echo: true
+from scipy.stats import randint
+max_N = 1000
+
+N_dist = pd.DataFrame(index = np.arange(1, max_N + 1))
+
+# using a uniform prior 
+N_dist['probs'] = randint(1, max_N + 1).pmf(np.arange(1, max_N + 1)) 
+```
+
+:::{.center-text}
+```{python}
+N_dist.plot(lw = 4, legend = False, fontsize = 14, figsize=(8,3.5))
+plt.xlabel('$N$', size = 14)
+plt.ylabel('Probability', size = 14);
+```
+:::
+:::
+
+## Train Problem: Likelihood
+:::{style="font-size: .8em"}
+Now let us figure out the likelihood of the data.
+
+In a hypothetical fleet of $N$ trains, what is the probability that we would see number 60?
+
+<br>
+
+If we assume that we are equally likely to see any train, the chance of seeing any particular one is $1/N$.
+
+However, for values of $N < 60$, the data are impossible - meaning their likelihood is zero.
+
+```{python}
+#| echo: true
+def likelihood(max_N, data):
+    '''Returns the likelihood of seeing a particular train number (data) when the company has max_N trains'''
+    lval = pd.DataFrame(index = np.arange(1, max_N + 1))
+    lval['likelihoods'] = 1 / np.arange(1, max_N + 1)
+    lval['likelihoods'][lval.index < data] = 0
+    return lval['likelihoods']
+```
+
+:::
+
+
+## Train Problem: Bayes Update
+:::{style="font-size: .8em"}
+```{python}
+#| echo: true
+def update(distribution, likelihood):
+    '''our standard Bayesian update function'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+```
+
+Now let us perform a Bayesian update using the observed data "60".
+
+```{python}
+#| echo: true
+update(N_dist, likelihood(1000, 60));
+```
+:::{.center-text}
+```{python}
+N_dist.plot(lw = 4, legend = False, fontsize = 14, figsize=(8,3.5))
+plt.xlabel('$N$', size = 14)
+plt.ylabel('Probability', size = 14);
+ax = plt.gca()
+ax.set_xlim([0,max_N])
+```
+:::
+
+:::
+
+## Train Problem: MAP Estimate
+:::{style="font-size: .8em"}
+Not surprisingly, all values of $N$ below 60 have been eliminated and 60 is the MAP estimate of $N$.
+
+```{python}
+#| echo: true
+N_dist['probs'].idxmax()
+```
+
+If you want to maximize your chances of getting
+the answer _**exactly right,**_ you should guess that the train company has 60 trains.
+
+On the other hand, you would probably be happy to get an answer that is _**close**_ to the right answer - and for that, the MAP estimate is not always best.
+
+In this case, the posterior distribution is highly skewed, and the MAP estimate (60) is actually very close to some _**impossible**_ values (59, 58, ... etc).
+
+:::
+
+## MMSE Estimator
+:::{style="font-size: .8em"}
+Previously, we used the _**Mean Squared Error (MSE)**_ to judge the quality of an estimator: 
+
+$$\small \operatorname{MSE}(\hat{\theta}) = E[(\hat{\theta} - \theta)^2].$$
+
+MSE is the average squared distance between the estimator $\hat{\theta}$ and the true value of the parameter $\theta$. 
+
+In the frequentist perspective on statistics, $\theta$ is fixed but unknown, while the point estimate $\hat{\theta}$ is a function of the data (and therefore is a random variable).
+
+In a Bayesian setting, the $\theta$ is a random variable and $\hat{\theta}$ is fixed but unkown. The MSE takes the expectation over the posterior distribution of $\theta:$
+
+$$\small E[(\hat{\theta} - \theta)^2] = \sum_\theta p(\theta) \,(\hat{\theta} - \theta)^2.$$
+:::
+
+## MMSE Estimator
+:::{style="font-size: .8em"}
+To find the $\small \hat{\theta}$ that minimizes MSE, we take the derivative of MSE with respect to $\small \hat{\theta}:$
+
+$$\small \frac{d}{d\hat{\theta}} \sum_\theta p(\theta) \,(\hat{\theta} - \theta)^2 = 2 \sum_\theta p(\theta) (\hat{\theta} - \theta)$$
+
+And we set it to zero:
+
+$$\small  2 \sum_\theta p(\theta) (\hat{\theta} - \theta) = 0 $$
+
+$$\small  2 \hat{\theta} \sum_\theta p(\theta)  = 2 \sum_\theta p(\theta) \theta $$
+
+:::
+
+## MMSE Estimator
+:::{style="font-size: .8em"}
+
+Since $\small \sum_\theta p(\theta) = 1$, and $\small  \sum_\theta p(\theta) \theta = E[\theta]$, we obtain
+
+$$\small \hat{\theta} = E[\theta].$$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Minimum Mean Squared Error (MMSE) Estimate</span>
+        <p> 
+         The minimum mean squared error estimate is the posterior expected value of the parameter \(\small \theta\):
+         $$\small \hat{\theta} = E[\theta].$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+``` 
+
+That is, the MMSE estimate of $N$ for the train problem is
+
+$$\small \text{MMSE}(N) = E[N] = \sum_{n=1}^{1000} n \cdot p(n). $$
+:::
+
+## Train Problem: MMSE Estimate
+:::{style="font-size: .8em"}
+Using Python we find:
+
+```{python}
+#| echo: true
+np.sum(N_dist.index * N_dist['probs'])
+``` 
+
+The MMSE is 333, so that might be a good guess if you want to minimize error.
+
+Recall that we used the uniform prior from 1 to 1000, but we offered no justification for choosing a uniform distribution or that particular upper bound. 
+
+With so little data - only one observation - the posterior distribution is extremely sensitive to the prior.
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .8em"}
+
+This table shows what happens as we vary the upper bound:
+
+```{python}
+#| echo: true
+df = pd.DataFrame(columns=['Posterior mean'])
+df.index.name = 'Upper bound'
+
+for max_N in [500, 1000, 2000]:
+    N_dist = pd.DataFrame(index = np.arange(1, max_N + 1))
+
+    # using a uniform prior distribution
+    N_dist['probs'] = randint(1, max_N + 1).pmf(np.arange(1, max_N + 1)) 
+    
+    update(N_dist, likelihood(max_N, 60))
+
+    df.loc[max_N] = np.sum(N_dist.index * N_dist['probs'])
+    
+df
+```
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .8em"}
+As we vary the upper bound, the posterior mean changes substantially. So that's bad.  
+
+When the posterior is sensitive to the prior, there are two ways to proceed:
+
+* Get more data.
+
+* Get more background information and choose a better prior.
+
+With more data, posterior distributions based on different priors tend to converge.  
+For example, suppose that in addition to train 60 we also see trains 30 and 90.
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .7em"}
+```{python}
+#| echo: true
+df = pd.DataFrame(columns=['Posterior mean'])
+df.index.name = 'Upper bound'
+
+dataset = [30, 60, 90]
+
+for max_N in [500, 1000, 2000]:
+    N_dist = pd.DataFrame(index = np.arange(1, max_N + 1))
+
+    # using a uniform prior distribution
+    N_dist['probs'] = randint(1, max_N + 1).pmf(np.arange(1, max_N + 1)) 
+    
+    for data in dataset:
+        update(N_dist, likelihood(max_N, data))
+
+    df.loc[max_N] = np.sum(N_dist.index * N_dist['probs'])
+    
+df
+```
+
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .8em"}
+With just three observations, the differences become much smaller. However, _**three observations is not yet enough for the posteriors to converge**_.
+
+Another option for improving our estimate is to find an _**informative prior**_ by gathering more background information.
+
+<!-- It is probably not reasonable to assume that a train-operating company with 1000 locomotives is just as likely as a company with only 1. -->
+
+With some effort, we could probably find a list of companies that operate locomotives in the area of observation.
+Or we could interview an expert in rail shipping to gather information about the typical size of companies.
+But even without getting into the specifics of railroad economics, we can make some educated guesses.
+
+In most fields, there are many small companies, fewer medium-sized companies, and only one or two very large companies.
+
+In fact, _**the distribution of company sizes tends to follow a power law**_.
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .7em"}
+
+:::{.center-text}
+```{python}
+max_N = 1000
+alpha = 1.0
+
+power = pd.DataFrame(index = np.arange(1, max_N + 1))
+power['probs'] = power.index ** (-alpha)
+power['probs'] = power['probs'] / power['probs'].sum()
+
+unif = pd.DataFrame(index = np.arange(1, max_N + 1))
+unif['probs'] = randint(1, max_N + 1).pmf(np.arange(1, max_N + 1)) 
+
+fig, ax = plt.subplots(figsize=(8, 2.85))
+power.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)  
+unif.plot(ax = ax, color = 'orange', lw = 4, style = '--', fontsize = 14)
+ax.legend(['Power Law Prior', 'Uniform Prior'], fontsize = 14, loc = 'best')
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16);   
+```
+:::
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 2.85))
+power.plot(ax = ax, logy=True, logx=True, color = 'cornflowerblue', lw = 4, fontsize = 14)  
+unif.plot(ax = ax, color = 'orange', lw = 4, style = '--', fontsize = 14)
+ax.legend(['Power Law Prior', 'Uniform Prior'], fontsize = 14, loc = 'best')
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16);   
+```
+:::
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .8em"}
+
+After a Bayesian update with the power law prior, we find the following posterior distribution.
+
+:::{.center-text}
+```{python}
+update(power, likelihood(1000, 60));
+update(unif, likelihood(1000, 60));
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+power.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)  
+unif.plot(ax = ax, color = 'orange', lw = 4, style = '--', fontsize = 14)
+ax.legend(['Power Law Prior', 'Uniform Prior'], fontsize = 14, loc = 'best')
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.title('Posterior Distributions', size = 16);   
+```
+:::
+:::
+
+## Sensitivity to the Prior
+:::{style="font-size: .8em"}
+The power law gives less prior probability to high values, which yields lower posterior means, and less sensitivity to the upper bound. 
+
+Here's how the posterior means depend on the upper bound when we use a power law prior and observe three trains:
+
+```{python}
+df = pd.DataFrame(columns=['Posterior mean'])
+df.index.name = 'Upper bound'
+
+dataset = [30, 60, 90]
+
+for max_N in [500, 1000, 2000]:
+    
+    # using a power law prior
+    power = pd.DataFrame(index = np.arange(1, max_N + 1))
+    power['probs'] = power.index ** (-alpha)
+    power['probs'] = power['probs'] / power['probs'].sum()
+    
+    for data in dataset:
+        update(power, likelihood(max_N, data))
+
+    df.loc[max_N] = np.sum(power.index * power['probs'])
+    
+df
+```
+
+Now the differences are much smaller.  In fact,
+with an arbitrarily large upper bound, the mean converges on 134.
+
+:::
+
+## Credible Intervals
+:::{style="font-size: .8em"}
+
+So far we have seen two ways to summarize a posterior distribution: the value with the highest posterior probability (the MAP) and the posterior mean (the MMSE).
+These are both _**point estimates**_, that is, single values that estimate the quantity we are interested in.
+
+In general, whenever we have a point estimate, we'd like to know how concentrated likely values are around that estimate.
+
+For example, in the frequentist approach, we want to see confidence intervals around a point estimate, so we can see how representative the point estimate really is.
+
+In the Bayesian case, we look for an interval that contains "most" of the posterior probability distribution.
+
+This is called a __credible interval.__
+
+:::
+
+## Credible Intervals
+:::{style="font-size: .8em"}
+
+For example, let us look for an interval in which we are 90% confident that the parameter lies.
+
+So we are looking for bounds $a$ and $b$ such that $P\left(a < (H\,\vert\,D) \leq b \right) \ge 0.9$.
+
+A simple way to visualize this is to consider the CDF of the posterior.
+
+Here is the posterior for the power-law prior with upper bound 1000, after the single train observation of 60.
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 3.5))
+power.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)  
+ax.legend(['Power Law Prior'], fontsize = 14, loc = 'best')
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.title('Posterior Distribution', size = 16);   
+```
+:::
+:::
+
+## Credible Intervals
+:::{style="font-size: .8em"}
+We can calculate its CDF.
+
+```{python}
+#| echo: true
+power['cdf'] = np.cumsum(power['probs'])
+```
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 3.5))
+power['cdf'].plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)  
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.title('CDF of Posterior', size = 16);   
+```
+:::
+
+Let us set $a$ so that $\small P((N\,\vert\,D) \leq a) = 0.05$, and set $b$ so that $\small P((N\,\vert\,D) > b) = 0.05.$
+:::
+
+## Credible Intervals
+:::{style="font-size: .8em"}
+```{python}
+#| echo: true
+# find a such that P[N|D <= a] is <= 0.05
+a = max(power.index[power['cdf'] <= .05])
+a
+```
+
+```{python}
+#| echo: true
+b = min(power.index[power['cdf'] > .95])
+b
+```
+
+```{python}
+#| echo: true
+# confirm that this is a 90% credible interval
+power['cdf'].iloc[b] - power['cdf'].iloc[a]
+```
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(7.5, 2.8))
+power['cdf'].plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)
+ymin = power['probs'].min()
+# ax.set_ylim(ymin = ymin)
+# plt.plot(a, power['cdf'].iloc[a], 'o', color = 'orange', markersize = 10)
+ymin, ymax = plt.ylim()
+xmin, xmax = plt.xlim()
+plt.vlines(a, ymin = ymin, ymax = power['cdf'].iloc[a], linestyles = 'dashed', color = 'g')
+#plt.plot(a, ymin, 'o', color = 'g', markersize = 14, clip_on = False)
+#plt.plot(b, power['cdf'].iloc[b], 'o', color = 'orange', markersize = 10)
+plt.vlines(b, ymin = ymin, ymax = power['cdf'].iloc[b], linestyles = 'dashed', color = 'g')
+plt.hlines(power['cdf'].iloc[a], xmin = xmin, xmax = a, linestyles = 'dashed', color = 'g')
+plt.hlines(power['cdf'].iloc[b], xmin = xmin, xmax = b, linestyles = 'dashed', color = 'g')
+#plt.plot(b, ymin, 'o', color = 'g', markersize = 14, clip_on = False)
+ax.set_ylim(ymin = ymin)
+ax.set_xlim(xmin = xmin)
+plt.xlabel('$N$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.title('CDF of Posterior', size = 16); 
+```
+:::
+:::
+
+## Frequentist vs Bayes
+:::{style="font-size: .8em"}
+We can summarize the differences as follows:
+
+__Probability:__
+
+* Frequentist probability assumes that data represents "independent trials under identical conditions." 
+* Bayesian probability uses probability to model our _**degree of belief**_ of a hypothesis.
+
+__Statistical Approach:__
+
+* A typical goal of frequentist statistics is to infer the parameters of the distribution that the data came from.
+* A typical goal of Bayesian statistics is to update our degree of belief about the parameters using the data.
+
+:::
+
+## Frequentist vs Bayes
+:::{style="font-size: .75em"}
+__Point Estimates:__
+
+* Typical point estimators used in frequentist statistics are the MLE and MoM estimators.
+* Typical point estimators used in Bayesian statistics are the MAP and MMSE estimators.
+
+__Uncertainty:__
+
+* The uncertainty of a point estimate in frequentist statistics is expressed using a confidence interval.
+* The uncertainty of a point estimate in Bayesian statistics is expressed using a credible interval.
+
+__Slogan:__ In frequentist statistics, the model is fixed and the data are random. In Bayesian statistics, the data are fixed and the model is random.
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/intro/Netflix.png" width=400/>
+::: 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   A student notices their roommate watching episode 8 of a TV series on Netflix. The show looks interesting, and the student wonders if they will have enough time to watch the entire series over the Thanksgiving break. Assume that there can't be more than 10.  <br>
+   
+   a. Help the student estimate the total number of episodes in the series using the minimum mean squared error (MMSE) estimation.
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Help the student estimate the total number of episodes in the series using the maximum a posteriori (MAP) estimation.
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+##
+
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/mmse/mary_poppins.png" width=400/> <br>
+With every job when it's complete. There is a sense of bitter-sweet.
+::: 
+
+:::
