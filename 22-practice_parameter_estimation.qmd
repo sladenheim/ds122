@@ -24,3 +24,5 @@ format:
 - Practice method of moments
 
 :::
+
+<!-- Netflix example, harder bias/variance question -->

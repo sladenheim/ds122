@@ -13,6 +13,34 @@ format:
         chalkboard: true 
 ---
 
+## Group Question 2
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    When three friends go for coffee, they decide who will pay the check by each flipping a coin and then letting the “odd person” pay. If all three flips produce the same result (so that there is no odd person), then they make a second round of flips, and they continue to do so until there is an odd person. <br>
+    a. What distribution can be used to model the number of rounds? <br>
+    <br>
+    <br>
+    b. What is the probability that exactly 3 rounds of flips are made?<br>
+    <br>
+    <br>
+    c. What is the expectation of the number of rounds played? <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
 ## Why Common Continuous Distributions?
 :::{style="font-size: .8em"}
 Common continuous distributions help us answer questions like:
@@ -20,6 +48,12 @@ Common continuous distributions help us answer questions like:
 - What’s the chance a passenger waits less than 5 minutes for a bus? 
 - What percent of students scored above 85 on a test?
 - How long until the next customer arrives to a store?
+
+:::{.center-text}
+<img src="images/common distributions/Gauss-on-Deutschemark.png" width=600/>
+
+:::
+
 :::
 
 
@@ -27,21 +61,41 @@ Common continuous distributions help us answer questions like:
 
 :::{style="font-size: .8em"}
 
-* Common continuous distributions:
+* Introduce common continuous distributions:
     - Uniform distribution
     - Gaussian/normal distribution
     - Exponential distribution
-* Overview of related continuous and discrete distributions
+* For each, discuss intuition, PDF, mean, variance, and Python implementation
+
+* Highlight similarities between certain continuous and discrete distributions
+
+* Apply the knowledge to a college fellowship problem
+
 
 :::
 
 ## Best of the Best
 :::{style="font-size: .8em"}
-A college provides admission only on the basis of SAT and ACT scores. The college admin decides to give the top performer fellowship to the student who has performed the best among all applicants.
 
-The admin knows that the SAT scores are normally distributed with mean 1000 and standard deviation 200, while the ACT scores are normally distributed with mean 20 and standard deviation 5. The highest score received from applicants who appeared for SAT is 1355 and the highest score received from applicants who appeared for ACT is 30.
+:::{.columns}
+::: {.column width="30%"}
+:::{.center-text}
+<img src="images/common distributions/Admissions_logo.jpeg" width=200/>
+:::
+:::
+::: {.column width="70%"}
+A college provides admission only on the basis of SAT and ACT scores. 
 
-Question: Help the college to choose the best candidate for the fellowship.
+The college admin decides to give the top performer fellowship to the student who has performed the best among all applicants.
+:::
+:::
+
+- The SAT scores are normally distributed with mean 1000 and standard deviation 200. The highest score is 1355.
+- The ACT scores are normally distributed with mean 20 and standard deviation 5. The highest score is 30. 
+<!-- 
+The admin knows that the SAT scores are normally distributed with mean 1000 and standard deviation 200, while the ACT scores are normally distributed with mean 20 and standard deviation 5. The highest score received from applicants who appeared for SAT is 1355 and the highest score received from applicants who appeared for ACT is 30. -->
+
+__Question__: Help the college to choose the best candidate for the fellowship.
 :::
 
 ## Uniform Distribution
@@ -54,13 +108,11 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> (Continuous) Uniform Distribution </span>
         <p>
-       A random variable \(X\) follows a continuous uniform distribution on \(\small{[0,1]}\), if its PDF is given by
+       A random variable \(\small X\) follows a continuous uniform distribution on \(\small{[0,1]}\), if its PDF is given by
 
     $$\small{f(x) = \;\left\{\begin{array}{cr} 1 & \text{for  } 0\leq x \leq 1, \\ 0 & \text{otherwise. }\end{array}\right.}$$
 
-    This is called uniform density on \(\small{[0,1]}.\) 
-
-    For a general interval \(\small{[a,b]},\) this function would become 
+    For a general set of parameters \(\small a\) and \(\small b\) (i.e., a general interval \(\small{[a,b]}\)) this function would become 
 
     $$\small{f(x) = \;\left\{\begin{array}{cr} \frac{1}{b-a} & \text{for  } a\leq x \leq b, \\ 0 & \text{otherwise. }\end{array}\right.}$$
         </p>
@@ -70,23 +122,23 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 <!-- __Remark__: $a$ and $b$ are the parameters of the uniform distribution. -->
-__Remark__: The expected value and the variance of a continuous uniform distribution are, respectively $\frac{a+b}{2} \text{ and } \frac{(b-a)^2}{12}.$
+__Remark__: The expected value and the variance are, respectively $\frac{a+b}{2} \text{ and } \frac{(b-a)^2}{12}.$
 :::
 
 ## Uniform Distribution
-:::{style="font-size: .8em"}
-__Example__: Let $X$ be a continuous random variable that is uniformly distributed over $[0,10]$. <br>
-a. Find the CDF of $X.$ <br>
-$$
-f(x) = 
+:::{style="font-size: .7em"}
+__Example__: Let $\small X$ be a continuous random variable that is uniformly distributed over $\small [0,10]$. <br>
+a. Find the CDF of $\small X.$ <br>
+b. Find $\small E[X].$ <br>
+a. The PDF of $\small X$ is given by
+$$\small f(x) = 
 \begin{cases}
-\frac{1}{10} & \text{for } x \in [0, 10] \\\\
-0 & \text{otherwise}
-\end{cases}
-$$
+\frac{1}{10} & \text{for } x \in [0, 10], \\\\
+0 & \text{otherwise}.
+\end{cases} $$
 
-To find the CDF, $F(x) = P(X \leq x)$, we integrate the PDF from 0 to $x$:
-$$
+To find the CDF, $\small F(x) = P(X \leq x)$, we integrate the PDF from 0 to $\small x$:
+$$ \small
 F(x) = 
 \begin{cases}
 0 & x < 0 \\\\
@@ -99,24 +151,25 @@ $$
 ## Uniform Distribution
 :::{style="font-size: .8em"}
 __Example (continues)__: <br>
-b. Find $E[X].$ <br>
-We can find $E[X]$ directly using the formula for the mean of the continuous uniform distribution:
-$$E[X]= \frac{0+10}{2} = 5.$$
-Alternatively, we can integrate $x \cdot f(x)$ from 0 to 10.
+b. We can find $\small E[X]$ directly using the formula for the mean of the continuous uniform distribution:
+$$\small E[X]= \frac{0+10}{2} = 5.$$
+Alternatively, we can integrate $\small x \cdot f(x)$ from 0 to 10.
 \begin{align*}
-E[X] &= \int_{-\infty}^{\infty} x f(x) \:dx = \int_0^{10} x \cdot \frac{1}{10-0} dx = \frac{1}{10} \int_0^{10} x \:dx \\
-& =\frac{1}{10}\cdot \frac{1}{2} \left[x^2\right]_{x=0}^{x=10} = \frac{1}{20} \cdot 100 = 5.
+\small E[X] & \small= \int_{-\infty}^{\infty} x f(x) \:dx = \int_0^{10} x \cdot \frac{1}{10-0} dx = \frac{1}{10} \int_0^{10} x \:dx \\
+& \small =\frac{1}{10}\cdot \frac{1}{2} \left[x^2\right]_{x=0}^{x=10} = \frac{1}{20} \cdot 100 = 5.
 \end{align*}
 :::
 
 ## Uniform Distribution
 :::{style="font-size: .8em"}
-__Example__: Buses arrive at a specified stop at 15-minute intervals starting at 7 am. That is, they arrive at 7, 7:15, 7:30, 7:45, and so on. If a passenger arrives at the stop at a time that is uniformly distributed between 7 and 7:30, find the probability that he waits less than 5 minutes for a bus.<br>
-Let $X$ denote the number of minutes past 7 that the passenger arrives at the stop. Since $X$ is a uniform random variable over the interval $(0, 30)$, it follows that the passenger will have to wait less than 5 minutes if (and only if) he arrives between 7:10 and 7:15 or between 7:25 and 7:30. Hence, the desired probability is 
+__Example__: Buses arrive at a specified stop at 15-minute intervals starting at 7 am. That is, they arrive at 7, 7:15, 7:30, 7:45, and so on. If a passenger arrives at the stop at a time that is uniformly distributed between 7 and 7:30, find the probability that he waits less than 5 minutes for a bus.
+
+
+Let $X$ be the number of minutes past 7 that the passenger arrives at the stop. Then $X$ is a uniform random variable over the interval $(0, 30)$. The passenger will have to wait less than 5 minutes if he arrives between 7:10 and 7:15 or between 7:25 and 7:30. Hence, the desired probability is 
 
 \begin{align*}
-P(10 < X < 15) + P(25 < X < 30) &= \int_{10}^{15} \frac{1}{30} dx + \int_{25}^{30} \frac{1}{30} dx\\
-& = \frac{1}{30} (5+5) = \frac{1}{3}.
+\small P(10 < X < 15) + P(25 < X < 30) & \small= \int_{10}^{15} \frac{1}{30} dx + \int_{25}^{30} \frac{1}{30} dx\\
+& \small = \frac{1}{30} (5+5) = \frac{1}{3}.
 \end{align*}
 :::
 
@@ -126,7 +179,7 @@ P(10 < X < 15) + P(25 < X < 30) &= \int_{10}^{15} \frac{1}{30} dx + \int_{25}^{3
 #| echo: true
 from scipy.stats import uniform
 
-# Boundaries of [0, 30]
+# Parameters
 a = 0
 b = 30
 
@@ -134,7 +187,7 @@ b = 30
 p1 = uniform.cdf(15, loc=a, scale=b - a) - uniform.cdf(10, loc=a, scale=b - a)
 p2 = uniform.cdf(30, loc=a, scale=b - a) - uniform.cdf(25, loc=a, scale=b - a)
 
-# Total probability
+# Sum of probabilities
 total_probability = p1 + p2
 print(f"The desired probability is: {total_probability}")
 ```
@@ -142,7 +195,7 @@ print(f"The desired probability is: {total_probability}")
 
 ## Gaussian Distribution
 :::{style="font-size: .8em"}
-The Gaussian distribution has two parameters: the mean and the variance, $\mu$ and $\sigma$, respectively. 
+The Gaussian distribution has two parameters: the mean and the variance, $\small \mu$ and $\small  \sigma$, respectively. 
 :::
 :::{.columns}
 ::: {.column width="68%"}
@@ -155,8 +208,8 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Gaussian Distribution (Normal Distribution)</span>
         <p>
-       A random variable \(X\) is normally distributed, with parameters \(\mu\) and \(\sigma^2\), \(X \sim N(\mu, \sigma^2),\) if the PDF of \(X\) is given by
-       $$ f_{\mu,\sigma}(x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}. $$
+       A random variable \(\small  X\) is normally distributed, with parameters \(\small  \mu\) and \(\small  \sigma^2\), \(\small  X \sim N(\mu, \sigma^2),\) if the PDF of \(\small  X\) is given by
+       $$\small  f_{\mu,\sigma}(x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}. $$
         </p>
     </div>
     """
@@ -176,7 +229,7 @@ display(HTML(html_content))
 
 ## Gaussian Distribution
 :::{style="font-size: .8em"}
-__Remark__: The _standard Gaussian_ distribution has mean zero and a variance (and standard deviation)
+__Remark__: The __standard Gaussian__ distribution has mean zero and a variance (and standard deviation)
 of 1.   The PDF of the standard Gaussian is:
 
 $$ \small{f(x) = \frac{1}{\sqrt{2 \pi}} e^{-x^2/2}. }$$
@@ -188,7 +241,7 @@ $$ \small{f(x) = \frac{1}{\sqrt{2 \pi}} e^{-x^2/2}. }$$
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-plt.figure(figsize=(5, 3.5))
+plt.figure(figsize=(5, 3))
 x = np.linspace(norm.ppf(0.001), norm.ppf(0.999), 100)
 plt.plot(x, norm.pdf(x),'b-', lw = 5, alpha = 0.6)
 plt.title(r'Standard Gaussian PDF,  $\mu = 0, \sigma = 1$', size=18)
@@ -199,7 +252,7 @@ plt.ylabel(r'$p(x)$', size=16);
 
 ::: {.column width="50%"}
 ```{python}
-plt.figure(figsize=(5, 3.5))
+plt.figure(figsize=(5, 3))
 x = np.linspace(norm.ppf(0.001), norm.ppf(0.999), 100)
 plt.plot(x, norm.cdf(x),'b-', lw = 5, alpha = 0.6)
 plt.title(r'Standard Gaussian CDF.  $\mu = 0, \sigma = 1$', size=18)
@@ -232,7 +285,7 @@ print(f"The desired probability is {prob_more_than_40:.4f}")
 
 ## Exponential Distribution
 :::{style="font-size: .8em"}
-The exponential distribution concerns a Poisson process and has one parameter, $\lambda$, the rate of success.
+The exponential distribution concerns a Poisson process and has one parameter, $\small \lambda$, the rate of success.
 ```{python}
 from IPython.core.display import HTML
 
@@ -241,25 +294,25 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Exponential Distribution</span>
      <p>
-      A continuous random variable whose PDF is given, for some \(\lambda > 0,\) by
+      A continuous random variable whose PDF is given, for some \( \small \lambda > 0,\) by
 
-        $$f(x) = \;\left\{\begin{array}{cr} \lambda e^{-\lambda x} & \text
+        $$ \small f(x) = \;\left\{\begin{array}{cr} \lambda e^{-\lambda x} & \text
         {for  } x \geq 0, \\ 0 & \text{otherwise}\end{array}\right.$$
 
-        is exponentially distributed with parameter \(\lambda.\)
+        is exponentially distributed with parameter \(\small \lambda.\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean of the exponential distribution is $1/\lambda$, and the variance is $1/\lambda^2$. Its CDF, $F(a)$, is given by
-$$\small{F(a) = P(X \leq x) = 1 - e^{-\lambda x} \mbox{ for } x \geq 0.}$$ 
+__Remark__: The mean of the exponential distribution is $\small 1/\lambda$, and the variance is $\small 1/\lambda^2$. Its CDF, $\small F(a)$, is given by
+$$ \small{F(a) = P(X \leq x) = 1 - e^{-\lambda x} \mbox{ for } x \geq 0.}$$ 
 :::
 
 ## Exponential Distribution
 :::{style="font-size: .8em"}
-The exponential distribution answers the question: "What is the probability it takes time $x$ to obtain the first success?''
+The exponential distribution answers the question: "_**What is the probability it takes time $x$ to obtain the first success?**_''
 
 The exponential is the continuous analog of the geometric distribution.
 :::
@@ -281,7 +334,7 @@ x = np.linspace(expon.ppf(0, scale=1/lam), expon.ppf(0.995, scale=1/lam), 100)
 xg = np.arange(geom.ppf(0, p), geom.ppf(0.995, p))
 
 # Plotting
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(10, 4))
 plt.plot(x, expon.cdf(x, scale=1/lam), 'b-', lw=5, alpha=0.6, label='Exponential')
 plt.plot(xg, geom.cdf(xg, p), 'ro', ms=8, label='Geometric')
 plt.ylim([0, 1])
@@ -299,16 +352,15 @@ plt.show()
 
 ## Exponential Distribution
 :::{style="font-size: .8em"}
-__Example__: Suppose a small business receives phone calls at a steady average rate of 6 calls per hour. <br>
-What’s the probability that the next call comes within 5 minutes?
+__Example__: Suppose a small business receives phone calls at a steady average rate of 6 calls per hour. What’s the probability that the next call comes within 5 minutes?
 :::
 :::{.center-text}
 ```{python}
 #| echo: true
 from scipy.stats import expon
 
-# Rate of phone calls: 6 per hour => lambda = 6
-# Convert to minutes: lambda = 6 / 60 = 0.1 per minute
+# Rate of phone calls: 6 per hour 
+# Convert to minutes: 6 / 60 = 0.1 per minute => lambda = 0.1
 rate_per_minute = 0.1
 
 # Probability that the next call comes within 5 minutes
@@ -322,8 +374,8 @@ print(f"The desired probability is {prob_within_5:.4f}")
 :::{style="font-size: .8em"}
 In the last two lectures we introduced the binomial, geometric, Poisson, and exponential distributions. Each of these four distributions describes either 
 
-* Bernoulli trials with  probability $p$, or
-* Poisson process with  rate $\lambda$.
+* Bernoulli trials with  probability $\small p$, or
+* Poisson process with  rate $\small \lambda$.
 
 In addition, each of the four distributions answers one of the following questions:
 
@@ -342,6 +394,7 @@ In addition, each of the four distributions answers one of the following questio
 
 ## Best of the Best
 :::{style="font-size: .8em"}
+
 ```{python}
 fig, (ax1, ax2) = plt.subplots(1,2, figsize = (13,4))
 x = np.linspace(400, 1600, 1000)
@@ -360,6 +413,11 @@ plt.yticks(fontsize=16)
 plt.xticks(fontsize=16)
 plt.show()
 ```
+
+:::{.center-text}
+<img src="images/common distributions/Admissions_logo.jpeg" width=140/>
+:::
+
 :::
 
 ## Best of the Best
@@ -375,6 +433,11 @@ act_top = (30 - 20) / 5
 print(f"The Z-score of highest scorer in the ACT among all the applicants is equal to {act_top:.2f}.")
 
 ```
+
+:::{style="font-size: .8em"}
+The person with the highest ACT score should receive the fellowship, because his Z-score is higher.
+:::
+
 :::{.center-text}
 ```{python}
 # Create a smaller figure
@@ -393,9 +456,6 @@ plt.show()
 ```
 :::
 
-:::{style="font-size: .8em"}
-The person with the highest ACT score should receive the fellowship, because his Z-score is higher.
-:::
 :::
 
 ## Group Question 1
@@ -426,6 +486,39 @@ display(HTML(html_content))
 
 ## Group Question 2
 :::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+Suppose that the travel time from Ben's home to
+his office is normally distributed with mean 40
+minutes and standard deviation 7 minutes. If Ben
+wants to be 95 percent certain that he will not be
+late for an office appointment at 1 P.M., what is the
+latest time that he should leave home?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+<!-- ## Group Question 2
+:::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
 
@@ -454,7 +547,7 @@ display(HTML(html_content))
 :::{.notes}
 Let $X$ represent the waiting time. Then $X$ is an exponential random variable with $\alpha = 1/10.$
 Then the desired probability is equal to 
-$$P(10<X<20) = 1- e^{-20/10} - (1 - e^{-10/10}) = e^{-1} - e^{-2} = 0.233.$$
-:::
+$$P(10<X<20) = 1- e^{-20/10} - (1 - e^{-10/10}) = e^{-1} - e^{-2} = 0.233.$$ -->
+<!-- ::: -->
 
 

@@ -1,0 +1,518 @@
+---
+title: Hypothesis Testing
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## A vs B 
+:::{style="font-size: .8em"}
+Hypothesis testing is focused on answering questions like:
+
+* Does one medicine work better than another?
+* Is one ad campaign more effective than another?
+* Does one machine learning algorithm work better than another?
+* Does one region experience higher temperatures than another?
+* Is one set of voters more likely to go to the polls than another?
+
+The problem with approaching such questions is that we must use _**sampled data**_ that involves some randomness to answer them.
+
+
+:::
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Fisher's approach
+    - The lady tasting tea
+    - $p$-value
+
+- Neyman-Pearson approach
+    - Alternative hypothesis
+    - Types of hypotheses
+    - Type I and II errors
+    - Significance level
+:::
+
+## Left-Handedness at BU
+:::{style="font-size: .8em"}
+Zaza is a student at BU and is left-handed. She heard that about 12% of all people are left-handed. However, she suspects that the percentage of lefties at BU is greater than 12%. 
+
+:::{.center-text}
+<img src="images/hypothesis_testing/left-handed.png" width=300/>
+:::
+
+Zaza took a random sample of 50 students and found that 20% of them are left-handed. Then she simulated the percentage of left-handed students and ran 1000 simulations.
+The table below sums up the results of the simulations, each simulating a sample of 50 students under the assumption that 12% of all people are left-handed.
+
+:::
+
+## Left-Handedness at BU
+:::{style="font-size: .6em"}
+
+| Simulated Percentage of Left-Handed Students | Frequency |
+|---------------------------------------------|-----------|
+| 0                                           | 7         |
+| 2                                           | 11        |
+| 4                                           | 32        |
+| 6                                           | 74        |
+| 8                                           | 112       |
+| 10                                          | 169       |
+| 12                                          | 194       |
+| 14                                          | 158       |
+| 16                                          | 115       |
+| 18                                          | 68        |
+| 20                                          | 41        |
+| 22                                          | 10        |
+| 24                                          | 5         |
+| 26                                          | 4         |
+:::
+
+
+## Left-Handedness at BU
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/hypothesis_testing/left-handed.png" width=400/>
+:::
+__Questions__: 
+
+- Based on the simulations what is the probability of getting a sample with at least 20% left-handed students?
+- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12? 
+:::
+
+## Fisher's Approach
+:::{style="font-size: .8em"}
+The problem of hypothesis testing centers on the question of _**identifying statistically significant differences.**_
+
+The first strategy for answering this question was developed by Ronald Fisher in the 1920s.
+
+:::{.center-text}
+<img src="images/hypothesis_testing/Fisher.jpg" width=160/>
+:::
+
+Fisher cast the decision framework as deciding whether "something surprising" has occurred. 
+
+:::
+
+##  The Lady Tasting Tea
+:::{style="font-size: .8em"}
+
+Fisher knew a woman (Muriel Bristol) who claimed that, when given a cup of hot tea and milk, she was able to 
+tell whether the tea or the milk had been added first to the cup.
+
+:::{.center-text}
+<img src="images/hypothesis_testing/tea_party.png" width=350/>
+:::
+
+
+Fisher introduced the term __null hypothesis__ to describe the "uninteresting" situation, in which nothing surprising has happened.   In this case, the null hypothesis
+was that Ms. Bristol could not tell the difference between the two ways of pouring milk and tea.
+:::
+
+##  Fisher's $p$-value
+:::{style="font-size: .8em"}
+The abstract concept of "making a discovery" is operationalized as __rejecting the null hypothesis.__
+
+_**On what basis can we reject the null hypothesis?**_    
+
+Fisher proposed that we use a __test statistic__ whose distribution we can compute if the null hypothesis is true. 
+
+We perform the experiment and get some observed value for the test statistic. We can then ask whether a value of that magnitude, or greater, would have occurred under the null hypothesis. 
+
+For this purpose Fisher introduced the __p-value.__
+
+:::
+
+##  Fisher's $p$-value
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The \(p\)-value </span>
+        <p>
+        Consider an observed test statistic \(t\) from an unknown distribution \(T.\)  Then the p-value \(p\)
+        is the probability of observing a test-statistic value at least as "extreme" as \(t\) if null hypothesis \(H_{0}\) were true.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<br>
+
+In other words, the p-value is the probability of obtaining test results at least as extreme as the result actually observed, under the assumption that the null hypothesis is correct.
+:::
+
+##  The Lady Tasting Tea
+:::{style="font-size: .8em"}
+Fisher proposed to give Ms. Bristol eight cups:
+
+- 4 milk-poured-first, and 
+- 4 tea-poured-first.  
+
+The order of the cups was unknown to Ms. Bristol. Her task was to identify the four in which she thinks the milk was poured first.
+
+<br>
+_**The test statistic**_ $t$ _**is equal to the number of cups (out of four) correctly identified by Ms. Bristol**_.
+
+We can then ask: what is _**the probability that Ms. Bristol would correctly identify four cups just by chance**_? This probability is the p-value of the experiment.
+:::
+
+##  The Lady Tasting Tea
+:::{style="font-size: .8em"}
+There are 8 cups of tea, and she chooses four of them.  So there are 
+
+$$\small {\displaystyle {\binom {8}{4}}={\frac {8!}{4!(8-4)!}}=70} $$
+
+possible choices she could make.
+
+If her choices were random, the number of successes is given by the _**hypergeometric distribution**_ (outside the scope of this class).  
+
+Let a random variable $X$ be equal to the number of successes. Then
+
+$${\displaystyle X\sim \operatorname {Hypergeometric} (N=8,K=4,n=4)},$$
+
+where $N$ is the population size or total number of cups of tea, $K$ is the number of success states in the population or four cups of either type, and $n$ is the number of draws, or four cups. 
+:::
+
+##  The Lady Tasting Tea
+:::{style="font-size: .8em"}
+
+__What actually happened?__  
+
+Fisher actually "ran" this experiment.  And sure enough, Ms. Bristol identified all four cups correctly.  So the value of the test statistic is $t = 4$.
+
+And what is the _p_-value?   This is
+
+$$ p = P(X \ge t) = P(X \ge 4) = \frac{1}{70} \approx 1.4\%  $$
+
+In other words, if the lady were in fact choosing at random, this outcome would happen only about 1.4% of the time, ie, one time in 70.
+
+Given this result, Fisher was willing to conclude that the lady's tea identification was not random, and therefore he was willing to _**reject the null hypothesis.**_
+:::
+
+##  The Lady Tasting Tea
+:::{style="font-size: .8em"}
+_**What if she had failed? What if the lady had chosen instead two cups of each kind of tea?**_   
+
+
+In this case, the probability of such outcome is 75%.
+
+Should we then conclude that the null hypothesis is _**true**_?
+
+Definitely _**not.**_  By choosing as she did, the lady would not be providing any conclusive evidence that her choices were random.  
+
+<br><br>
+As Fisher emphasized, we can never accept the null hypothesis - _**we can only fail to reject it**_.
+
+:::
+
+##  Neyman-Pearson Approach
+:::{style="font-size: .8em"}
+What if we wanted to say something about how well the lady can distinguish the two cups of tea?
+
+Jerzy Neyman and Egon Pearson advanced an approach to deal with this.
+
+<!-- :::{.center-text}
+<img src="images/hypothesis_testing/Jerzy-Neyman.jpg" width=200/>
+
+<img src="images/hypothesis_testing/Egon_Pearson.jpg" width=200/>
+::: -->
+
+:::{.columns}
+
+:::{.column}
+:::{.center-text}
+<img src="images/hypothesis_testing/Jerzy-Neyman.jpg" width=250/>
+:::
+:::
+
+
+:::{.column}
+:::{.center-text}
+<img src="images/hypothesis_testing/Egon_Pearson.jpg" width=210/>
+:::
+:::
+
+They argued that the experimenter should make a statement in advance about what they are looking for.   They called this the __alternative hypothesis.__
+
+:::
+:::
+
+##  Alternative Hypothesis
+:::{style="font-size: .8em"}
+__Example__: Let's say we are investigating whether a vaccine shortens the duration of an infectious illness.
+
+We would state two hypotheses:
+    
+   * $H_0$: the null hypothesis: vaccinated and unvaccinated individuals have the same average duration of illness.
+   * $H_1$: the alternative hypothesis: vaccinated and unvaccinated individuals have different average durations of illness.
+   
+Notice that exactly one of these must be true, so if we reject $H_0$ that implies we accept $H_1$.
+:::
+
+##  Types of Hypotheses
+:::{style="font-size: .8em"}
+A hypothesis can be either _**simple**_ or _**composite**_. This terminology is based on whether a hypothesis fully specifies the distribution of the population.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Simple Hypothesis </span>
+        <p>
+        A simple hypothesis is a hypothesis that completely specifies the distribution of the population. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Example__: In the context of a normal distribution, a simple hypothesis would specify both the mean and the variance.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Composite Hypothesis </span>
+        <p>
+        A composite hypothesis is a hypothesis that does not completely specify the distribution of the population. Instead, it includes multiple possible values or a range of values for the parameter being tested.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+##  Types of Hypotheses
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Suppose that \(x^{(1)}, x^{(2)}, ..., x^{(n)}\) form a random sample from a normal distribution for which both the mean \(\mu\) and the variance \(\sigma^2\) are unknown. Which of the following hypotheses is simple? <br>
+        <br>
+
+     a. \(\small H_0: \mu > 3 \text{ and } \sigma < 1\) <br>
+     b. \(\small H_0: \mu = -2 \text{ and } \sigma^2<5\) <br>
+     c. \(\small H_0: \mu = 0\) <br>
+     d. \(\small H_0: \mu = 0 \text{ and } \sigma=1\) <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+d
+:::
+
+
+
+##  Types of Errors
+:::{style="font-size: .8em"}
+First, we might make an error by concluding that there is a difference when, in fact, there is none. This is called __False Positive__ or __Type I Error__.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Type I Error </span>
+        <p>
+        Type I error is rejecting the null hypothesis when it is true.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+Second, we might make an error by concluding there is no difference when in fact there is a difference.  This is called
+__False Negative__ or __Type II Error__.
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Type II Error </span>
+        <p>
+        A type II error is accepting the null hypothesis when it is false.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: The probability of type II error is usually denoted by $\beta$.
+:::
+
+##  Types of Errors
+:::{style="font-size: .8em"}
+
+Based on $\beta$, we can talk about the _**power**_ of the test.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Power of the Test </span>
+        <p>
+        The power of the test is the probability that the null hypothesis is rejected when it is false. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: The power of the test equals $1-\beta$.
+
+__Example__: In a medical test, there is a big difference between a false positive and a false negative errors.
+
+Consider a cancer screen.  
+
+* A false positive is a result "cancer is present" when in fact it is not present.   
+* A false negative is a result "cancer is not present" when in fact it is present.  
+
+Should we treat these two kinds of errors as equally important?
+
+:::
+
+##  Significance Level
+:::{style="font-size: .8em"}
+Neyman and Pearson felt that in science, we want to control the false positive rate to avoid making incorrect "discoveries."
+
+They proposed the following:  the experimenter chooses a false positive rate in advance, called the __significance level__ $\alpha$.  
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Significance Level </span>
+        <p>
+        The significance level is the probability of a type I error.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+The value of $\alpha$ should be set based on experience and expectations.  
+
+The experimenter then constructs a test that compares the two hypotheses, and computes the $p$-value associated with the null hypothesis.  The experimenter rejects the null hypothesis if $p < \alpha$.
+:::
+
+##  Neyman-Pearson Approach
+:::{style="font-size: .8em"}
+For example, say the experimenter wants to be very conservative and rarely make an incorrect declaration that an effect is present.  Then they would set $\alpha$ to a small value, say 0.001.
+
+So they would demand to see a small $p$-value, less than 0.001, in order to reject the null hypothesis.
+
+However, this means that in doing so, they run the risk of false negatives -- failing to detect an effect that is present.
+
+In the Neyman-Pearson framework, we don't look at the value of $p$ other than to compare it to $\alpha$.  That is, unlike Fisher's approach, we don't use $p$ to tell us "how big the effect is."  
+
+For example, if $\alpha$ were 0.05, we would reject the null hypothesis if $p$ were 0.04, or 0.01, or 0.00001.   
+:::
+
+## Left-Handedness at BU
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/hypothesis_testing/left-handed.png" width=400/>
+:::
+__Questions__: 
+
+- Based on the simulations what is the probability of getting a sample with at least 20% left-handed students?
+- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12? 
+:::
+
+## Left-Handedness at BU
+:::{style="font-size: .8em"}
+
+| Simulated Percentage of Left-Handed Students | Frequency |
+|---------------------------------------------|-----------|
+| 20                                          | 41        |
+| 22                                          | 10        |
+| 24                                          | 5         |
+| 26                                          | 4         |
+:::
+
+:::{style="font-size: .8em"}
+The probability of getting a sample with at least 20% left-handed students is the sum of the number of frequencies at and above 20, divided by the total number simulations:
+ $$\small \frac{41 + 10 + 5 + 4}{1000} = 0.06. $$
+:::
+
+## Left-Handedness at BU
+:::{style="font-size: .8em"}
+Zaza let the null hypothesis be that the actual percentage of left-handed students is 12% versus the alternative hypothesis that the actual percentage is higher than that.
+
+Zaza decided to reject the hypothesis if the simulated outcome has the probability less than 1% under the null hypothesis. 
+
+What should Zaza conclude regarding the null hypothesis?
+
+ 0.06 is greater than 0.01, which is the significance level for this test, so we fail to reject the null hypothesis.
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   A coin is thrown independently 10 times to test the hypothesis that the probability of heads is \(\frac{1}{2}\) versus the alternative that the probability is not \(\frac{1}{2}.\) The test rejects if either 0 or 10 heads are observed.<br><br>
+    a. What is the significance level of the test (probability the hypothesis is rejected)? <br>
+    <br>
+    <br>
+    <br>
+    b. If in fact the probability of heads is 0.1, what is the power of the test?<br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. To find the significance level, we need to find the probability that the hypothesis is rejected. From the question, we know that happens if 0 or 10 heads are observed. Thus, we need to find $P(X=0 or 10)$. To find this, we plug both 0 and 10 into the binomial PDF, with n =10 and p=.5. 
+\[ = {10 \choose 0} (.5)^0 (.5)^{10} + {10 \choose 10} (.5)^{10} (.5)^0 \] This equals 0.002. \\
+b. To find the power of the test when the true probability is .1, we need to find the probability the test rejects the null hypothesis (which it should) when the probability is .1. To find this, we find $ P(X = 0 | p = .1) + P(X = 10 | p =.1) $ 
+\[ = {10 \choose 0} (.1)^0 (.9)^{10} + {10 \choose 10} (.1)^{10} (.9)^0\] This comes out to 0.349, which is the power of the test. 
+:::

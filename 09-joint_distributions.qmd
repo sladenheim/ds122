@@ -23,14 +23,23 @@ Imagine evaluating people in a dating pool based on two traits:
 
 You might notice that the more attractive someone is, the less kind they seem.
 Or vice versa: the kinder someone is, the less attractive they appear.<br>
-<br>
+<br><br>
 
-_Does this mean that being attractive causes someone to be unkind?_ 
+__Does this trade-off reflect a real link between attractiveness and kindness?__  
 
-<br>
+:::
 
-People are evenly distributed across both kindness and appearance. However, in practice, you only notice people who are either kind or attractive, or both. 
+:::{.notes}
+Your friend sets you up on a blind date. You ask, “Are they attractive?”
+They pause and say, “Well… they have a great personality.”
 
+You already know what that means.
+
+Now think about how we judge people in dating pools. We tend to notice those who are either very attractive, very kind, or ideally both. But we rarely notice the ones who are neither — they’re invisible to us.
+
+This creates an illusion: it feels like attractive people are mean, and kind people are unattractive.
+
+But is that really true?
 :::
 
 ## Dating Pool Illusion
@@ -76,6 +85,12 @@ plt.show()
 ```
 :::
 
+:::{.notes}
+People are evenly distributed across both kindness and appearance. However, in practice, you only notice people who are either kind or attractive, or both.
+
+A joint distribution of kindness and appearance.
+:::
+
 
 
 
@@ -83,16 +98,24 @@ plt.show()
 
 :::{style="font-size: .8em"}
 
-* Joint distributions
+* Joint distributions (of discrete random variables)
 * Marginal distributions
-* Indepent random variables
+* Independent random variables
 * Covariance 
 * Correlation coefficient
+* Application of above concepts to explore the relationship between heights of fathers and sons
 
+:::
+
+:::{.notes}
+All the concepts can be extended to continuous random variables, but that's not required for this course.
 :::
 
 
 ## Like Father, Like Son?
+:::{style="font-size: .8em"}
+
+A study was conducted to explore the relationship between the heights of fathers and their sons.
 
 :::{.center-text}
 ```{python}
@@ -107,14 +130,29 @@ print(df.head(6))
 ```
 :::
 
-:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="25%"}
+:::{.center-text}
+<img src="images/joint distributions/father_son.png" width=400/>
+:::
+:::
+::: {.column width="70%"}
+:::{style="font-size: 1.0em"}
 The properties of the dataset: <br>
 
 - 100 rows/observations,
 - 2 columns/variables,
 - Heights are measured in inches
+:::
+:::
+:::
 
-__Question__: Explore the relationship between father and son heights. Do taller fathers usually have taller sons?
+
+__Question__: Do taller fathers usually have taller sons based on this dataset?
+:::
+
+:::{.notes}
+regression to the mean
 :::
 
 
@@ -168,7 +206,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-Mathematically, we write: $\small{P(X) = \sum_y P(X, Y = y).}$
+__Remark__: Mathematically, we write: $\small{P(X) = \sum_y P(X, Y = y).}$
 
 __Example__:
  <!-- We could also be interested in each characteristic on its own. For example, we might be interested in the distribution of _StudyEffort_ across our population. -->
@@ -189,23 +227,40 @@ __Example__:
 
 ## Marginal Distributions
 :::{style="font-size: .8em"}
-__Example__: A fair coin is tossed three times. Let $X$ denote the number of heads on the first toss and $Y$ the total number of heads. The sample space is then equal to
+__Example__: A fair coin is tossed three times. Let $\small X$ denote _**the number of heads on the first toss**_ and $\small Y$ _**the total number of heads**_. The sample space is then equal to
 
-$$\Omega = \{ HHH, HHT, HTH, HTT, THH, THT, TTH, TTT\}.$$
+$$\small  \Omega = \{ HHH, HHT, HTH, HTT, THH, THT, TTH, TTT\}.$$
 
-From the sample space we see that the joint probability mass (or frequency) function of $X$ and $Y$ is as given in the following table:
+From the sample space we see that the __joint probability mass__ (or __frequency__) __function__ of $\small  X$ and $\small  Y$ is as given in the following table:
 
-| | $y = 0$ |$y = 1$| $y = 2$| $y = 3$|
+| | $\small  y = 0$ |$\small  y = 1$| $\small  y = 2$| $\small  y = 3$|
 | :---: | :---: | :---: | :---: | :---: |
-| $x = 0$ | $\frac{1}{8}$ | $\frac{2}{8}$ | $\frac{1}{8}$ | 0 |
-| $x = 1$ | 0  | $\frac{1}{8}$ | $\frac{2}{8}$ | $\frac{1}{8}$ |
+| $\small  x = 0$ | $\small \frac{1}{8}$ | $\small \frac{2}{8}$ | $\small \frac{1}{8}$ | 0 |
+| $\small x = 1$ | 0  | $\small \frac{1}{8}$ | $\small \frac{2}{8}$ | $\small \frac{1}{8}$ |
 
-<span style="color:rgb(1, 180, 180);">What is the marginal PMF of $Y$?</span>
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        What is the marginal PMF of \(\small  Y\)?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+contingency table
 :::
 
 ## Marginal Distributions
 :::{style="font-size: .8em"}
-Here is a set of observations of two random variables, $X_1$ and $X_2$:
+Here is a set of observations of two random variables, $\small  X_1$ and $\small  X_2$:
 :::
 :::{.center-text}
 ```{python}
@@ -230,7 +285,7 @@ plt.tight_layout()
 ```
 :::
 :::{style="font-size: .8em"}
-We can calculate the marginals by summing over the joint probabilities.
+We can calculate the marginals using Python.
 :::
 
 ## Marginal Distributions
@@ -254,7 +309,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Independent Random Variables </span>
         <p>
-       Random variables \(X\) and \(Y\) are independent if their joint cdf \(F\) factors into the product of their marginal cdf’s, \(F_{X}\) and \(F_{Y}\):
+       Random variables \(\small X\) and \(\small Y\) are independent if their joint cdf \(\small F\) factors into the product of their marginal cdf’s, \(\small F_{X}\) and \(\small F_{Y}\):
 
        $$\small{F(x,y) = F_{X}(x)F_{Y}(y)}$$ 
 
@@ -267,36 +322,57 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: Two random variables $X$ and $Y$, forming a discrete random vector, are independent if and only if
-$$p_{XY}(x,y) = p_X(x)p_Y(y),$$
-where $p_{XY}$ is their joint PMF and $p_{X}$ and $p_{Y}$ are their marginal PMFs.
+__Remark__: Two random variables $\small X$ and $\small Y$ are independent if and only if
+$$\small p_{XY}(x,y) = p_X(x)p_Y(y),$$
+where $\small p_{XY}$ is their joint PMF and $\small p_{X}$ and $\small p_{Y}$ are their marginal PMFs.
 :::
 
 ## Independence
 :::{style="font-size: .8em"}
 __Example__: Let us investigate whether _Grade_ and _StudyEffort_ are independent.
-:::
-:::{style="font-size: .7em"}
 
 Starting from the marginals 
+:::
+
+:::{style="font-size: .7em"}
 
 |low|high|
 |---|---|
 | 0.70| 0.30|
 
-and
-
 |A|B|C|
 |---|---|---|
 | 0.25| 0.37| 0.38|
 
+:::
+
+:::{style="font-size: .8em"}
 we compute the new distribution based on the independence assumption:
+:::
+
+:::{style="font-size: .7em"}
 
 | |low|high|
 |---|---|---|
 |A| 0.175| 0.075|
 |B| 0.259| 0.111|
 |C|0.266| 0.114|
+
+:::
+:::{style="font-size: .8em"}
+
+The distribution is not equal to the original one, so they are not independent.
+:::
+
+:::{.notes}
+
+| |low|high|
+|---|---|---|
+|__A__| 0.07| 0.18|
+|__B__| 0.28| 0.09|
+|__C__|0.35| 0.03|
+
+
 :::
 
 ## Independence
@@ -304,7 +380,7 @@ we compute the new distribution based on the independence assumption:
 __Example (continued)__:
 Since the resulting ditribution is not the same as the original joint distribution,  _Grade_ and _StudyEffort_ are not independent.
 
-__Example__: 
+__Example__: <span style="color:rgb(1, 180, 180);">Are $X_1$ and $X_2$ independent?</span>
 
 :::{.center-text}
 ```{python}
@@ -314,7 +390,6 @@ plt.xlabel(r'$X_1$', fontsize=18);
 plt.ylabel(r'$X_2$', fontsize=18);
 plt.axis('square');
 ```
-<span style="color:rgb(1, 180, 180);">Are $X_1$ and $X_2$ independent?</span>
 :::
 
 :::
@@ -337,7 +412,7 @@ g.plot(sns.scatterplot, sns.histplot)
 g.ax_joint.set_xlabel(r'$X_1$', fontsize=18)
 g.ax_joint.set_ylabel(r'$X_2$', fontsize=18)
 g.figure.subplots_adjust(top=0.9)
-plt.suptitle('$X_1$ and $X_2$ Independent', fontsize=20)
+plt.suptitle('$X_1$ and $X_2$: Independent', fontsize=20)
 plt.show()
 
 ```
@@ -351,7 +426,7 @@ g.plot(sns.scatterplot, sns.histplot)
 g.ax_joint.set_xlabel(r'$Y_1$', fontsize=18)
 g.ax_joint.set_ylabel(r'$Y_2$', fontsize=18)
 g.figure.subplots_adjust(top=0.9) # Reduce plot to make room 
-plt.suptitle('$Y_1$ and $Y_2$ Not Independent', fontsize=20);
+plt.suptitle('$Y_1$ and $Y_2$: Not Independent', fontsize=20);
 plt.show()
 ```
 :::
@@ -368,73 +443,76 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Covariance </span>
         <p>
-       The covariance of \(X_1\) and \(X_2\), denoted \(\operatorname{Cov}(X_1, X_2)\) is defined as:
+       The covariance of \( \small X_1\) and \( \small X_2\), denoted \( \small \operatorname{Cov}(X_1, X_2)\) is defined as:
     
         $$\small{ \operatorname{Cov}(X_1, X_2) = E[(X_1 - \overline{X_1})(X_2 - \overline{X_2})] }$$
 
-        where \(\overline{X_1}\) and \(\overline{X_2}\) are the means of \(X_1\) and \(X_2.\)
+        where \(\small \overline{X_1}\) and \(\small \overline{X_2}\) are the means of \(\small X_1\) and \(\small X_2.\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Notation__: We often denote $\operatorname{Cov}(X,Y)$ as $\sigma_{XY}$.
+__Notation__: We often denote $\small \operatorname{Cov}(X,Y)$ as $\small \sigma_{XY}$.
 
-__Remark__: The covariance of two continuous random variables is outside the scope of this course.
 
 We know how to find the expected value of a random variable. But how exactly do we compute 
-
-$$\operatorname{Cov}(X_1, X_2) = E[(X_1 - \overline{X_1})(X_2 - \overline{X_2})]?$$
+$\small E[(X_1 - \overline{X_1})(X_2 - \overline{X_2})]?$
 :::
 
 ## Covariance
 :::{style="font-size: .8em"}
-For discrete $X_1$ and $X_2$ with joint probability $P(X_1=x_1, X_2=x_2) = p(x_1,x_2)$ the covariance is computed as
+For discrete $\small X_1$ and $\small X_2$ with joint probability $\small P(X_1=x_1, X_2=x_2) = p(x_1,x_2)$ the covariance is computed as
 
-$$ \operatorname{Cov}(X_1, X_2) = \sum_{(x_1,x_2)\in S} (x_1 - \overline{X_1})(x_2 - \overline{X_2}) p(x_1,x_2). $$
+$$ \small \operatorname{Cov}(X_1, X_2) = \sum_{(x_1,x_2)\in S} (x_1 - \overline{X_1})(x_2 - \overline{X_2}) p(x_1,x_2). $$
 
-Here, $S$ is the _support_ of $X_1$ and $X_2$.
+Here, $\small S$ is the __support__ of $\small X_1$ and $\small X_2$.
 
-__Example__: Suppose that $X$ and $Y$ have the joint probability mass function given below.
+__Example__: Suppose that $\small X$ and $\small Y$ have the joint probability mass function given below.
 
-| | $x = 5$ |$x = 6$| $x = 7$| 
+| | $\small x = 5$ |$\small x = 6$| $\small x = 7$| 
 | :---: | :---: | :---: | :---: | 
-| $y = 8$ | 0 | 0.4 | 0.1 |
-| $y = 9$ | 0.3  | 0 | 0.2 | 
+| $\small y = 8$ | 0 | 0.4 | 0.1 |
+| $\small y = 9$ | 0.3  | 0 | 0.2 | 
 :::
 
 ## Covariance
 :::{style="font-size: .8em"}
-__Example (continued)__: The support $S$ is equal to the set $\{(5,8),(6,8),(7,8), (5,9),(6,9),(7,9)\}.$
+__Example (continued)__: <br>
+The support $S$ is the set $\{\small (5,8),(6,8),(7,8), (5,9),(6,9),(7,9)\}.$
 
 The marginal probabilities are given by
 
-| | $x = 5$ |$x = 6$| $x = 7$| 
+| | $\small x = 5$ |$\small x = 6$| $\small x = 7$| 
 | :---: | :---: | :---: | :---: | 
-| $p_X(x)$ | 0.3 | 0.4 | 0.3 |
+| $\small p_X(x)$ | 0.3 | 0.4 | 0.3 |
 
-| | $y = 8$ |$y = 9$| 
+| | $\small y = 8$ |$\small y = 9$| 
 | :---: | :---: | :---: | 
-| $p_Y(y)$ | 0.5 | 0.5 | 
+| $\small p_Y(y)$ | 0.5 | 0.5 | 
 
-The mean of $X$ can be computed using $p_X(x)$ as follows
+The mean of $\small X$ can be computed using $\small p_X(x)$ as follows
 
-$$\overline{X} = 5 \cdot 0.3 + 6 \cdot 0.4 + 7 \cdot 0.3 = 6.$$
+$$ \small \overline{X} = 5 \cdot 0.3 + 6 \cdot 0.4 + 7 \cdot 0.3 = 6.$$
 
-Similarly, we find that $\overline{Y} = 8.5.$
+Similarly, we find that $\small \overline{Y} = 8.5.$
 
+:::
+:::{.notes}
+| | $\small x = 5$ |$\small x = 6$| $\small x = 7$| 
+| :---: | :---: | :---: | :---: | 
+| $\small y = 8$ | 0 | 0.4 | 0.1 |
+| $\small y = 9$ | 0.3  | 0 | 0.2 | 
 :::
 
 ## Covariance
 :::{style="font-size: .8em"}
-__Example (continued)__: Now it remains to compute the covariance itself
+__Example (continued)__: Now it remains to compute the covariance itself:
 
 $$\small{\operatorname{Cov}(X,Y) = (5-6)(8-8.5)(0) + (6-6)(8-8.5)(0.4) + (7-6)(8-8.5)(0.1)}$$
 
 $$\small{+ (5-6)(9-8.5)(0.3) + (6-6)(9-8.5)(0) + (7-6)(9-8.5)(0.2) = -0.1.}$$
-
-We typically "normalize" covariance by the standard deviations of the random variables. The result is known as "correlation coefficient" or "Pearson's correlation coefficient" or "Pearson's $\rho.$"
 
 ```{python}
 from IPython.core.display import HTML
@@ -444,8 +522,8 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Properties of Covariance </span>
         <p>
-       $$\operatorname{Cov}(X,Y) = \operatorname{Cov}(Y,X),$$
-       $$\operatorname{Var}(X) = \operatorname{Cov}(X,X).$$
+       $$\small \operatorname{Cov}(X,Y) = \operatorname{Cov}(Y,X),$$
+       $$\small \operatorname{Var}(X) = \operatorname{Cov}(X,X).$$
         </p>
     </div>
     """
@@ -453,6 +531,17 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+We typically _**normalize**_ covariance by the standard deviations and obtain the __correlation coefficient__ (or __Pearson's correlation coefficient__ or __Pearson's__ $\rho.$)
+
+:::
+
+:::{.notes}
+| | $\small x = 5$ |$\small x = 6$| $\small x = 7$| 
+| :---: | :---: | :---: | :---: | 
+| $\small y = 8$ | 0 | 0.4 | 0.1 |
+| $\small y = 9$ | 0.3  | 0 | 0.2 | 
+
+$$ \small \operatorname{Cov}(X_1, X_2) = \sum_{(x_1,x_2)\in S} (x_1 - \overline{X_1})(x_2 - \overline{X_2}) p(x_1,x_2). $$
 :::
 
 ## Correlation
@@ -465,9 +554,9 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Correlation </span>
         <p>
-       If \(X\) and \(Y\) are jointly distributed random variables and the variances and covariances of both \(X\) and \(Y\) exist and the variances are nonzero, then the correlation of \(X\) and \(Y\) , denoted by \( \rho\), is
+       If \(\small X\) and \(\small Y\) are jointly distributed random variables and the variances of both \(\small X\) and \(\small Y\) exist and the variances are nonzero, then the correlation of \(\small X\) and \(\small Y\) , denoted by \(\small \rho\), is
 
-       $$\rho(X_1,X_2) = \frac{E\left[(X_1-\overline{X_1})(X_2-\overline{X_2})\right]}{\sigma_{X_1} \sigma_{X_2}}.$$
+       $$\small \rho(X_1,X_2) = \frac{E\left[(X_1-\overline{X_1})(X_2-\overline{X_2})\right]}{\sigma_{X_1} \sigma_{X_2}}.$$
         </p>
     </div>
     """
@@ -475,25 +564,29 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-Because it is normalized, $\rho(X_1, X_2)$ takes on values between -1 and 1.   
+Because it is normalized, $\small \rho(X_1, X_2)$ takes on values between -1 and 1.   
 
-If $\rho(X_1, X_2) = 0$ then $X_1$ and $X_2$ are _uncorrelated_.   
-
-If $\rho(X_1, X_2) > 0$ then $X_1$ and $X_2$ are _positively correlated_, and if $\rho(X_1, X_2) < 0$ they are _negatively correlated_ or (_anticorrelated_).
+If $\small \rho(X_1, X_2) = 0$ then $\small X_1$ and $\small X_2$ are **uncorrelated**.   <br>
+If $\small \rho(X_1, X_2) > 0$ then $\small X_1$ and $\small X_2$ are **positively correlated**. <br>
+if $\small \rho(X_1, X_2) < 0$ they are **negatively correlated** or (**anticorrelated**).
 :::
 
 ## Correlation
 :::{style="font-size: .8em"}
-If $X_1$ and $X_2$ are uncorrelated, are they independent?
+_**If $X_1$ and $X_2$ are uncorrelated, are they independent?**_
 
 In general, __NO__.
+<br><br>
 
-If $X_1$ and $X_2$ are uncorrelated, that means the relationship between them can't be predicted by _a linear model._
+If $X_1$ and $X_2$ are uncorrelated, that means the relationship between them can't be predicted by _**a linear model.**_
 
 However, this does not mean that they are necessarily independent!
 :::
 
 ## Like Father, Like Son?
+:::{style="font-size: .8em"}
+Let us look at the covariance and correlation of heights of fathers and their sons.
+:::
 
 :::{.center-text}
 ```{python}
@@ -508,10 +601,26 @@ print(f"The correlation between the heights is {correlation:.4f}")
 ```
 :::
 
+
+:::{.columns}
+::: {.column width="20%"}
+:::{.center-text}
+<img src="images/joint distributions/father_son.png" width=150/>
+:::
+:::
+::: {.column width="80%"}
 :::{style="font-size: .8em"}
 The positive covariance indicates that taller fathers tend to have taller sons.
 
 The correlation of 0.42 suggests a moderate positive linear relationship between father and son heights.
+:::
+:::
+:::
+
+:::{.notes}
+cov() is a Pandas method
+
+It computes the covariance between two Series (columns)
 :::
 
 ## Group Question 1
@@ -526,7 +635,7 @@ def generate_html():
         <p>
 <img src="images/joint distributions/PMF_table.png" width=900/><br>
 
-\(X\) and \(Y\) are discrete random variables. Both \(X\) and \(Y\) can assume values 0, 1, and 2. The incomplete table above is meant to depict the joint distribution of \(X\) and \(Y\), and the marginal distributions of \(X\) and \(Y.\)<br>
+\(\small X\) and \(\small Y\) are discrete random variables. Both \(\small X\) and \(\small Y\) can assume values 0, 1, and 2. The incomplete table above is meant to depict the joint distribution of \(\small X\) and \(\small Y\), and the marginal distributions of \(\small X\) and \(\small Y.\)<br>
 
 a. Complete the table. <br>
     <br>
@@ -549,18 +658,17 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-b. Find the expected value of \(X\) and the expected value of \(Y\).<br>
+b. Find the expected value of \(\small X\) and the expected value of \(\small Y\).<br>
     <br>
     <br>
     <br>
-c. Find the covariance of \(X\) and \(Y\). <br>
+c. Find the covariance of \(\small X\) and \(\small Y\). <br>
     <br>
     <br>
     <br>
     <br>
     <br>
-    <br>
-d. Are \(X\) and \(Y\) independent? Explain your answer.
+d. Are \(\small X\) and \(\small Y\) independent? Explain your answer.
     <br>
     <br>
     <br>

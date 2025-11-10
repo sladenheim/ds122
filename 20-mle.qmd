@@ -17,9 +17,10 @@ format:
 :::{style="font-size: .8em"}
 
 - Model fitting
-- Likelihood function and its computation
-- Log-likelihood function and its computation
-- Maximum Likelihood Estimation
+- Likelihood function 
+- Log-likelihood function 
+- Maximum Likelihood Estimation (MLE)
+- Application to the train problem
 
 :::
 
@@ -28,7 +29,7 @@ format:
 A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
 
 :::{.center-text}
-<img src="images/train/train60.jpeg" width=400/>
+<img src="images/train/train60.jpeg" width=300/>
 :::
 
 __Question__: Estimate how many trains the railroad has using maximum likelihood estimation.
@@ -36,7 +37,7 @@ __Question__: Estimate how many trains the railroad has using maximum likelihood
 
 ## Model Fitting
 :::{style="font-size: .8em"}
-Imagine that you know that data is drawn from a particular _kind_ of distribution, but you don't know the value(s) of the distribution's parameter(s). 
+Assume that you know that data is drawn from a particular _**kind**_ of distribution, but you don't know the value(s) of the distribution's parameter(s). 
 
 The table below lists some common distributions and their parameters.
 
@@ -55,12 +56,12 @@ The table below lists some common distributions and their parameters.
 
 ## Model Fitting
 :::{style="font-size: .8em"}
-Assume that data is drawn from a distribution
+That is, data is drawn from a distribution
 $p(x; \theta).$
 
 The way to read this is: the probability of $x$ under a distribution having parameter(s) $\theta$.
 
-We call $p(x; \theta)$ a _family_ of distributions because there is a different distribution for each value of $\theta$. 
+We call $p(x; \theta)$ a __family__ of distributions because there is a different distribution for each value of $\theta$. 
 
 <!-- The graph below illustrates the probability density functions of several normal distributions (from the same parametric family). -->
 
@@ -92,7 +93,11 @@ In this setting, it's the parameter(s) $\theta$ that change, not the data $x.$
 
 When treat $p(x; \theta)$ as a function of $\theta$ (instead of $x$, say) we call it a __likelihood__.
 
-This shift in terminology highlights that we're now focusing on how the probability changes as we vary $\theta.$
+This shift in terminology highlights that we are now focusing on how the probability changes as we vary $\theta.$
+:::
+
+:::{.notes}
+Subtle difference with parameter estimation: paramter estimation can be unrelated to the actual parameters, for instance it can be the range of outcomes in the normal distribution, not necessarily mu and sigma.
 :::
 
 ## Model Fitting
@@ -124,55 +129,62 @@ ax.yaxis.set_visible(False)
 for spine in [list(ax.spines.values())[i] for i in [0, 1, 3]]:
     spine.set_visible(False)
 ```
-Can you imagine that this dataset might be drawn from a normal distribution?
-
-In that case, 
+Assuming that this data is drawn from a normal distribution 
 
 $$\small{p(x; \theta) = \mathcal{N}(x; \mu, \sigma^2).}$$
 
-Then model fitting would consist of finding the $\mu$ and $\sigma$ that best match the given data $x$ shown above. In other words, the likelihood function gives the probability of observing the given data as a function of the parameter(s). Therefore, the parameters can be estimated by maximizing the likelihood function.
+Then model fitting would consist of finding the $\mu$ and $\sigma$ that best match the given data $x$ shown above. In other words, _**the likelihood function gives the probability of observing the given data as a function of the parameter(s)**_. Therefore, _**the parameters can be estimated by maximizing the likelihood function**_.
+:::
+
+:::{.notes}
+The same as probability
+
+
 :::
 
 ## Calculating Likelihood
 :::{style="font-size: .8em"}
-Let's think about how to calculate likelihood. Consider a set of $m$ data items 
+How can we calculate the likelihood function? 
 
-$$ X_s = (x_1, x_2, \dots, x_m), $$ 
+Consider a set of $m$ data items 
 
-drawn independently from the unknown distribution $p_{\text{data}}(x)$.
+$$ \small X_s = (x^{(1)}, x^{(2)}, \dots, x^{(m)}), $$ 
+
+drawn independently from the unknown distribution $p(x)$.
 
 What is the probability of the entire dataset $X_s$?
 
-We assume that the $x_i$ are independent;  so the probabilities multiply.
+Since we assume that the $x^{(i)}$ are independent, the probabilities multiply.
 
 Therefore, the joint probability is
 
-$$p(X_s; \theta) =  p(x_1; \theta) \cdot  p(x_2; \theta) \cdot \ldots \cdot p(x_m; \theta). $$
+$$ \small p(X_s; \theta) =  p(x^{(1)}; \theta) \cdot  p(x^{(2)}; \theta) \cdot \ldots \cdot p(x^{(m)}; \theta) = \prod_{i=1}^m p(x^{(i)}; \theta). $$
 
 <!-- We can use a special shorthand notation to represent products. Just like $\sum$ is shorthand for summing, $\prod$ is shortand for taking the product.
 
 For example, the product of two numbers $a_1$ and $a_2$ (i.e., $a_1 a_2$), can be written as $\prod_{i=1}^2 a_i$. -->
 
-The joint probability can be written as:
+<!-- The joint probability can be written as:
 
-$$ p(X_s; \theta) = \prod_{i=1}^m p(x_i; \theta). $$
+$$ \small p(X_s; \theta) = \prod_{i=1}^m p(x^{(i)}; \theta). $$ -->
 
 :::
 
 ## Calculating Likelihood
 :::{style="font-size: .8em"}
-Now, each individual $p(x_i; \theta)$ is a value between 0 and 1.
+Note that each individual $p(x^{(i)}; \theta)$ is a value between 0 and 1.
 
-And there are $m$ of these numbers being multiplied.   So for any reasonable-sized dataset, the joint probability is going to be _very small_.
+There are $m$ of these numbers being multiplied.   So for any reasonable-sized dataset, the joint probability is going to be _**very small**_.
+<br><br>
 
 For example, if a typical probability is $1/10$, and there are 500 data items, then the joint probability will be a number on the order of $10^{-500}$.   
 
-So the probability of a given dataset as a number will usually be too small to even represent in a computer using standard floating point!
+So the likelihood of the dataset will usually be too small to even represent in a computer using standard floating point!
 :::
 
 ## Log-Likelihood
 :::{style="font-size: .8em"}
-Luckily, there is an excellent way to handle this problem. Instead of using likelihood, we will use the log of likelihood.  
+Luckily, there is an excellent way to handle this problem. Instead of using likelihood, we will use the _**log of likelihood**_.  
 
 The table below shows some of the properties of the natural logarithm.
 
@@ -208,7 +220,7 @@ b
 
 ## Log-Likelihood
 :::{style="font-size: .8em"}
-We will shortly see that we are only interested in the maxima of the likelihood function. Since the log function does not change those points (the log is a monotonic function), using the log of the likelihood works for us.
+We will only be interested in the maxima of the likelihood function. Since the log function does not change those points (the log is a monotonic function), using the log of the likelihood works for us.
 
 :::{.center-text}
 <img src="images/parameter_estimation/natural_log_max.png" width=500/>
@@ -219,11 +231,11 @@ We will shortly see that we are only interested in the maxima of the likelihood 
 :::{style="font-size: .75em"}
 So we will work with the log-likelihood:
 
-$$\small{\log p_{\text{model}}(X_s; \theta).}$$
+$$\small{\log p(X_s; \theta).}$$
 
 Which becomes:
 
-$$\small{\log p_{\text{model}}(X_s; \theta) = \log \prod_{i=1}^m p_{\text{model}}(x_i; \theta) = \sum_{i=1}^m \log p_{\text{model}}(x_i; \theta).}$$
+$$\small{\log p(X_s; \theta) = \log \prod_{i=1}^m p(x_i; \theta) = \sum_{i=1}^m \log p(x_i; \theta).}$$
 
 This way we are no longer multiplying many small numbers, and we work with values that are easy to represent.
 
@@ -315,9 +327,9 @@ plt.title(r'Log-Likelihood for considered discrete model based on sample $X_s$',
 plt.show()
 ```
 
-We can see that there is clearly a maximum in the plot of the log-likelihood function, somewhere between 0.4 and 0.6.  
+A maximum in the plot of the log-likelihood function is somewhere between 0.4 and 0.6.  
 
-If we use the value of $\theta$ at the maximum, we are choosing to set $\theta$ to _maximize the (log-)likelihood of the data under the model._
+If we use the value of $\theta$ at the maximum, we _**maximize the (log-)likelihood of the data under the model**_.
 :::
 
 ## Computation of MLE
@@ -368,11 +380,8 @@ c
 
 ## Computation of MLE
 :::{style="font-size: .8em"}
-:::{.center-text}
-__Summary of the computational steps__
-:::
 
-The steps to find Maximum Likelihood Estimate $\hat{\theta}$ for distribution parameter $\theta$:
+Typically, to find the Maximum Likelihood Estimate $\hat{\theta}$ for distribution parameter $\theta$, we perform the following steps:
 
  1. Compute the likehood function $p\left(X_s;\theta \right).$<br>
  2. Compute the corresponding log-likelihood function $\log p\left(X_s;\theta \right).$<br>
@@ -387,17 +396,17 @@ Let us compute the MLE for the example we looked at earlier.
 
 __Example.__ Earlier we obtained the following log-likehood function:
 
-$$\small{5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}}$$
+$$\small{5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}}.$$
 
 The derivative of this log-likelihood function with respect to $\theta$ is equal to
 
-$$\small{\log p(X_s; \theta) = \frac{\partial}{\partial\theta}\log p(X_s;\theta) = \frac{5}{\theta} - \frac{5}{1-\theta}.}$$
+$$\small{\log p(X_s; \theta) = \frac{\partial}{\partial\theta}\log p(X_s;\theta) = \frac{5}{\theta} - \frac{5}{1-\theta}}.$$
 
 Setting the derivative to zero leads to
 
-$$\small{5(1-\theta) - 5\theta=0,}$$
+$$\small{5(1-\theta) = 5\theta};$$
 
-$$\small{1-2\theta=0.}$$
+$$\small{2\theta=1.}$$
 :::
 
 
@@ -440,18 +449,18 @@ We assume:
 - We observed train #60.
 
 
-The likelihood of seeing train 60 is:
+Let $\theta = N$. The likelihood of seeing train 60 is:
 
 $$
-p(X_s; N) = \frac{1}{N}, \quad \text{for } N \geq 60.
+p(X_s; \theta) = \frac{1}{\theta}, \quad \text{for } \theta \geq 60.
 $$
 
-This function decreases as \( N \) increases.  
+This function decreases as $\theta$ increases.  
 So the maximum likelihood estimate is:
 
 
 $$
-\hat{N} = 60.
+\hat{\theta} = 60.
 $$
 
 
