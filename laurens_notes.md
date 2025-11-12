@@ -2,60 +2,60 @@
 
 ## Timeline
 
-Lisa ends lecturing with L26 on 11/7, and I start on 11/10
+Lisa ends lecturing with L27 on 11/10, and I start on 11/12
 
-That means I have 10 lectures to work with, L27 through L36.
+That means I have 10 lectures to work with, L28 through L37.
 
 
-**L27 - Poisson Processes** 
+**L28 - Poisson Processes** 
 - Mixture distributions (adding, subtracting, mixing)
 - Poisson processes & World Cup problem
 - Probability of superiority
 
-**L28 - Bayesian Testing & Decision Making** 
+**L29 - Bayesian Testing & Decision Making** 
 - Euro problem revisited with Bayes factors
 - Bayesian hypothesis testing
 - Bayesian bandits (Thompson sampling)
 
-**L29 - Comparison**
+**L30 - Comparison**
 - Comparing two distributions (height example or better sports example)
 - Posterior predictive distributions
 - Applications to A/B testing
 
-**L30 - Classification (Naive Bayes)**
+**L31 - Classification (Naive Bayes)**
 - Naive Bayes classifier
 - Penguin example with visualizations
 - Multinomial vs multivariate normal
 
-**L31 - Conjugate Priors Part 1**
+**L32 - Conjugate Priors Part 1**
 - Motivation: grid method vs analytical
 - Beta-Binomial (Euro problem)
 - Return to exponentials, intuition about "pseudo-data"
 
-**L32 - Conjugate Priors Part 2** 
+**L33 - Conjugate Priors Part 2** 
 - Gamma-Poisson (World Cup revisited)
 - Dirichlet-Multinomial (Lions/Tigers/Bears)
 - Table of conjugate pairs
 
-**L33 - Monte Carlo Methods** 
+**L34 - Monte Carlo Methods** 
 - Monte Carlo integration (better motivating example)
 - Pseudo-random generation
 - Accept-reject sampling
 - Bridge to MCMC
 
-**L34 - MCMC Part 1** 
+**L35 - MCMC Part 1** 
 - Motivation: high-dimensional posteriors
 - Markov chain steady states revisited
 - Metropolis-Hastings algorithm (theory)
 - Simple example (Good King Markov or similar)
 
-**L35 - MCMC Part 2** 
+**L36 - MCMC Part 2** 
 - Detailed balance and why MH works
 - Proposal distributions
 - Burn-in and convergence diagnostics
 - Euro problem with MCMC implementation
 
-**L36 - MCMC in Practice** 
+**L37 - MCMC in Practice** 
 - PyMC introduction
 - Bayesian regression example
 - Comparing to frequentist regression

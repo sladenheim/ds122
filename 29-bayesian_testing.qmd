@@ -34,7 +34,7 @@ from collections import Counter
 
 :::
 
-## The Euro Problem - Reminder
+## The Euro Coin Problem - Reminder
 
 :::{style="font-size: .7em"}
 
@@ -109,7 +109,7 @@ plt.title('Posterior Distribution of p', size=18)
 plt.legend(fontsize=14);
 ```
 
-The posterior mean is about 0.56, with a 90% credible interval from 0.51 to 0.61.
+The posterior mean (MMSE) is about 0.56, with a 90% credible interval from 0.51 to 0.61.
 
 **But this doesn't directly answer:** Is the coin biased or fair?
 

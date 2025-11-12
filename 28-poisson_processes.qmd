@@ -47,134 +47,36 @@ In the 2018 FIFA World Cup final, France defeated Croatia 4 goals to 2.
 <img src="images/poisson/france_croatia.jpg" width=400/>
 :::
 
-To answer these questions, we need  **mixture distributions** and **Poisson processes**.
+To answer these questions, we need **Poisson processes** and **mixture distributions**.
 
 :::
 
-## Mixture Distributions
-
-:::{style="font-size: .8em"}
-
-Consider this (American) football scenario:
-
-**Scenario:** A team randomly selects between two play types:
-
-- With probability 1/2, they call a **run play**
-  - Steady gains: 0, 5, or 10 yards (equal probability)
-- With probability 1/2, they call a **pass play**
-  - Higher variance: -10, 0, 5, 10, 15, or 20 yards (equal probability)
-  - (-10 represents an interception)
-
-What is the distribution of yards gained?
-
-:::
-
-## Computing a Mixture
+## Modeling soccer goals
 
 :::{style="font-size: .7em"}
 
-:::{.center-text}
-<img src="images/poisson/football_field.jpg" width=800/>
-:::
+**Goals in soccer have interesting properties:**
 
+- **Discrete events** (0, 1, 2, 3... goals) but occur over **continuous time** (90 minutes)
+- Goals can happen at any moment during the game
+- Each goal happens somewhat independently of others
+- Teams have a characteristic scoring rate ("goals per game")
 
-:::
+**This matches the Poisson process framework perfectly:**
 
-
-## Computing a Mixture
-
-:::{style="font-size: .7em"}
-
-:::{.center-text}
-<img src="images/poisson/football_field.jpg" width=800/>
-:::
-
-<br><br><br>
-
-- P(5 yards) via run: $(1/2) \times (1/3) = 1/6$
-- P(5 yards) via pass: $(1/2) \times (1/6) = 1/12$
-- **Total:** $1/6 + 1/12 = 1/4$
+- We've seen Poisson distributions before for counting rare events
+- But now we're thinking about them **per unit time** (per game, per 90 minutes)
+- The rate parameter $\lambda$ captures a team's goal-scoring ability
+- Perfect for modeling "how many events in a fixed time period"
 
 :::
 
-## Mixture Distributions
-
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="purple-box">
-     <span class="label">Mixture Distribution</span>
-        <p>
-        If \(f\) is the PMF of a mixture distribution, and \(f_1, f_2, \ldots, f_n\) are the component distributions, where the probability of selecting distribution \(f_i\) is \(p_i\), then:
-        $$f(x) = \sum_{i=1}^{n} p_i \cdot f_i(x)$$
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-
-:::
-
-
-##  <span style="font-size: 0.9em">Calculating the mixture by hand</span>
-
-:::{style="font-size: .8em"}
-
-
-Probability of gaining 0 yards:
-
-- Via run play: $(1/2) \times (1/3) = 1/6$
-- Via pass play: $(1/2) \times (1/6) = 1/12$
-- Total: $1/6 + 1/12 = 1/4$
-
-Probability of gaining 15 yards:
-
-- Via run play: $(1/2) \times (0) = 0$ (can't get 15 on a run)
-- Via pass play: $(1/2) \times (1/6) = 1/12$
-- Total: $0 + 1/12 = 1/12$
-
-:::
-
-## Computing Mixtures in Code
-
-:::{style="font-size: .8em"}
-
-```{python}
-#| echo: true
-# Run play: 0, 5, or 10 yards
-run = pd.DataFrame(index=[0, 5, 10])
-run['probs'] = 1/3
-
-# Pass play: -10, 0, 5, 10, 15, or 20 yards
-pass_play = pd.DataFrame(index=[-10, 0, 5, 10, 15, 20])
-pass_play['probs'] = 1/6
-
-def make_mixture(pmf_table, probs):
-    mix = pmf_table.fillna(0)
-    mix = mix.transpose() * probs
-    return mix.sum(axis=1)
-
-pmf_table = pd.concat([run.transpose(), pass_play.transpose()], ignore_index=True)
-play_probs = [0.5, 0.5]
-
-mixture = make_mixture(pmf_table, play_probs)
-print(mixture.sort_index())
-```
-
-
-:::
 
 ## Poisson Processes
 
 :::{style="font-size: .7em"}
 
-Switching gears, remember we defined:
+Remember we defined:
 
 ```{python}
 from IPython.core.display import HTML
@@ -184,7 +86,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Poisson Distribution </span>
         <p>
-       A random variable \(X\) has a Poisson distribution with parameter \(\lambda > 0\), \(X \sim Pois(\lambda)\), if it has a discrete distribution with 
+       A random variable \(X\) has a Poisson distribution with parameter \(\lambda > 0\) if it has a discrete distribution with 
        \[
        P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}, \quad k = 0, 1, 2, \dots
        \]
@@ -195,7 +97,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-Now we can talk about the related "poisson process":
+Now we can talk about the related "Poisson process":
 
 ```{python}
 from IPython.core.display import HTML
@@ -205,7 +107,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Poisson Process</span>
         <p>
-        A Poisson process models events that occur randomly over time at a constant average rate \(\lambda\) per time period.  The number of occurrences in a fixed period of time follows a Poisson distribution.
+        A Poisson process models events that occur randomly over time at a constant average rate \(\lambda\) per time period.  The number of occurrences in a fixed period of time follows a Poisson distribution.  The time between occurrences follows an exponential distribution.
         </p>
     </div>
     """
@@ -227,7 +129,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Poisson Process</span>
         <p>
-        A Poisson Process models events that occur randomly over time at a constant average rate \(\lambda\) per time period.  The number of occurrences in a fixed period of time follows a Poisson distribution.
+        A Poisson Process models events that occur randomly over time at a constant average rate \(\lambda\) per time period.  The number of occurrences in a fixed period of time follows a Poisson distribution.  The time between occurrences follows an exponential distribution.
         </p>
     </div>
     """
@@ -246,8 +148,7 @@ display(HTML(html_content))
 :::
 
 
-## Back to soccer goals
-
+##  <span style="font-size: 0.7em">Poisson process for soccer goals</span>
 
 :::{style="font-size: .8em"}
 
@@ -265,15 +166,16 @@ The problem now is, we don't know $\lambda$!
 
 ## The World Cup Problem
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 
 **The Setup:**
 
-- Assume goals follow a Poisson process with unknown rates ($\lambda_C$, $\lambda_F$)
-- We have seen one game where France scored 4 goals, Croatia scored 2 goals
+- (Data) We have seen one game where France scored 4 goals, Croatia scored 2 goals
+- (Model) Assume goals follow a Poisson process with unknown rates ($\lambda_C$, $\lambda_F$)
 
 **Next steps:**
 
+0. Remember we are going to **fix data** and **vary models**
 1. Choose a **prior** for $\lambda_C$ and $\lambda_F$
 2. Use the outcome of this game to find our **posterior** beliefs about $\lambda_C$ and $\lambda_F$
 3. Calculate our **posterior predictive distribution** for future scores
@@ -581,10 +483,149 @@ Question 2 is asking "how likely is $x_F > x_C$ where $x_F \sim \text{Poisson}(\
 
 <br>
 
-The distribution of goals is a **mixture** of Poisson distributions weighted by the **posterior** on $\lambda$.
+We need one more tool to answer Question 2 - Mixture Distributions.
 
 :::
 
+
+## Mixture Distributions
+
+:::{style="font-size: .8em"}
+
+Consider this (American) football scenario:
+
+**Scenario:** A team randomly selects between two play types:
+
+- With probability 1/2, they call a **run play**
+  - Steady gains: 0, 5, or 10 yards (equal probability)
+- With probability 1/2, they call a **pass play**
+  - Higher variance: -10, 0, 5, 10, 15, or 20 yards (equal probability)
+  - (-10 represents an interception)
+
+What is the distribution of yards gained?
+
+:::
+
+## Computing a Mixture
+
+:::{style="font-size: .7em"}
+
+:::{.center-text}
+<img src="images/poisson/football_field.jpg" width=800/>
+:::
+
+
+:::
+
+
+## Computing a Mixture
+
+:::{style="font-size: .7em"}
+
+:::{.center-text}
+<img src="images/poisson/football_field.jpg" width=800/>
+:::
+
+<br><br><br>
+
+- P(5 yards) via run: $(1/2) \times (1/3) = 1/6$
+- P(5 yards) via pass: $(1/2) \times (1/6) = 1/12$
+- **Total:** $1/6 + 1/12 = 1/4$
+
+:::
+
+## Mixture Distributions
+
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Mixture Distribution</span>
+        <p>
+        If \(f\) is the PMF of a mixture distribution, and \(f_1, f_2, \ldots, f_n\) are the component distributions, where the probability of selecting distribution \(f_i\) is \(p_i\), then:
+        $$f(x) = \sum_{i=1}^{n} p_i \cdot f_i(x)$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+:::
+
+
+##  <span style="font-size: 0.9em">Calculating the mixture by hand</span>
+
+:::{style="font-size: .8em"}
+
+
+Probability of gaining 0 yards:
+
+- Via run play: $(1/2) \times (1/3) = 1/6$
+- Via pass play: $(1/2) \times (1/6) = 1/12$
+- Total: $1/6 + 1/12 = 1/4$
+
+Probability of gaining 15 yards:
+
+- Via run play: $(1/2) \times (0) = 0$ (can't get 15 on a run)
+- Via pass play: $(1/2) \times (1/6) = 1/12$
+- Total: $0 + 1/12 = 1/12$
+
+:::
+
+## Computing Mixtures in Code
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+# Run play: 0, 5, or 10 yards
+run = pd.DataFrame(index=[0, 5, 10])
+run['probs'] = 1/3
+
+# Pass play: -10, 0, 5, 10, 15, or 20 yards
+pass_play = pd.DataFrame(index=[-10, 0, 5, 10, 15, 20])
+pass_play['probs'] = 1/6
+
+def make_mixture(pmf_table, probs):
+    mix = pmf_table.fillna(0)
+    mix = mix.transpose() * probs
+    return mix.sum(axis=1)
+
+pmf_table = pd.concat([run.transpose(), pass_play.transpose()], ignore_index=True)
+play_probs = [0.5, 0.5]
+
+mixture = make_mixture(pmf_table, play_probs)
+print(mixture.sort_index())
+```
+
+
+:::
+
+## Back to Question 2
+
+:::{style="font-size: .8em"}
+
+**Question 2:** If they played again, what's the chance France would win?
+
+This is different! 
+
+<br>
+
+Question 1 asked "how likely is $\lambda_{\text{F}} > \lambda_{\text{C}}$?"
+
+Question 2 is asking "how likely is $x_F > x_C$ where $x_F \sim \text{Poisson}(\lambda_{\text{F}})$ and $x_C \sim \text{Poisson}(\lambda_{\text{C}})$?"
+
+<br>
+
+The distribution of goals is a **mixture** of Poisson distributions weighted by the **posterior** on $\lambda$.
+
+:::
 
 ##  <span style="font-size: 0.8em">Posterior Predictive Distribution</span>
 
