@@ -106,7 +106,7 @@ We now have three probabilities we need to determine:
 
 - $\small P(\text{1st bowl})$ which is one bowl out of two, so 1/2.
 - $\small P(\text{vanilla cookie} \vert \text{1st bowl})$ which is 30 out of 40 cookies, so 3/4.
-- $\small P(\text{vanilla cookie})$ which is a litte tougher, since it's the combined probability of vanillia cookies from either bowl. So let's use the law of total probability:
+- $\small P(\text{vanilla cookie})$ which is a little tougher, since it's the combined probability of vanilla cookies from either bowl. So let's use the law of total probability:
 
 $$\small \begin{align*}
  & P(\text{vanilla cookie})  = \\
@@ -127,7 +127,7 @@ P(\text{first bowl} \vert \text{vanilla cookie})\ & = \frac{P(\text{vanilla cook
 
 <br><br>
 
-Just like we suspected, because the first bowl had more vanillia cookies, it was more likely that our cookie came from the first bowl.
+Just like we suspected, because the first bowl had more vanilla cookies, it was more likely that our cookie came from the first bowl.
 :::
 
 ## Basic Bayesian Concepts
@@ -166,7 +166,7 @@ display(HTML(html_content))
 
 - $P(H)$ is the probability of the hypothesis before we see the data, called the **prior** probability.
 - $P(H \vert D)$ is the probability of the hypothesis after we see the data, called the **posterior** probability.
-- $P(D \vert H)$ is the probabilitiy of the data under the hypothesis, called the **likelihood**.
+- $P(D \vert H)$ is the probability of the data under the hypothesis, called the **likelihood**.
 - $P(D)$ is the **total probability of the data** under any hypothesis (it is also known as the **normalizing constant**).
 
 
@@ -179,13 +179,13 @@ The _**prior**_ is often the trickiest portion of the Bayes' Rule to pin down.
 
 Sometimes it can be computed exactly as in the cookie bowl problem, where we were equally likely to pick each bowl. 
 
-But what if we chose bowls proportinally to their size? We would need to include that into our analysis. 
+But what if we chose bowls proportionally to their size? We would need to include that into our analysis. 
 
-Other times, people might disagree about which background information is relevent to the problem at hand. 
+Other times, people might disagree about which background information is relevant to the problem at hand. 
 
 <br><br>
 
-The _**likelihood**_ is usually well defined and can be computed directly. In the cookie problem we know the numbers of different cookies in each bowl, so we can compute the probabilites under each hypothesis.
+The _**likelihood**_ is usually well defined and can be computed directly. In the cookie problem we know the numbers of different cookies in each bowl, so we can compute the probabilities under each hypothesis.
 
 :::
 
@@ -238,7 +238,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ``` 
 
-Let's go step by step to create a Bayes table for the cookie problem. First, we need a table that contains all possible hyptheses, one row for each hypothesis:
+Let's go step by step to create a Bayes table for the cookie problem. First, we need a table that contains all possible hypotheses, one row for each hypothesis:
 
 ```{python}
 #| echo: true
@@ -305,7 +305,7 @@ This gives us 5/8, just like we calculated before.
 ## Bayes Table
 :::{style="font-size: .8em"}
 
-Finally, we can use the total probability of the data to get the posterior probability of each hypthesis.
+Finally, we can use the total probability of the data to get the posterior probability of each hypothesis.
 
 ```{python}
 #| echo: true
@@ -313,9 +313,9 @@ table['posterior'] = table['unnormalized'] / prob_data
 table
 ```
 
-The posterior probability of the first bowl, given that we observed a vanilla cokie, is 0.6, the same as when we used Bayes' theorem directly before. 
+The posterior probability of the first bowl, given that we observed a vanilla cookie, is 0.6, the same as when we used Bayes' theorem directly before. 
 
-Notice that the posteriors add up to 1 (as we should expect given mutually exclusive and collectivly exhaustive hypotheses).
+Notice that the posteriors add up to 1 (as we should expect given mutually exclusive and collectively exhaustive hypotheses).
 
 :::
 
@@ -376,7 +376,7 @@ What are the _**hypotheses**_? And what is the _**likelihood**_ of the data unde
 
 __**Hypothesis 1:**__ The prize is behind door 1
 
-In this case Monty chose door 2 or door 3 at random, so he was equally likely to open door 2 and 3, so the observation that he opened door 3 had a 50/50 chance of occuring.
+In this case Monty chose door 2 or door 3 at random, so he was equally likely to open door 2 and 3, so the observation that he opened door 3 had a 50/50 chance of occurring.
 
 __**Hypothesis 2:**__ The prize is behind door 2
 
