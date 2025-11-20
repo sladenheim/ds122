@@ -1,0 +1,735 @@
+---
+title: Conjugate Priors Part 2
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import gamma, poisson, dirichlet, multinomial, beta
+from mpl_toolkits.mplot3d import Axes3D
+
+def update(distribution, likelihood):
+    '''Standard Bayesian update function'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- Apply the **Gamma-Poisson** conjugate pair to count data
+- Understand the **Dirichlet-Multinomial** conjugate pair
+- Recognize common **conjugate prior families**
+- Choose appropriate conjugate priors for real problems
+- Understand when conjugate priors are (and aren't) useful
+
+
+:::
+
+## Recap: What We Learned
+
+:::{style="font-size: .8em"}
+
+**Last time:** Conjugate priors and Beta-Binomial
+
+**Key ideas:**
+
+- Formulas can replace tables for Bayesian updates
+- **Conjugate priors:** Prior × Likelihood = Same family
+- When functional forms match, updates become simple arithmetic
+
+**Beta-Binomial conjugate pair:**
+
+- **Problem:** Estimating probability $\theta \in [0,1]$ (proportions, rates)
+- **Prior:** Beta($\alpha$, $\beta$) — parameters as "pseudo-data"
+- **Posterior:** Beta($\alpha + k$, $\beta + n - k$) after $k$ successes in $n$ trials
+
+**Today:** Two more important conjugate pairs!
+
+:::
+
+## Return to World Cup
+
+:::{style="font-size: .8em"}
+
+Remember the 2018 World Cup Final? France vs Croatia, final score 4-2
+
+**Our question:** What's each team's goal-scoring rate $\lambda$?
+
+**Model:** Goals follow a Poisson process
+
+- $\lambda$ = average goals per game
+- Number of goals in a game ~ Poisson($\lambda$)
+
+**From historical data:** Average ~1.4 goals per game
+
+**Can we use conjugate priors?** Yes! Gamma-Poisson! (Remember when I waved my hands and said "because it makes the math work"?)
+
+:::
+
+## The Poisson Distribution (Review)
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Poisson Distribution</span>
+        <p>
+        For counting events in a fixed interval with average rate \(\lambda\):
+        <br>
+        $$P(k \mid \lambda) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+        <br>
+        <b>Key property:</b> Mean = Variance = \(\lambda\)
+        <br>
+        <b>For our purposes (likelihood):</b><br>
+        $$P(k \mid \lambda) \propto \lambda^k e^{-\lambda}$$
+        <br>
+        (We can ignore the \(k!\) since it doesn't depend on \(\lambda\) and we have to normalize later anyway)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## The Gamma Distribution
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Gamma Distribution</span>
+        <p>
+        A continuous distribution for positive values with parameters \(\alpha\) (shape) and \(\beta\) (rate):
+        <br>
+        $$\text{Gamma}(\lambda \mid \alpha, \beta) \propto \lambda^{\alpha-1} e^{-\lambda\beta}$$
+        <br>
+        <b>Mean:</b> \(\frac{\alpha}{\beta}\) &nbsp;&nbsp; <br><b>Mode:</b> \(\frac{\alpha-1}{\beta}\) (when \(\alpha > 1\))
+        <br><br>
+        <b>Special cases:</b>
+        <ul>
+        <li>Gamma(1, \(\beta\)) = Exponential(\(\beta\)) - time between Poisson events</li>
+        <li>Gamma(\(n\), \(\beta\)) = Erlang(\(n\), \(\beta\)) - time until \(n\) Poisson events</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Visualizing Gamma Distributions
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| fig-width: 12
+#| fig-height: 5
+#| fig-align: center
+
+lambda_vals = np.linspace(0, 10, 200)
+
+fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+params = [(1, 1), (2, 1), (3, 1), (2, 0.5), (5, 1), (9, 2)]
+titles = ['Gamma(1,1) = Exp(1)', 'Gamma(2,1)', 'Gamma(3,1)',
+          'Gamma(2,0.5)', 'Gamma(5,1)', 'Gamma(9,2)']
+
+for i, (a, b) in enumerate(params):
+    row, col = i // 3, i % 3
+    ax[row, col].plot(lambda_vals, gamma.pdf(lambda_vals, a, scale=1/b), linewidth=2)
+    ax[row, col].set_title(f'{titles[i]} - Mean: {a/b:.1f}')
+    ax[row, col].set_xlabel('λ')
+    ax[row, col].set_ylabel('Density')
+    ax[row, col].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+:::
+## <span style="font-size: 0.85em">Why Gamma and Poisson Work Together</span>
+
+:::{style="font-size: .7em"}
+
+**Prior (Gamma, unnormalized):**
+
+$$P(\lambda) \propto \lambda^{\alpha-1} e^{-\lambda\beta}$$
+
+**Likelihood (Poisson for** $k$ **goals in 1 game, unnormalized):**
+$$P(k \mid \lambda) \propto \lambda^k e^{-\lambda \cdot 1}$$
+
+**Posterior:**
+$$P(\lambda \mid k) \propto P(\lambda) \cdot P(k \mid \lambda)$$
+$$P(\lambda \mid k) \propto \lambda^{\alpha-1} e^{-\lambda\beta} \cdot \lambda^k e^{-\lambda}$$
+$$P(\lambda \mid k) \propto \lambda^{(\alpha+k)-1} e^{-\lambda(\beta+1)}$$
+
+**This is Gamma($\alpha+k, \beta+1$)!**
+
+:::
+
+## The Update Rule
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Theorem: Gamma-Poisson Conjugacy</span>
+        <p>
+        If the prior distribution for a rate parameter \(\lambda\) is \(\lambda \sim \text{Gamma}(\alpha, \beta)\) and we observe \(k\) events in time period \(t\), then the posterior distribution is:
+        <br><br>
+        $$\lambda \mid \text{data} \sim \text{Gamma}(\alpha + k, \beta + t)$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**Interpretation:**
+
+- $\alpha$ = prior total events observed
+- $\beta$ = prior total time observed
+- **Update:** add new events to $\alpha$, add new time to $\beta$
+- **"Pseudo-data":** Like having seen $\alpha$ events in $\beta$ time periods!
+
+:::
+
+## <span style="font-size: 0.85em">World Cup Analysis (Look Ma, no tables!)</span>
+
+
+:::{style="font-size: .6em"}
+
+**Prior:** Gamma(1.4, 1) - average 1.4 goals/game from historical data
+
+**France's data:** 4 goals in 1 game
+
+- **Posterior:** Gamma(1.4 + 4, 1 + 1) = Gamma(5.4, 2)
+
+**Croatia's data:** 2 goals in 1 game
+
+- **Posterior:** Gamma(1.4 + 2, 1 + 1) = Gamma(3.4, 2)
+
+```{python}
+#| fig-width: 11
+#| fig-height: 4
+#| fig-align: center
+
+lambda_vals = np.linspace(0, 6, 200)
+
+fig, ax = plt.subplots(figsize=(8, 3.5))
+
+ax.plot(lambda_vals, gamma.pdf(lambda_vals, 1.4, scale=1),
+        '--', linewidth=2, label='Prior: Gamma(1.4, 1)', color='gray')
+ax.plot(lambda_vals, gamma.pdf(lambda_vals, 5.4, scale=1/2),
+        linewidth=3, label='France: Gamma(5.4, 2)', color='blue')
+ax.plot(lambda_vals, gamma.pdf(lambda_vals, 3.4, scale=1/2),
+        linewidth=3, label='Croatia: Gamma(3.4, 2)', color='red')
+
+ax.set_xlabel('Goal Scoring Rate λ (goals/game)', fontsize=13)
+ax.set_ylabel('Density', fontsize=13)
+ax.legend(fontsize=12)
+ax.set_title('Posterior Distributions for Goal Scoring Rates', fontsize=14)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+:::
+
+
+## The Dirichlet-Multinomial Pair
+
+:::{style="font-size: .8em"}
+
+**New problem:** Categorical data with **more than 2 categories**
+
+
+**Multinomial** = generalization of Binomial to k > 2 categories
+
+**Dirichlet** = generalization of Beta to k > 2 parameters
+
+**Examples:**
+
+- Species: Lions, Tigers, Bears
+- Customer choices: Product A, B, or C
+- Dice outcomes: 1, 2, 3, 4, 5, 6
+- Political parties: Democrat, Republican, Independent, Other
+
+:::
+
+## Lions and Tigers and Bears
+
+:::{style="font-size: .8em"}
+
+**Scenario:** Wildlife preserve with unknown species proportions
+
+**During tour, we see:**
+
+- 3 Lions
+- 2 Tigers
+- 1 Bear
+
+**Question:** What are the prevalences (proportions) of each species?
+
+**Back to PPDs:** What's our prediction the next animal we see is a bear?
+
+:::
+
+## The Multinomial Distribution
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Multinomial Distribution</span>
+        <p>
+        For \(n\) observations across \(k\) categories with probabilities \(\mathbf{p} = (p_1, \ldots, p_k)\), the multinomial distribution gives the probability:
+        <br>
+        $$P(\mathbf{x} \mid \mathbf{p}) = \frac{n!}{x_1! \cdots x_k!} p_1^{x_1} \cdots p_k^{x_k}$$
+        <br>
+        where \(\mathbf{x} = (x_1, \ldots, x_k)\) are the counts and \(\sum x_i = n\), \(\sum p_i = 1\)
+        <br>
+        <b>For likelihood (unnormalized):</b>
+        $$P(\mathbf{x} \mid \mathbf{p}) \propto p_1^{x_1} \cdots p_k^{x_k}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+:::
+
+## The Dirichlet Distribution
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Dirichlet Distribution</span>
+        <p>
+        A distribution over probability vectors \(\mathbf{p} = (p_1, \ldots, p_k)\) with parameters \(\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_k)\):
+        <br>
+        $$\text{Dir}(\mathbf{p} \mid \boldsymbol{\alpha}) \propto p_1^{\alpha_1-1} \cdots p_k^{\alpha_k-1}$$
+        
+        where \(\sum p_i = 1\) (probability simplex)
+        <br><br>
+        <b>Interpretation:</b>
+        <ul>
+        <li>\(\alpha_i\) = "pseudo-count" for category \(i\)</li>
+        <li>Uniform prior: \(\alpha_i = 1\) for all \(i\)</li>
+        <li>Larger \(\alpha_i\) = stronger belief in category \(i\)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Why Dirichlet and Multinomial Work
+
+:::{style="font-size: .7em"}
+
+**Prior (Dirichlet, unnormalized):**
+$$P(\mathbf{p}) \propto p_1^{\alpha_1-1} \cdots p_k^{\alpha_k-1}$$
+
+**Likelihood (Multinomial, unnormalized):**
+$$P(\mathbf{x} \mid \mathbf{p}) \propto p_1^{x_1} \cdots p_k^{x_k}$$
+
+**Posterior:**
+$$P(\mathbf{p} \mid \mathbf{x}) \propto P(\mathbf{p}) \cdot P(\mathbf{x} \mid \mathbf{p})$$
+$$P(\mathbf{p} \mid \mathbf{x}) \propto p_1^{\alpha_1-1} \cdots p_k^{\alpha_k-1} \cdot p_1^{x_1} \cdots p_k^{x_k}$$
+
+$$P(\mathbf{p} \mid \mathbf{x}) \propto p_1^{(\alpha_1+x_1)-1} \cdots p_k^{(\alpha_k+x_k)-1}$$
+
+**This is Dir($\alpha_1+x_1, \ldots, \alpha_k+x_k$)!**
+
+:::
+
+## The Update Rule
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        <b>Dirichlet-Multinomial Conjugate Update:</b><br><br>
+
+        <b>Prior:</b> \(\mathbf{p} \sim \text{Dir}(\alpha_1, \ldots, \alpha_k)\)<br>
+        <b>Data:</b> Observe \(x_1, \ldots, x_k\) counts in each category<br>
+        <b>Posterior:</b> \(\mathbf{p} \sim \text{Dir}(\alpha_1 + x_1, \ldots, \alpha_k + x_k)\)<br>
+        <br>
+        <b>Simple rule:</b> Add observed counts to each \(\alpha_i\)!
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Lions/Tigers/Bears: Solution
+
+:::{style="font-size: .7em"}
+
+**Prior:** Dir(1, 1, 1) - uniform over all possible proportions
+
+**Data:** 3 lions, 2 tigers, 1 bear
+
+**Posterior:** Dir(4, 3, 2)
+
+**What's the expected proportion of each species?**
+
+For Dirichlet($\alpha_1, \ldots, \alpha_k$), the mean proportion for category $i$ is:
+$$E[p_i] = \frac{\alpha_i}{\sum_j \alpha_j}$$
+
+So:
+
+- Lions: $\frac{4}{9} \approx 44\%$
+- Tigers: $\frac{3}{9} \approx 33\%$
+- Bears: $\frac{2}{9} \approx 22\%$
+
+:::
+
+## Visualizing Dirichlet (3D Simplex)
+
+:::{style="font-size: .7em"}
+
+For 3 categories, valid probability vectors lie on a **2D triangle** in 3D space:
+
+```{python}
+#| fig-width: 9
+#| fig-height: 6
+#| fig-align: center
+
+fig = plt.figure(figsize=(6, 4))
+ax = fig.add_subplot(111, projection='3d')
+
+# Generate points on probability simplex
+scale = 40
+pts = [(x/scale, y/scale, 1-(x+y)/scale)
+       for x in range(scale+1)
+       for y in range(scale+1-x)]
+
+x, y, z = zip(*pts)
+
+# Calculate density for Dir(4, 3, 2)
+dist = dirichlet([4, 3, 2])
+density = [dist.pdf(pt) for pt in pts]
+
+# Plot
+scatter = ax.scatter(x, y, z, c=density, cmap='Blues', marker='.', s=20)
+ax.plot([1, 0, 0, 1], [0, 1, 0, 0], [0, 0, 1, 0], 'k-', linewidth=2)
+
+ax.set_xlabel('P(Lions)', fontsize=12)
+ax.set_ylabel('P(Tigers)', fontsize=12)
+ax.set_zlabel('P(Bears)', fontsize=12)
+ax.set_title('Posterior: Dir(4, 3, 2)', fontsize=14)
+
+# Rotate view for better visibility
+ax.view_init(elev=25, azim=45)
+
+plt.colorbar(scatter, ax=ax, label='Density')
+plt.show()
+```
+
+**Higher density near (0.44, 0.33, 0.22)!**
+
+:::
+
+## Marginal Distributions
+
+:::{style="font-size: .7em"}
+
+**Useful fact:** Each marginal of a Dirichlet is a Beta!
+
+For Dir($\alpha_1, \alpha_2, \alpha_3$), the marginal for category 1 is:
+$$p_1 \sim \text{Beta}(\alpha_1, \alpha_2 + \alpha_3)$$
+
+**For our example - Dir(4, 3, 2):**
+
+```{python}
+#| fig-width: 12
+#| fig-height: 4
+
+p_vals = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots(1, 3, figsize=(13, 4))
+labels = ['Lions', 'Tigers', 'Bears']
+alphas = [4, 3, 2]
+
+for i in range(3):
+    # Marginal is Beta(alpha_i, sum of other alphas)
+    other_sum = sum(alphas) - alphas[i]
+    ax[i].plot(p_vals, beta.pdf(p_vals, alphas[i], other_sum), linewidth=3)
+    ax[i].set_title(f'Marginal for {labels[i]}')
+    ax[i].set_xlabel(f'P({labels[i]})')
+    ax[i].axvline(alphas[i]/sum(alphas), color='red', linestyle='--',
+                  label=f'Mean: {alphas[i]/sum(alphas):.2f}')
+    ax[i].legend()
+    ax[i].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
+## Table of Common Conjugate Pairs
+
+:::{style="font-size: .6em"}
+
+**Common Conjugate Prior Pairs:**
+
+| Likelihood | Use Case | Conjugate Prior | Update Rule |
+|------------|----------|-----------------|-------------|
+| Binomial | Success/failure counts | Beta($\alpha, \beta$) | Beta($\alpha+k, \beta+n-k$) |
+| Poisson | Event counts over time | Gamma($\alpha, \beta$) | Gamma($\alpha+k, \beta+t$) |
+| Multinomial | Categorical counts | Dirichlet($\boldsymbol{\alpha}$) | Dirichlet($\boldsymbol{\alpha}+\mathbf{x}$) |
+| Normal (known $\sigma$) | Continuous measurements | Normal($\mu_0, \sigma_0$) | Normal (updated $\mu, \sigma$) |
+| Exponential | Time between events | Gamma($\alpha, \beta$) | Gamma($\alpha+n, \beta+\sum x_i$) |
+
+
+:::
+
+## When to Use Conjugate Priors
+
+:::{style="font-size: .7em"}
+
+**Advantages:**
+
+- Fast - no grid computation
+- Exact - no approximation
+- Interpretable - "pseudo-data" intuition
+
+**When conjugate priors work well:**
+
+- Standard likelihood (Binomial, Poisson, Multinomial, Normal)
+- Prior matches your beliefs reasonably well
+
+**When they don't:**
+
+- Complex, non-standard likelihoods
+- Prior beliefs don't match conjugate family
+- Multiple parameters with complex relationships
+
+:::
+
+## Example: When Conjugacy Fails
+
+:::{style="font-size: .8em"}
+
+**Problem:** Estimating both mean AND variance of a normal distribution
+
+**Challenge:**
+
+- No simple conjugate prior for both parameters jointly
+- Need more complex approach (e.g., Normal-Inverse-Gamma prior)
+- Or use MCMC methods (coming soon!)
+
+**Another example:** Logistic regression
+
+- Likelihood is not from exponential family
+- No conjugate prior exists
+- Must use numerical methods (MCMC, variational inference, etc.)
+
+**Bottom line:** Conjugate priors are powerful but limited to specific cases
+
+:::
+
+
+## Summary
+
+:::{style="font-size: .7em"}
+
+**Three powerful conjugate pairs:**
+
+1. **Beta-Binomial** - proportions/probabilities
+2. **Gamma-Poisson** - rates/counts
+3. **Dirichlet-Multinomial** - categorical proportions
+
+**Key concepts:**
+
+- Conjugate priors = same family before and after update
+- Parameters as "pseudo-data"
+
+**Next time:** What to do when conjugate priors don't exist
+
+- Monte Carlo methods
+- Sampling-based inference
+- MCMC
+
+:::
+
+## <span style="font-size: 0.85em">Group Question 1: Customer Preferences</span>
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Scenario:</b> A cafe offers three drinks: Coffee, Tea, and Smoothies. Historical data from similar cafes suggests proportions of (0.5, 0.3, 0.2).<br><br>
+
+<b>Prior:</b> You model this as having seen 50 coffee, 30 tea, and 20 smoothie orders before. <br><br>
+
+<b>Today's data:</b> First 20 customers order:<br>
+• Coffee: 12<br>
+• Tea: 5<br>
+• Smoothies: 3<br>
+<br>
+<b>Your Tasks:</b><br>
+1. What is the prior distribution?<br>
+2. What is the posterior distribution?<br>
+3. What is the posterior mean for each drink?<br>
+4. How much did the proportions shift from the prior?<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 1: Solution
+
+:::{style="font-size: .6em"}
+
+**1. Piror:** Dir(1+50, 1+30, 1+20) = **Dir(51, 31, 21)**
+
+**1. Posterior:** Dir(51+12, 31+5, 21+3) = **Dir(63, 36, 24)**
+
+**2. Posterior means:**
+
+- Coffee: $\frac{63}{123} \approx 0.512$
+- Tea: $\frac{36}{123} \approx 0.293$
+- Smoothies: $\frac{24}{123} \approx 0.195$
+
+**3. Comparison:**
+
+| Drink | Prior Mean | Posterior Mean | Change |
+|-------|------------|----------------|--------|
+| Coffee | 0.500 | 0.512 | +0.012 |
+| Tea | 0.300 | 0.293 | -0.007 |
+| Smoothies | 0.200 | 0.195 | -0.005 |
+
+**Insight:** Strong prior (100 pseudo-observations) barely shifted with just 20 new observations!
+
+:::
+
+## <span style="font-size: 0.8em">Group Question 2: Overcoming Strong Beliefs</span>
+
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Scenario:</b> A political analyst strongly believes that voter preferences are split 60/40 between two parties (A and B). They model this with a prior representing 600 votes for A and 400 votes for B.<br><br>
+
+<b>New poll data suggests 50/50 split:</b> <br>
+
+In a poll of 100 voters:<br>
+• Party A: 50<br>
+• Party B: 50<br>
+<br>
+<b>Your Tasks:</b><br>
+1. What is the posterior after this poll?<br>
+2. What is the posterior mean for Party A?<br>
+3. How many 50/50 polls of size 100 would it take to sway the political analyst so thier posterior mean was approximately 0.55 for Party A?<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2: Solution
+
+:::{style="font-size: .6em"}
+
+**1. Posterior after first poll:** Dir(601+50, 401+50) = **Dir(651, 451)**
+
+**2. Posterior mean for Party A:**
+$$E[p_A] = \frac{651}{651+451} = \frac{651}{1102} \approx 0.591$$
+
+**3. How many polls to reach ~0.55?**
+
+We need to solve: $\frac{601 + 50n}{1002 + 100n} \approx 0.55$
+
+$$601 + 50n \approx 0.55(1002 + 100n)$$
+$$601 + 50n \approx 551.1 + 55n$$
+$$49.9 \approx 5n$$
+$$n \approx 10$$
+
+**Check:** After 10 polls: Dir(1101, 901), mean = $\frac{1101}{2002} \approx 0.550$ 
+
+**Key insight:** It takes ~1000 new observations to overcome a prior representing 1000 observations!
+
+:::

@@ -33,15 +33,39 @@ def update(distribution, likelihood):
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
-- Explain what a classification problem is and give examples
-- Implement a Naive Bayes classifier using Bayesian updating
-- Understand the "naive" assumption and why it matters
-- Compare naive Bayes to multivariate normal classifiers
-- Evaluate classifier performance
+- Explain what a **classification problem** is 
+- Implement a **Naive Bayes classifier** using Bayesian updating
+- Understand **the "naive" assumption** and why it matters
+- Start using **continuous distributions for likelihood**
+
+
+:::
+## <span style="font-size: 0.85em">Warm-Up: Bird Watcher's Dilemma</span>
+
+:::{style="font-size: .6em"}
+
+You spotted a bird on the coast. It's either a **Puffin**, **Tern**, or **Gull**.
+
+**Observation 1:** The bird dove underwater
+
+- Puffins dive often: P(dive | Puffin) = 0.9
+- Terns dive sometimes: P(dive | Tern) = 0.6
+- Gulls rarely dive: P(dive | Gull) = 0.3
+
+**Observation 2:** The bird has a colorful beak
+
+- Puffins have colorful beaks: P(colorful beak | Puffin) = 0.8
+- Terns have plain beaks: P(colorful beak | Tern) = 0.2
+- Gulls have plain beaks: P(colorful beak | Gull) = 0.2
+
+**Our task:**
+
+- Starting with equal priors (1/3 each), identify the bird.
+- Did the order of our observations matter?
+
 
 :::
 
-# Classification Problems
 
 ## What is Classification?
 
@@ -51,48 +75,12 @@ def update(distribution, likelihood):
 
 **Examples:**
 
-- Is this email spam or not spam?
+- What type of email is this: spam, promotional, social, or important?
 - Is this tumor benign or malignant?
-- Will this customer churn or stay?
 - Is this transaction fraudulent?
 
 
 **Classification is one of the most common applications of Bayesian methods!**
-
-:::
-
-## <span style="font-size: 0.7em">Spam Filtering: The Original Application</span>
-
-:::{style="font-size: .8em"}
-
-In the 1990s, Bayesian classification revolutionized spam filtering.
-
-
-**The idea:**
-
-- Calculate P(spam | words in email)
-- Words like "FREE", "WINNER", "VIAGRA" increase probability of spam
-- Words like "meeting", "deadline", "attached" decrease it
-
-
-```{python}
-#| echo: false
-import pandas as pd
-import numpy as np
-
-# Example word probabilities
-data = {
-    'Word': ['FREE', 'WINNER', 'meeting', 'deadline', 'viagra'],
-    'P(word|spam)': [0.65, 0.58, 0.12, 0.08, 0.82],
-    'P(word|ham)': [0.03, 0.02, 0.45, 0.38, 0.001]
-}
-df_spam = pd.DataFrame(data)
-print(df_spam.to_string(index=False))
-```
-
-. . .
-
-**Result:** Simple Bayesian classifiers achieved 95%+ accuracy!
 
 :::
 
@@ -118,9 +106,10 @@ We'll work with something cuter - classifying penguins into three species using 
 
 ## The Palmer Penguins Dataset
 
-Data on 344 penguins found on the Palmer Archipelago in the Antartic, including flipper and culmen (beak) length:
-
 :::{style="font-size: .8em"}
+
+Data on 344 penguins found on the Palmer Archipelago in the Antarctic, including flipper and culmen (beak) length:
+
 
 ```{python}
 # Load the Palmer Penguins dataset
@@ -141,7 +130,7 @@ except ImportError:
     df['Species'] = df['Species'].str.split(' ').str[0]
 
 # Show first few rows
-df[['Species', 'Flipper Length (mm)', 'Culmen Length (mm)']].head(10)
+df[['Species', 'Flipper Length (mm)', 'Culmen Length (mm)']].head(7)
 ```
 
 :::
@@ -254,39 +243,26 @@ prior_empirical
 
 :::
 
-## <span style="font-size: 0.7em">The Empirical Bayes Controversey</span>
+## <span style="font-size: 0.85em">The Empirical Bayes Controversy</span>
 
 :::{style="font-size: .7em"}
 
 **The concern:** We're using the same data to set the prior AND update it!
 
 
-::: {.columns}
-::: {.column width="50%"}
 **Less controversial when:**
 
-- Using past data to inform priors
-- Large datasets so prior has low impact
-- Being transparent about the approach
-- Domain knowledge supports the prior
-:::
+- Using **past data** to inform priors
+- **Large datasets** so prior has low impact
+- **Domain knowledge** supports the prior
 
-::: {.column width="50%"}
-**More controversial when:**
-
-- Using the exact same data twice
-- Small datasets where prior matters
-- Can lead to overconfidence
-- Violates Bayesian "spirit"
-:::
-:::
 
 
 **Our approach:** We'll use a uniform prior for this lecture (more conservative), but empirical Bayes is common in practice when you have lots of historical data!
 
 :::
 
-## <span style="font-size: 0.7em">Step 2: The Likelihood - Single Feature</span>
+## <span style="font-size: 0.85em">Step 2: The Likelihood - Single Feature</span>
 
 :::{style="font-size: .8em"}
 
@@ -295,6 +271,11 @@ For each species, we'll model flipper length as **normally distributed**.
 
 **Key assumption:**
 $$\text{Flipper length} \mid \text{Species} \sim \text{Normal}(\mu_{\text{species}}, \sigma_{\text{species}})$$
+
+**How do we get** $\mu$ **and** $\sigma$**?** We estimate them from our data!
+
+- $\mu_{\text{species}}$ = sample mean of flipper lengths for that species
+- $\sigma_{\text{species}}$ = sample standard deviation for that species
 
 
 ```{python}
@@ -312,11 +293,18 @@ def make_norm_map(df, colname, by='Species'):
 flipper_map = make_norm_map(df, 'Flipper Length (mm)')
 ```
 
+
+
 :::
 
-## <span style="font-size: 0.8em">Visualizing the Likelihood Models</span>
+## <span style="font-size: 1.0em">Visualizing the Likelihood</span>
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
+
+$$\text{Flipper length} \mid \text{Species} \sim \text{Normal}(\mu_{\text{species}}, \sigma_{\text{species}})$$
+
+- For continuous variables, we use the **probability density function (PDF)** instead of a probability mass function. 
+- The PDF value is NOT a probability! But it still measures "relative likelihood"
 
 ```{python}
 #| fig-width: 10
@@ -331,7 +319,7 @@ for species in flipper_map.keys():
     plt.plot(x, y, label=species, linewidth=2)
 
 plt.xlabel('Flipper Length (mm)', size=12)
-plt.ylabel('Probability Density', size=12)
+plt.ylabel('Likelihood (PDF)', size=12)
 plt.title('Flipper Length Distributions by Species', size=14)
 plt.legend()
 plt.grid(alpha=0.3)
@@ -340,7 +328,7 @@ plt.show()
 
 :::
 
-## <span style="font-size: 0.8em">Likelihood for One Observation</span>
+## <span style="font-size: 1.0em">Likelihood for One Observation</span>
 
 :::{style="font-size: .8em"}
 
@@ -401,7 +389,7 @@ Flipper length alone doesn't distinguish Adélie from Chinstrap well.
 
 Let's also use **culmen (beak) length**!
 
-**Key idea:** The posterior from the first update becomes the prior for the second update!
+**Key idea:** The posterior becomes the prior for the second update!
 
 ```{python}
 # Create distributions for culmen length
@@ -435,11 +423,35 @@ update_table_2
 
 **Now we're confident:** It's a Chinstrap!
 
+**Question** We updated flipper, then culmen. What if we reversed the order?
+
+:::
+
+## <span style="font-size: 1.0em">Sequential vs Joint Updates</span>
+
+:::{style="font-size: .7em"}
+
+We updated **sequentially** but we could have done it in **one joint update**!
+
+**Sequential updating:**
+$$P(\text{species} \mid \text{flipper, culmen}) \propto \underbrace{(\text{Prior} \times P(\text{flipper} \mid \text{species}))}_{\text{posterior after flipper}} \times P(\text{culmen} \mid \text{species})$$
+
+The old posterior becomes the new prior for the next update.
+
+
+**Joint updating:**
+$$P(\text{species} \mid \text{flipper, culmen}) \propto \text{Prior} \times \underbrace{P(\text{flipper, culmen} \mid \text{species})}_{\text{joint likelihood}}$$
+
+**Key insight - these are the SAME when features are independent!**
+
+$$P(\text{species} \mid \text{flipper, culmen}) \propto \text{Prior} \times \underbrace{P(\text{flipper} \mid \text{species}) \times P(\text{culmen} \mid \text{species})}_{\text{splits due to independence}}$$
+
+
 :::
 
 ## The "Naive" Assumption
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 
 We just used two features **independently**:
 
@@ -456,31 +468,9 @@ $$P(\text{flipper}, \text{culmen} \mid \text{species}) = P(\text{flipper} \mid \
 
 Probably not! Larger penguins likely have both longer flippers AND longer beaks.
 
-But... it often works surprisingly well anyway!
+<br>
 
-
-:::
-
-## Why "Naive" Bayes Works
-
-:::{style="font-size: .7em"}
-
-Even though the independence assumption is violated, Naive Bayes often works well because:
-
-
-1. **We only care about which class is most likely**, not exact probabilities
-2. Even if correlations exist, they may be similar across classes
-3. It's simple, fast, and works with many features
-4. Less prone to overfitting than complex models
-
-
-**Real-world success**
-
-Naive Bayes achieves:
-
-- 95%+ accuracy in spam detection
-- 94.7% accuracy on our penguin dataset
-- Competitive performance in many applications
+**So what happens if we DON'T make this assumption?**
 
 
 :::
@@ -499,6 +489,38 @@ Instead of treating features independently, we can use a **multivariate normal d
 
 
 $$\begin{bmatrix} \text{Flipper Length} \\ \text{Culmen Length} \end{bmatrix} \mid \text{Species} \sim \text{MVN}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$$
+
+:::
+
+## <span style="font-size: 1.0em">Reminder: Bivariate Normal</span>
+
+:::{style="font-size: .6em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Bivariate Normal Distribution</span>
+        <p>
+        A <b>bivariate normal</b> models two correlated variables simultaneously.
+        <br><br>
+        <b>The PDF (matrix form):</b>
+        $$f(\mathbf{x}) = \frac{1}{2\pi|\boldsymbol{\Sigma}|^{1/2}} \exp\left(-\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{x} - \boldsymbol{\mu})\right)$$
+        where:
+        <ul>
+        <li>\(\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\) (the observed values)</li>
+        <li>\(\boldsymbol{\mu} = \begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix}\) (mean vector)</li>
+        <li>\(\boldsymbol{\Sigma} = \begin{bmatrix} \sigma_1^2 & \rho\sigma_1\sigma_2 \\ \rho\sigma_1\sigma_2 & \sigma_2^2 \end{bmatrix}\) (covariance matrix, where \(\rho\) = correlation)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 
 :::
 
@@ -534,7 +556,7 @@ Notice: Longer flippers tend to go with longer beaks!
 
 :::
 
-## <span style="font-size: 0.9em">Computing Mean and Covariance</span>
+## <span style="font-size: 1.0em">Computing Mean and Covariance</span>
 
 :::{style="font-size: .8em"}
 
@@ -556,10 +578,9 @@ print(cov_chinstrap)
 ```
 
 
-Off-diagonal elements (50.8) show positive correlation between features!
 :::
 
-## <span style="font-size: 0.7em">Defining our Multivariate Normals</span>
+## <span style="font-size: 0.85em">Defining our Multivariate Normals</span>
 
 :::{style="font-size: .8em"}
 
@@ -583,7 +604,7 @@ multinorm_map = make_multinorm_map(df, features)
 
 :::
 
-## <span style="font-size: 0.7em">Classification with Multivariate Normal</span>
+## <span style="font-size: 0.85em">Classification with Multivariate Normal</span>
 
 :::{style="font-size: .8em"}
 
@@ -597,13 +618,11 @@ prior['probs'] = 1/len(species_list)
 
 ```{python}
 #| echo: true
-# Observed data: flipper = 193, culmen = 48
 observed_data = [193, 48]
-
 # Calculate likelihood for each species
+# !!! One combined likelihood, not separated by feature
 likelihood_mv = [multinorm_map[species].pdf(observed_data)
                  for species in species_list]
-
 # Update
 posterior_mv = prior.copy()
 update(posterior_mv, likelihood_mv)
@@ -616,7 +635,7 @@ Still clearly Chinstrap, but probabilities are different!
 :::
 
 
-## <span style="font-size: 0.7em">Visualizing Decision Boundaries</span>
+## <span style="font-size: 0.85em">Visualizing Decision Boundaries</span>
 
 :::{style="font-size: .8em"}
 
@@ -692,7 +711,7 @@ plt.show()
 
 
 
-## <span style="font-size: 0.7em">Naive Bayes vs Multivariate Normal</span>
+## <span style="font-size: 0.85em">Naive Bayes vs Multivariate Normal</span>
 
 :::{style="font-size: .8em"}
 
@@ -718,6 +737,29 @@ Multivariate normal is only slightly better! The correlation structure doesn't h
 
 :::
 
+## Why "Naive" Bayes Works
+
+:::{style="font-size: .7em"}
+
+ Naive Bayes performed nearly as well multivariate normal (94.7% vs 95.3%)!
+
+Even though the independence assumption is violated, Naive Bayes often works well because:
+
+
+- **We only care about which class is most likely**, not exact probabilities
+- Even if correlations exist, they may be **similar correlations across classes**
+- **Less prone to overfitting** than complex models
+
+
+**Real-world success:**
+
+- 95%+ accuracy in spam detection
+- 94.7% accuracy on our penguin dataset
+- Used in customer segmentation, sentiment analysis, many business applications
+
+
+:::
+
 ## When to Use Which?
 
 :::{style="font-size: .8em"}
@@ -726,21 +768,17 @@ Multivariate normal is only slightly better! The correlation structure doesn't h
 ::: {.column width="50%"}
 **Naive Bayes**
 
-- Many features
-- Features might not be continuous
+- Many features, including discrete
 - Limited data
 - Need speed/simplicity
-- Text classification
 :::
 
 ::: {.column width="50%"}
 **Multivariate Normal**
 
-- Continuous features
-- Known correlations matter
+- Few, continuous features
 - Enough data for covariance
 - Need probability calibration
-- Fewer features (<10-20)
 :::
 :::
 
@@ -748,8 +786,165 @@ Start with Naive Bayes! It's surprisingly effective and much simpler.
 
 :::
 
+## <span style="font-size: 0.85em">Spam Filtering: The Original Application</span>
 
-## <span style="font-size: 0.8em">Group Question: Spam Detection</span>
+:::{style="font-size: .8em"}
+
+In the 1990s, Bayesian classification revolutionized spam filtering and is still used today!
+
+**The Goal:** Calculate P(spam | words in email)
+
+**The Intuition:**
+
+- Words like "FREE", "WINNER", "VIAGRA" increase probability of spam
+- Words like "meeting", "deadline", "attached" decrease it
+
+Let's walk through a concrete example to see how this works.
+
+:::
+
+## <span style="font-size: 0.85em">Step 1: Learning from Historical Data</span>
+
+:::{style="font-size: .8em"}
+
+First, we analyze thousands of emails to learn word frequencies.
+
+```{python}
+#| echo: false
+
+# Example word probabilities from training data
+spam_data = {
+    'Word': ['FREE', 'WINNER', 'meeting', 'deadline', 'viagra'],
+    'P(word|spam)': [0.65, 0.58, 0.12, 0.08, 0.82],
+    'P(word|ham)': [0.03, 0.02, 0.45, 0.38, 0.001]
+}
+df_spam_probs = pd.DataFrame(spam_data)
+print(df_spam_probs.to_string(index=False))
+```
+
+**Interpretation:**
+
+- 65% of spam emails contain "FREE" vs. only 3% of legitimate emails
+- 45% of legitimate emails contain "meeting" vs. only 12% of spam
+
+:::
+
+## <span style="font-size: 0.85em">Step 2: Setting Our Prior</span>
+
+:::{style="font-size: .8em"}
+
+Before looking at any words, what's the baseline probability of spam?
+
+```{python}
+#| echo: true
+# Suppose 30% of emails are spam (from historical data)
+prior_spam = pd.DataFrame({
+    'Class': ['Spam', 'Ham'],
+    'Prior P': [0.30, 0.70]
+})
+print(prior_spam.to_string(index=False))
+```
+
+**Note:** This prior could be:
+
+- Based on your personal inbox history
+- Industry averages
+- Uniform (50/50) if no information available
+
+:::
+
+## <span style="font-size: 0.85em">Step 3: A New Email Arrives</span>
+
+:::{style="font-size: .8em"}
+
+**Email text:** "WINNER! Claim your FREE prize now!"
+
+**Words detected:** "WINNER", "FREE"
+
+Let's update our beliefs step by step using Naive Bayes.
+
+:::
+
+## <span style="font-size: 0.85em">Update #1: Processing "WINNER"</span>
+
+:::{style="font-size: .8em"}
+
+```{python}
+# Start with prior
+email_class = pd.DataFrame({
+    'Class': ['Spam', 'Ham'],
+    'Prior': [0.30, 0.70]
+})
+
+# Get likelihoods from our learned probabilities
+likelihood_winner = [0.58, 0.02]  # P(WINNER|spam), P(WINNER|ham)
+
+# Calculate posterior
+email_class['Likelihood'] = likelihood_winner
+email_class['Prior × Likelihood'] = email_class['Prior'] * email_class['Likelihood']
+normalizer = email_class['Prior × Likelihood'].sum()
+email_class['Posterior'] = email_class['Prior × Likelihood'] / normalizer
+
+print(email_class.to_string(index=False))
+```
+
+**After seeing "WINNER":** P(spam) jumps from 30% to 93%!
+
+:::
+
+## <span style="font-size: 0.85em">Update #2: Processing "FREE"</span>
+
+:::{style="font-size: .8em"}
+
+Now use the posterior from "WINNER" as our new prior:
+
+```{python}
+# The posterior from "WINNER" becomes our new prior
+email_class_2 = pd.DataFrame({
+    'Class': ['Spam', 'Ham'],
+    'Prior (after WINNER)': email_class['Posterior'].values
+})
+
+# Get likelihoods for "FREE"
+likelihood_free = [0.65, 0.03]  # P(FREE|spam), P(FREE|ham)
+
+# Calculate new posterior
+email_class_2['Likelihood'] = likelihood_free
+email_class_2['Prior × Likelihood'] = email_class_2['Prior (after WINNER)'] * email_class_2['Likelihood']
+normalizer = email_class_2['Prior × Likelihood'].sum()
+email_class_2['Posterior'] = email_class_2['Prior × Likelihood'] / normalizer
+
+print(email_class_2.to_string(index=False))
+```
+
+**After seeing "FREE" too:** P(spam) increases to 99.8%!
+
+**Decision:** This is almost certainly spam.
+
+:::
+
+## <span style="font-size: 0.85em">The Naive Assumption in Spam Filtering</span>
+
+:::{style="font-size: .8em"}
+
+We treated "WINNER" and "FREE" as **independent** given the class.
+
+$$P(\text{WINNER, FREE} \mid \text{spam}) = P(\text{WINNER} \mid \text{spam}) \times P(\text{FREE} \mid \text{spam})$$
+
+**Is this realistic?**
+
+No! Spammers who use "WINNER" are more likely to also use "FREE" - these words are correlated.
+
+**But does it matter?**
+
+For classification purposes, often not much! We just need to identify which class is most likely.
+
+**Real-world success:** Bayesian spam filters achieved 95%+ accuracy and helped save email from the spam crisis of the late 1990s.
+
+:::
+
+
+## <span style="font-size: 1.0em">Group Question: Spam Detection</span>
 
 :::{style="font-size: .6em"}
 
@@ -760,11 +955,11 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-<b>The Setup:</b> You want to determine if a text you receive is spam.  You've made the following observations:</b><br>
+<b>The Setup:</b> You want to determine if a text you receive is spam.  You've made the following observations:</b><br><br>
 • 50% of your spam texts offer you a "job opportunity" (vs 1% of your regular texts) <br>
-• 50% of your spam messages ask you do "donate" to something (vs 1% of your regular texts) <br>
+• 50% of your spam messages ask you to "donate" to something (vs 1% of your regular texts) <br>
 • 20% of your real messages mention your name (vs 1% of the spam texts) <br>
-• 10% of the texts you receive have spam <br>
+• 10% of the texts you receive are spam <br>
 <br><br>
 <b>Your Task:</b> You just received the text: "Hi [your name] do you want to donate to my fundraiser?"  Using a Naive Bayes approach, make your best guess as to whether the text is spam or not.
         </p>
@@ -776,3 +971,139 @@ display(HTML(html_content))
 
 
 :::
+
+
+
+## <span style="font-size: 1.0em">Group Question: Mystery Penguin!</span>
+
+:::{style="font-size: .5em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>The Mystery:</b> You've discovered a penguin on the Palmer Archipelago with the following measurements:<br>
+• Flipper length: 215 mm<br>
+• Culmen (beak) length: 37 mm<br>
+<br>
+<b>The normal distribution parameters for each species:</b><br>
+<table style="border-collapse: collapse; margin: 10px 0;">
+  <tr style="border-bottom: 2px solid black;">
+    <th style="padding: 5px 15px; text-align: left;">Species</th>
+    <th style="padding: 5px 15px; text-align: center;">Flipper Distribution</th>
+    <th style="padding: 5px 15px; text-align: center;">Culmen Distribution</th>
+  </tr>
+  <tr>
+    <td style="padding: 5px 15px;"><b>Adélie</b></td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=190.0, σ=6.5)</td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=38.8, σ=2.7)</td>
+  </tr>
+  <tr>
+    <td style="padding: 5px 15px;"><b>Chinstrap</b></td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=195.8, σ=7.1)</td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=48.8, σ=3.3)</td>
+  </tr>
+  <tr>
+    <td style="padding: 5px 15px;"><b>Gentoo</b></td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=217.2, σ=6.5)</td>
+    <td style="padding: 5px 15px; text-align: center;">N(μ=47.5, σ=3.1)</td>
+  </tr>
+</table>
+<br>
+<b>Some potentially useful normal PDF values:</b><br>
+f(215 | μ=190.0, σ=6.5) = 0.000038<br>
+f(215 | μ=195.8, σ=7.1) = 0.0015<br>
+f(215 | μ=217.2, σ=6.5) = 0.058<br>
+f(37 | μ=38.8, σ=2.7) = 0.118<br>
+f(37 | μ=48.8, σ=3.3) = 0.000202<br>
+f(37 | μ=47.5, σ=3.1) = 0.000415<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## <span style="font-size: 1.0em">Group Question: Mystery Penguin!</span>
+
+:::{style="font-size: .7em"}
+
+
+::: {style="text-align: center;"}
+![](images/classification/mystery_penguin.png){width=200}
+:::
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Your Task:</b> Using Naive Bayes with a uniform prior, update with flipper length and culmen length to find a posterior distribution over penguin species.<br><br>
+1. Which species is this penguin most likely to be?<br>
+2. Given the posterior distribution, how likely do you think it is *any* of these three?<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## <span style="font-size: 1.0em">Mystery Penguin: Solution</span>
+
+:::{style="font-size: .65em"}
+
+**Step 1: Update with flipper length (215 mm)**
+
+```{python}
+#| echo: false
+
+# Step 1: Start with uniform prior and update with flipper
+species_list = ['Adelie', 'Chinstrap', 'Gentoo']
+mystery_penguin = pd.DataFrame({
+    'Species': species_list,
+    'Prior': [1/3, 1/3, 1/3],
+    'Likelihood': [0.000038, 0.0015, 0.058]
+})
+
+mystery_penguin['Prior × Likelihood'] = mystery_penguin['Prior'] * mystery_penguin['Likelihood']
+normalizer = mystery_penguin['Prior × Likelihood'].sum()
+mystery_penguin['Posterior'] = mystery_penguin['Prior × Likelihood'] / normalizer
+
+print(mystery_penguin.to_string(index=False))
+```
+
+
+
+**Step 2: Update with culmen length (37 mm)**
+
+```{python}
+#| echo: false
+
+# Step 2: Use previous posterior as new prior, update with culmen
+mystery_penguin_2 = pd.DataFrame({
+    'Species': species_list,
+    'Prior': mystery_penguin['Posterior'].values,
+    'Likelihood': [0.118, 0.000202, 0.000415]
+})
+
+mystery_penguin_2['Prior × Likelihood'] = mystery_penguin_2['Prior'] * mystery_penguin_2['Likelihood']
+normalizer = mystery_penguin_2['Prior × Likelihood'].sum()
+mystery_penguin_2['Posterior'] = mystery_penguin_2['Prior × Likelihood'] / normalizer
+
+print(mystery_penguin_2.to_string(index=False))
+```
+
+
+:::
+

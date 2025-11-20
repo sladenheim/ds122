@@ -85,7 +85,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
      <span class="label"> Poisson Distribution </span>
-        <p>
+        <p style="margin-bottom: 0;">
        A random variable \(X\) has a Poisson distribution with parameter \(\lambda > 0\) if it has a discrete distribution with 
        \[
        P(X = k) = \frac{e^{-\lambda} \lambda^k}{k!}, \quad k = 0, 1, 2, \dots
@@ -106,7 +106,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
      <span class="label">Poisson Process</span>
-        <p>
+        <p style="margin-bottom: 0;">
         A Poisson process models events that occur randomly over time at a constant average rate \(\lambda\) per time period.  The number of occurrences in a fixed period of time follows a Poisson distribution.  The time between occurrences follows an exponential distribution.
         </p>
     </div>

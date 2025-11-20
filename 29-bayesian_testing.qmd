@@ -34,18 +34,28 @@ from collections import Counter
 
 :::
 
-## The Euro Coin Problem - Reminder
+## The Coin Problem - Reminder
+:::{style="font-size: .8em"}
 
-:::{style="font-size: .7em"}
+An article in The Guardian stated: _When spun on edge 250 times, a Belgian one-euro coin came up heads 140 times and tails 110._
 
-
-From David MacKay's _Information Theory, Inference, and Learning Algorithms_:
-
-> A statistical statement appeared in _The Guardian_ on Friday, January 4, 2002:
->
-> "When spun on edge 250 times, a Belgian one-euro coin came up heads 140 times and tails 110. 'It looks very suspicious to me,' said Barry Blight, a statistics lecturer at the London School of Economics. 'If the coin were unbiased, the chance of getting a result as extreme as that would be less than 7%.'"
+:::{.center-text}
+<img src="images/map/euro-coin.png" width=200/>
+:::
 
 **Question:** Do these data give evidence that the coin is biased rather than fair?
+
+:::
+
+## The Coin Problem - Motivation
+
+:::{style="font-size: .8em"}
+
+Just in case you thought you'd never use coin-flipping in real life...
+
+:::{.center-text}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/IP_n225kG84?start=670&end=680" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+:::
 
 :::
 
@@ -113,6 +123,7 @@ The posterior mean (MMSE) is about 0.56, with a 90% credible interval from 0.51 
 
 **But this doesn't directly answer:** Is the coin biased or fair?
 
+
 :::
 
 ## Bayesian Hypothesis Testing
@@ -122,7 +133,7 @@ The posterior mean (MMSE) is about 0.56, with a 90% credible interval from 0.51 
 Instead of estimating $p$, we can compare two **hypotheses**:
 
 - **$H_{\text{fair}}$:** The coin is fair ($p = 0.5$)
-- **$H_{\text{biased}}$:** The coin is biased toward heads ($p$ uniformly distributed between 0.55 and 0.95)
+- **$H_{\text{biased}}$:** The coin is biased toward heads ($p$ uniformly distributed between 0.55 and 0.85)
 
 Since we observed more heads (140) than tails (110), if the coin is biased, it's likely biased toward heads.
 
@@ -131,8 +142,8 @@ Since we observed more heads (140) than tails (110), if the coin is biased, it's
 # Create "biased toward heads" distribution
 biased_heads = pd.DataFrame(index=np.arange(101)/100)
 biased_heads['probs'] = 0
-# Uniform distribution from 0.55 to 0.95
-biased_heads.loc[0.55:0.95, 'probs'] = 1
+# Uniform distribution from 0.55 to 0.85
+biased_heads.loc[0.55:0.85, 'probs'] = 1
 biased_heads['probs'] = biased_heads['probs'] / biased_heads['probs'].sum()
 ```
 
@@ -158,7 +169,7 @@ ax1.set_xlim(0, 1)
 biased_heads.plot(ax=ax2, lw=3, legend=False, color='blue')
 ax2.set_xlabel('Probability of Heads (p)', size=14)
 ax2.set_ylabel('Probability', size=14)
-ax2.set_title('Biased Hypothesis: p ~ Uniform(0.55, 0.95)', size=16);
+ax2.set_title('Biased Hypothesis: p ~ Uniform(0.55, 0.85)', size=16);
 ```
 
 :::
@@ -225,13 +236,37 @@ print(f"Bayes Factor (Fair/Biased) = {K:.2f}")
 
 :::
 
+## Bayes Factors
+
+:::{style="font-size: .8em"}
+
+ $$K = \frac{P(\text{Data} | H_A)}{P(\text{Data} | H_B)}$$
+
+<br>
+
+Like p-values have the 0.05 threshold, Bayes factors have **evidence scales**
+
+<br>
+
+**Common interpretation guidelines:**
+
+- K > 10: Strong evidence for H_A
+- K = 3-10: Moderate evidence for H_A  
+- K = 1/3 to 3: Weak/inconclusive evidence
+- K < 1/10: Strong evidence for H_B
+
+:::
+
+
 ## Interpreting Bayes Factors
 
 :::{style="font-size: .8em"}
 
-If we start with equal prior probabilities (50% fair, 50% biased), we can convert the Bayes factor to a posterior probability:
+We can convert the Bayes factor to a posterior using our **prior** beliefs:
 
 $$P(\text{fair} | \text{data}) = \frac{K \cdot P(\text{fair})}{K \cdot P(\text{fair}) + P(\text{biased})}$$
+
+**Example:** If we start with equal priors (50% fair, 50% biased):
 
 ```{python}
 #| echo: true
@@ -240,11 +275,13 @@ posterior_fair = (K * prior_fair) / (K * prior_fair + (1 - prior_fair))
 print(f"P(Fair | Data) = {posterior_fair:.2f}")
 ```
 
-The data moved us from 50% confidence to 56% confidence that the coin is fair.
+The data moved us from 50% confidence to 49% confidence that the coin is fair.
 
-**Conclusion:** The evidence is weak - we're actually *more* likely to think the coin is fair now.
+**Conclusion:** The evidence is weak - our beliefs have barely changed regardless of where we started!
 
 :::
+
+
 
 ## Beyond Hypothesis Testing
 
@@ -258,7 +295,7 @@ More useful questions might be:
 
 2. **Decision-making:** How can we use predictions to make better decisions? (Whether to gamble with the coin or not)
 
-We already saw prediction with the World Cup problem (posterior predictive distributions).
+We already saw prediction with the World Cup problem (with **posterior predictive distributions**).
 
 Next: An example of decision-making with **Bayesian Bandits**.
 
@@ -314,7 +351,7 @@ plt.tight_layout();
 
 :::{style="font-size: .8em"}
 
-After playing a machine, we update our beliefs based on the outcome:
+After playing a machine, we update our beliefs based on the outcome, just like the coin problem:
 
 - **Win:** Multiply by $p$ (higher $p$ values become more likely)
 - **Loss:** Multiply by $(1-p)$ (lower $p$ values become more likely)
@@ -331,7 +368,7 @@ def update_bandit(belief, outcome):
 
 :::
 
-## Example: One Machine, 10 Plays
+## <span style="font-size: 0.8em">Example: One Machine, 10 Plays</span>
 
 :::{style="font-size: .8em"}
 
@@ -368,6 +405,7 @@ See jupyter notebook
 :::{style="font-size: .8em"}
 
 After playing manually, we probably:
+
 - Explored all machines early on
 - Started favoring machines that seemed better
 - Occasionally checked "worse" machines to see if we were wrong
@@ -436,11 +474,203 @@ def play(i):
 
 :::
 
+##  <span style="font-size: 0.7em">Step-by-Step: First Thompson Sample</span>
+
+:::{style="font-size: .65em"}
+
+Starting with uniform priors, let's see how Thompson sampling works step-by-step:
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Reset beliefs
+np.random.seed(49)  # For reproducibility
+beliefs_demo = [p_prior.copy() for i in range(4)]
+counter_demo = Counter()
+
+# Draw one sample from each machine's posterior
+samples = [np.random.choice(b.index, p=b['probs']) for b in beliefs_demo]
+chosen_machine = np.argmax(samples)
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color='blue', alpha=0.3)
+    # Mark the sampled value
+    axes[i].axvline(samples[i], color='red' if i == chosen_machine else 'gray',
+                   linestyle='--', lw=2, alpha=0.8)
+    axes[i].scatter([samples[i]], [0], color='red' if i == chosen_machine else 'gray',
+                   s=100, zorder=5, marker='o')
+
+    title = f'Machine {i}'
+    if i == chosen_machine:
+        title += f'\n**CHOSEN** (p̃={samples[i]:.2f})'
+        axes[i].set_title(title, size=11, weight='bold', color='red')
+    else:
+        title += f'\n(p̃={samples[i]:.2f})'
+        axes[i].set_title(title, size=11)
+
+    axes[i].set_xlabel('Win Probability (p)', size=9)
+    axes[i].set_ylabel('Probability', size=9)
+plt.tight_layout()
+plt.suptitle(f'Step 1: Draw samples, choose Machine {chosen_machine}',
+            fontsize=12, weight='bold', y=1.02);
+```
+
+:::
+
+## Step-by-Step: After First Play
+
+:::{style="font-size: .65em"}
+
+Now we play the chosen machine and update its posterior:
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Play the chosen machine
+outcome_1 = play(chosen_machine)
+update_bandit(beliefs_demo[chosen_machine], outcome_1)
+counter_demo[chosen_machine] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False,
+            color='red' if i == chosen_machine else 'blue',
+            alpha=0.8 if i == chosen_machine else 0.3)
+
+    title = f'Machine {i}'
+    if i == chosen_machine:
+        title += f'\n**UPDATED** (1 play)'
+        axes[i].set_title(title, size=11, weight='bold', color='red')
+    else:
+        axes[i].set_title(title, size=11)
+
+    axes[i].set_xlabel('Win Probability (p)', size=9)
+    axes[i].set_ylabel('Probability', size=9)
+plt.tight_layout()
+plt.suptitle(f'After playing Machine {chosen_machine}: Result = {outcome_1}',
+            fontsize=12, weight='bold', y=1.02);
+```
+
+Notice how the chosen machine's posterior has shifted based on the outcome!
+
+:::
+
+##  <span style="font-size: 0.7em">Step-by-Step: Second Thompson Sample</span>
+
+:::{style="font-size: .65em"}
+
+Now let's sample again from our **updated** beliefs:
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Draw another sample from each machine's posterior
+samples_2 = [np.random.choice(b.index, p=b['probs']) for b in beliefs_demo]
+chosen_machine_2 = np.argmax(samples_2)
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color='blue', alpha=0.3)
+    # Mark the sampled value
+    axes[i].axvline(samples_2[i], color='red' if i == chosen_machine_2 else 'gray',
+                   linestyle='--', lw=2, alpha=0.8)
+    axes[i].scatter([samples_2[i]], [0], color='red' if i == chosen_machine_2 else 'gray',
+                   s=100, zorder=5, marker='o')
+
+    title = f'Machine {i}'
+    if i == chosen_machine_2:
+        title += f'\n**CHOSEN** (p̃={samples_2[i]:.2f})'
+        axes[i].set_title(title, size=11, weight='bold', color='red')
+    else:
+        title += f'\n(p̃={samples_2[i]:.2f})'
+        axes[i].set_title(title, size=11)
+
+    axes[i].set_xlabel('Win Probability (p)', size=9)
+    axes[i].set_ylabel('Probability', size=9)
+plt.tight_layout()
+plt.suptitle(f'Step 2: Draw new samples, choose Machine {chosen_machine_2}',
+            fontsize=12, weight='bold', y=1.02);
+```
+
+:::
+
+##  <span style="font-size: 0.8em">Step-by-Step: After Second Play</span>
+
+:::{style="font-size: .65em"}
+
+After playing the second chosen machine and updating:
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Play the second chosen machine
+outcome_2 = play(chosen_machine_2)
+update_bandit(beliefs_demo[chosen_machine_2], outcome_2)
+counter_demo[chosen_machine_2] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False,
+            color='red' if i == chosen_machine_2 else 'blue',
+            alpha=0.8 if i == chosen_machine_2 else 0.3)
+
+    title = f'Machine {i}'
+    plays = counter_demo.get(i, 0)
+    if plays > 0:
+        title += f'\n({plays} play{"s" if plays > 1 else ""})'
+    if i == chosen_machine_2:
+        axes[i].set_title(title, size=11, weight='bold', color='red')
+    else:
+        axes[i].set_title(title, size=11)
+
+    axes[i].set_xlabel('Win Probability (p)', size=9)
+    axes[i].set_ylabel('Probability', size=9)
+plt.tight_layout()
+plt.suptitle(f'After playing Machine {chosen_machine_2}: Result = {outcome_2}',
+            fontsize=12, weight='bold', y=1.02);
+```
+
+Notice how the posteriors are starting to look different based on their play histories!
+
+:::
+
+## Step-by-Step: After 10 Plays
+
+:::{style="font-size: .65em"}
+
+Let's continue this process for 10 total plays:
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Play 8 more times (we already did 2, so 8 more to get to 10)
+for _ in range(8):
+    machine = choose(beliefs_demo)
+    outcome = play(machine)
+    update_bandit(beliefs_demo[machine], outcome)
+    counter_demo[machine] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color='blue')
+    axes[i].set_title(f'Machine {i} (True p={actual_probs[i]:.1f})\n{counter_demo.get(i, 0)} plays', size=10)
+    axes[i].set_xlabel('Win Probability (p)', size=9)
+    axes[i].set_ylabel('Probability', size=9)
+plt.tight_layout()
+plt.suptitle('After 10 plays: Beliefs are starting to diverge',
+            fontsize=12, weight='bold', y=1.02);
+```
+
+Already we're starting to see which machines might be better!
+
+:::
+
 ## Running the Strategy
 
 :::{style="font-size: .7em"}
 
-Let's play 200 times using Thompson sampling:
+Let's play 500 times using Thompson sampling:
 
 ```{python}
 #| echo: true
@@ -488,7 +718,7 @@ df
 
 :::
 
-## Evolution of Play Strategy Over Time
+##  <span style="font-size: 0.9em">Evolution of Play Over Time</span>
 
 :::{style="font-size: .8em"}
 
@@ -516,7 +746,7 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
 for machine in range(4):
     ax.plot(x, selection_freq[machine], 'o-', lw=2, label=f'Machine {machine} (p={actual_probs[machine]:.1f})',
             color=colors[machine], markersize=6)
-
+ 
 ax.set_xlabel('Number of Plays', size=14)
 ax.set_ylabel('Selection Frequency', size=14)
 ax.set_title('How Often Each Machine Was Selected Over Time', size=16)
@@ -525,7 +755,18 @@ ax.grid(alpha=0.3)
 ax.set_ylim(0, 1);
 ```
 
-**Key observation:** Early exploration (all machines tried) → Later exploitation (focus on Machine 3)!
+
+:::
+
+
+##  <span style="font-size: 0.9em">Other ways it could have gone</span>
+
+:::{style="font-size: .8em"}
+
+<div style="text-align: center;">
+<img src="images/bayesian_testing/game1.png" width=600 style="display: block; margin: 0 auto -10px;"/>
+<img src="images/bayesian_testing/game2.png" width=600 style="display: block; margin: 0 auto;"/>
+</div>
 
 :::
 
@@ -537,11 +778,10 @@ ax.set_ylim(0, 1);
 
 1. **Bayes factors** compare the evidence for two hypotheses by taking the ratio of likelihoods
 
-2. **Bayesian hypothesis testing** provides an alternative to p-values, but depends on how you define hypotheses
+2. **Bayesian hypothesis testing** provides an alternative to p-values, but depends on how you define hypotheses 
 
 3. **Thompson sampling** uses posterior distributions to make optimal decisions that balance exploration and exploitation
 
-4. **Decision-making** often matters more than hypothesis testing - use predictions to guide actions!
 
 :::
 
@@ -564,34 +804,10 @@ Define two hypotheses:
 • \(H_{\text{claimed}}\): p = 0.05<br>
 • \(H_{\text{rumor}}\): p = 0.20<br>
 <br>
-<b>a.</b> Compute P(Data | \(H_{\text{claimed}}\)).
-<br><br>
-<b>b.</b> Compute P(Data | \(H_{\text{rumor}}\)).
-<br><br>
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-:::
-
-## Group Question 1 (cont'd)
-
-:::{style="font-size: .65em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-<b>c.</b> Calculate the Bayes factor \(K = \frac{P(\text{Data} | H_{\text{claimed}})}{P(\text{Data} | H_{\text{rumor}})}\).
+<b>a.</b>  Calculate the Bayes factor \(K = \frac{P(\text{Data} | H_{\text{claimed}})}{P(\text{Data} | H_{\text{rumor}})}\).
 <br><br><br><br>
-<b>d.</b> Which hypothesis does the data support more strongly?
-<br><br><br><br><br>
+<b>b.</b> Which hypothesis does the data support more strongly?
+<br><br>
         </p>
     </div>
     """
@@ -600,6 +816,8 @@ display(HTML(html_content))
 ```
 
 :::
+
+
 
 ## Group Question 2
 
