@@ -60,6 +60,7 @@ That means I have 10 lectures to work with, L28 through L37.
 - Bayesian regression example
 - Comparing to frequentist regression
 - Best practices and diagnostics
+- HALF AS LONG AS OTHER LECTURES to allow for time for teaching evaluations
 
 ### Old lecture names:
 - poisson processes

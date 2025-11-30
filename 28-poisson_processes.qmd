@@ -809,3 +809,63 @@ display(HTML(html_content))
 ```
 
 :::
+
+## Group Question: Solution
+
+:::{style="font-size: .6em"}
+
+**Part (a): P(5 yards | Conservative)**
+
+Conservative strategy: 75% run, 25% pass
+
+- Run plays: Gain 0, 5, or 10 yards with probability 1/3 each
+- Pass plays: Gain -10, 0, 5, 10, 15, or 20 yards with probability 1/6 each
+
+Using the law of total probability:
+
+$$P(\text{5 yards} \mid \text{Conservative}) = P(\text{5 yards} \mid \text{Run}) \cdot P(\text{Run}) + P(\text{5 yards} \mid \text{Pass}) \cdot P(\text{Pass})$$
+
+$$= \frac{1}{3} \cdot 0.75 + \frac{1}{6} \cdot 0.25 = 0.25 + 0.0417 = 0.2917$$
+
+:::
+
+## Group Question: Solution
+
+:::{style="font-size: .6em"}
+
+
+**Part (b): Posterior after 3 runs (Bayes' rule via table)**
+
+| Strategy | Prior | Likelihood | Unnormalized Posterior | Posterior |
+|----------|-------|------------|------------------------|-----------|
+| Conservative | 1/3 | $(0.75)^3 = 0.4219$ | $\frac{1}{3} \times 0.4219 = 0.1406$ | $\frac{0.1406}{0.1875} = 0.75$ |
+| Balanced | 1/3 | $(0.50)^3 = 0.125$ | $\frac{1}{3} \times 0.125 = 0.0417$ | $\frac{0.0417}{0.1875} = 0.22$ |
+| Aggressive | 1/3 | $(0.25)^3 = 0.0156$ | $\frac{1}{3} \times 0.0156 = 0.0052$ | $\frac{0.0052}{0.1875} = 0.03$ |
+| **Total** | **1** | | **0.1875** | **1.00** |
+
+**Interpretation:** After observing 3 runs, we're 75% confident they're using a Conservative strategy!
+
+:::
+
+## Group Question: Solution 
+
+:::{style="font-size: .65em"}
+
+**Part (c): Posterior predictive for 4th play**
+
+We need to compute: $P(\text{yards} \mid RRR)$ by averaging over strategies
+
+For **5 yards gained** (as an example):
+
+$$P(\text{5 yards} \mid RRR) = \sum_{\text{strategy}} P(\text{5 yards} \mid \text{strategy}) \cdot P(\text{strategy} \mid RRR)$$
+
+$$= 0.2917 \cdot 0.75 + 0.2083 \cdot 0.22 + 0.1250 \cdot 0.03 = 0.268$$
+
+Where:
+
+- $P(\text{5 yards} \mid \text{Conservative}) = 0.2917$ (from part a)
+- $P(\text{5 yards} \mid \text{Balanced}) = \frac{1}{3} \cdot 0.5 + \frac{1}{6} \cdot 0.5 = 0.2083$
+- $P(\text{5 yards} \mid \text{Aggressive}) = \frac{1}{3} \cdot 0.25 + \frac{1}{6} \cdot 0.75 = 0.1250$
+
+
+:::

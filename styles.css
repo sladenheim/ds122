@@ -149,3 +149,7 @@
   margin-bottom: -10px;
 }
 
+.code-max-height pre {
+  max-height: 400px;
+  overflow-y: auto;
+}

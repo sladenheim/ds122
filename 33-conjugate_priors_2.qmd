@@ -35,11 +35,9 @@ def update(distribution, likelihood):
 
 :::{style="font-size: .8em"}
 
+- Recognize common **conjugate prior families**
 - Apply the **Gamma-Poisson** conjugate pair to count data
 - Understand the **Dirichlet-Multinomial** conjugate pair
-- Recognize common **conjugate prior families**
-- Choose appropriate conjugate priors for real problems
-- Understand when conjugate priors are (and aren't) useful
 
 
 :::
@@ -66,6 +64,164 @@ def update(distribution, likelihood):
 
 :::
 
+
+## Understanding Proportionality
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Definition: Proportionality</span>
+        <p>
+        We say \(f(x) \propto g(x)\) ("f is proportional to g") when there exists a constant \(c\) such that:
+        <br>
+        $$f(x) = c \cdot g(x)$$
+        where \(c\) does not depend on \(x\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+<br>
+
+**Why does this matter for Bayesian inference?**
+
+- We can ignore constants in the prior and likelihood when computing the posterior, because they will be washed out in the normalizeation step.
+
+:::
+
+
+## Full vs Proportional Likelihood
+
+:::{style="font-size: .65em"}
+
+**Scenario:** We flip a coin 3 times and get 2 heads. We want to estimate $p$ = P(heads).
+
+**Prior:** Uniform over $p \in \{0.2, 0.4, 0.6\}$
+
+**Likelihood:** Binomial(k=2 | n=3, $p$)
+
+**Full formula:** 
+
+- $P(k=2 \mid n=3, p) = \binom{3}{2} p^2 (1-p)^1 = 3p^2(1-p)$
+
+**Proportional formula:** 
+
+- $P(k=2 \mid n=3, p) \propto p^2 (1-p)$
+
+Let's compare the grid approach using both versions
+
+:::
+
+
+## Full vs Proportional Likelihood
+
+:::{style="font-size: .58em"}
+
+**Using full Binomial likelihood with coefficient:**
+
+| $p$ | Prior | Likelihood = $3p^2(1-p)$ | Prior × Lik | Normalized |
+|-----|-------|-------------------------|-------------|------------|
+| 0.2 | 0.33 | 3(0.2)²(0.8) = 0.096 | 0.032 | 0.155 |
+| 0.4 | 0.33 | 3(0.4)²(0.6) = 0.288 | 0.096 | 0.465 |
+| 0.6 | 0.33 | 3(0.6)²(0.4) = 0.432 | 0.144 | 0.697 |
+| | | **Sum:** | 0.207 | 1.317 |
+
+
+**Using proportional likelihood (ignoring the coefficient 3):**
+
+| $p$ | Prior | Likelihood $\propto p^2(1-p)$ | Prior × Lik | Normalized |
+|-----|-------|------------------------------|-------------|------------|
+| 0.2 | 0.33 | (0.2)²(0.8) = 0.032 | 0.011 | 0.155 |
+| 0.4 | 0.33 | (0.4)²(0.6) = 0.096 | 0.032 | 0.465 |
+| 0.6 | 0.33 | (0.6)²(0.4) = 0.144 | 0.048 | 0.697 |
+| | | **Sum:** | 0.069 | 1.317 |
+
+
+:::
+
+
+## Group Question 2: Normal Conjugacy
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Scenario:</b> You're a forest conservationist estimating the mean age \(\mu\) of trees in an old-growth forest. From studies of similar forests, you know individual tree ages vary with standard deviation \(\sigma = 30\) years around the forest mean.<br><br>
+
+<b>Prior:</b> Based on previous forests in this region, you believe \(\mu \sim \text{Normal}(120, 400)\).
+<br>
+
+<b>Data:</b> You core the first tree and find it's \(x = 150\) years old. 
+<br> <br>
+
+<b>Your Tasks:</b><br>
+1. Find the formula for the prior distribution of \(\mu\) for this forest. <br>
+2. Find the formula for the likelihood of this first tree measurement. <br>
+3. Find the formula for the (unnormalized) posterior. <br>
+4. Playing with the posterior, what form does this have? <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2: Solution
+
+:::{style="font-size: .7em"}
+
+**Step 1: Multiply prior and likelihood**
+
+$$p(\mu \mid x) \propto p(\mu) \times p(x \mid \mu)$$
+$$p(\mu \mid x) \propto e^{-\frac{(\mu-120)^2}{800}} \times e^{-\frac{(150-\mu)^2}{1800}}$$
+
+**Step 2: Combine using exponential property**
+
+$$p(\mu \mid x) \propto e^{-\left[\frac{(\mu-120)^2}{800} + \frac{(150-\mu)^2}{1800}\right]}$$
+
+
+:::
+
+
+## Group Question 2: Solution
+
+:::{style="font-size: .7em"}
+**Step 3: Simplify the exponent**
+
+
+Expanding and then completing the square gives:
+
+$$\frac{(\mu-120)^2}{800} + \frac{(150-\mu)^2}{1800} = \frac{(\mu - 129.2)^2}{553.8} + \text{constant}$$
+
+
+**Step 4: Identify the form**
+
+$$p(\mu \mid x) \propto c e^{-\frac{(\mu - 129.2)^2}{553.8}}$$
+
+**This is Normal(129.2, 276.9)!** The exponent has the characteristic Normal form.
+
+**Conclusion: Normal-Normal Conjugacy!**
+
+
+:::
+
+
+
 ## Return to World Cup
 
 :::{style="font-size: .8em"}
@@ -81,7 +237,9 @@ Remember the 2018 World Cup Final? France vs Croatia, final score 4-2
 
 **From historical data:** Average ~1.4 goals per game
 
-**Can we use conjugate priors?** Yes! Gamma-Poisson! (Remember when I waved my hands and said "because it makes the math work"?)
+**Can we use conjugate priors?** Yes! Gamma-Poisson! 
+
+(Remember when I waved my hands and said "because it makes the math work"?)
 
 :::
 
@@ -101,12 +259,10 @@ def generate_html():
         For counting events in a fixed interval with average rate \(\lambda\):
         <br>
         $$P(k \mid \lambda) = \frac{\lambda^k e^{-\lambda}}{k!}$$
-        <br>
         <b>Key property:</b> Mean = Variance = \(\lambda\)
-        <br>
+        <br> <br>
         <b>For our purposes (likelihood):</b><br>
         $$P(k \mid \lambda) \propto \lambda^k e^{-\lambda}$$
-        <br>
         (We can ignore the \(k!\) since it doesn't depend on \(\lambda\) and we have to normalize later anyway)
         </p>
     </div>
@@ -133,7 +289,6 @@ def generate_html():
         A continuous distribution for positive values with parameters \(\alpha\) (shape) and \(\beta\) (rate):
         <br>
         $$\text{Gamma}(\lambda \mid \alpha, \beta) \propto \lambda^{\alpha-1} e^{-\lambda\beta}$$
-        <br>
         <b>Mean:</b> \(\frac{\alpha}{\beta}\) &nbsp;&nbsp; <br><b>Mode:</b> \(\frac{\alpha-1}{\beta}\) (when \(\alpha > 1\))
         <br><br>
         <b>Special cases:</b>
@@ -273,6 +428,84 @@ plt.show()
 :::
 
 
+## Checking Our Work: Grid vs Formula
+
+:::{style="font-size: .65em"}
+
+Let's verify the conjugate prior formula gives the same answer as our grid approach for **France's** posterior:
+
+```{python}
+#| fig-width: 11
+#| fig-height: 4
+#| fig-align: center
+#| echo: true
+
+# Grid approach (like we did before)
+lambda_grid = np.linspace(0, 8, 1000)
+
+# Prior: Gamma(1.4, 1)
+prior = gamma.pdf(lambda_grid, 1.4, scale=1)
+
+# Likelihood: observed 4 goals in 1 game, Poisson likelihood
+likelihood = poisson.pmf(4, lambda_grid)
+
+# Posterior (unnormalized)
+posterior_unnorm = prior * likelihood
+
+# Normalize
+posterior_grid = posterior_unnorm / np.trapz(posterior_unnorm, lambda_grid)
+
+# Formula approach: Gamma(1.4 + 4, 1 + 1) = Gamma(5.4, 2)
+posterior_formula = gamma.pdf(lambda_grid, 5.4, scale=1/2)
+```
+
+
+:::
+
+## Checking Our Work: Grid vs Formula
+
+:::{style="font-size: .65em"}
+
+Let's verify the conjugate prior formula gives the same answer as our grid approach for **France's** posterior:
+
+```{python}
+#| fig-width: 11
+#| fig-height: 4
+#| fig-align: center
+
+# Plot comparison
+fig, ax = plt.subplots(1, 2, figsize=(12, 3.5))
+
+# Left: Grid approach steps
+ax[0].plot(lambda_grid, prior, ':', linewidth=2, label='Prior: Gamma(1.4, 1)', color='gray')
+ax[0].plot(lambda_grid, likelihood/likelihood.max() * prior.max(), ':',
+           linewidth=2, label='Likelihood (scaled)', color='orange')
+ax[0].plot(lambda_grid, posterior_grid, ':', linewidth=3, label='Posterior (grid)', color='blue')
+ax[0].set_xlabel('λ (goals/game)', fontsize=12)
+ax[0].set_ylabel('Density', fontsize=12)
+ax[0].set_title('Grid Approach: Prior × Likelihood', fontsize=13)
+ax[0].legend(fontsize=10)
+ax[0].grid(alpha=0.3)
+
+# Right: Comparison
+ax[1].plot(lambda_grid, posterior_grid, linewidth=3, label='Grid Posterior', color='blue', alpha=0.7)
+ax[1].plot(lambda_grid, posterior_formula, '--', linewidth=3,
+           label='Formula: Gamma(5.4, 2)', color='red', alpha=0.7)
+ax[1].set_xlabel('λ (goals/game)', fontsize=12)
+ax[1].set_ylabel('Density', fontsize=12)
+ax[1].set_title('Grid vs Formula: Nearly Identical!', fontsize=13)
+ax[1].legend(fontsize=10)
+ax[1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Key insight:** The formula gives us the **exact** posterior that the grid approximates!
+
+:::
+
+
 ## The Dirichlet-Multinomial Pair
 
 :::{style="font-size: .8em"}
@@ -329,7 +562,7 @@ def generate_html():
         $$P(\mathbf{x} \mid \mathbf{p}) = \frac{n!}{x_1! \cdots x_k!} p_1^{x_1} \cdots p_k^{x_k}$$
         <br>
         where \(\mathbf{x} = (x_1, \ldots, x_k)\) are the counts and \(\sum x_i = n\), \(\sum p_i = 1\)
-        <br>
+        <br><br>
         <b>For likelihood (unnormalized):</b>
         $$P(\mathbf{x} \mid \mathbf{p}) \propto p_1^{x_1} \cdots p_k^{x_k}$$
         </p>
@@ -406,10 +639,9 @@ from IPython.core.display import HTML
 
 def generate_html():
     return r"""
-    <div class="blue-box">
+    <div class="purple-box">
+     <span class="label">Theorem: Dirichlet-Multinomial Conjugacy</span>
         <p>
-        <b>Dirichlet-Multinomial Conjugate Update:</b><br><br>
-
         <b>Prior:</b> \(\mathbf{p} \sim \text{Dir}(\alpha_1, \ldots, \alpha_k)\)<br>
         <b>Data:</b> Observe \(x_1, \ldots, x_k\) counts in each category<br>
         <b>Posterior:</b> \(\mathbf{p} \sim \text{Dir}(\alpha_1 + x_1, \ldots, \alpha_k + x_k)\)<br>
@@ -538,10 +770,10 @@ plt.show()
 **Common Conjugate Prior Pairs:**
 
 | Likelihood | Use Case | Conjugate Prior | Update Rule |
-|------------|----------|-----------------|-------------|
+|------------|----------|--------------|------------------|
 | Binomial | Success/failure counts | Beta($\alpha, \beta$) | Beta($\alpha+k, \beta+n-k$) |
 | Poisson | Event counts over time | Gamma($\alpha, \beta$) | Gamma($\alpha+k, \beta+t$) |
-| Multinomial | Categorical counts | Dirichlet($\boldsymbol{\alpha}$) | Dirichlet($\boldsymbol{\alpha}+\mathbf{x}$) |
+| Multinomial | Categorical counts | Dirichlet(..., $\alpha$, ...) | Dirichlet(..., $\alpha_i + x_i$, ...) |
 | Normal (known $\sigma$) | Continuous measurements | Normal($\mu_0, \sigma_0$) | Normal (updated $\mu, \sigma$) |
 | Exponential | Time between events | Gamma($\alpha, \beta$) | Gamma($\alpha+n, \beta+\sum x_i$) |
 
@@ -563,57 +795,12 @@ plt.show()
 - Standard likelihood (Binomial, Poisson, Multinomial, Normal)
 - Prior matches your beliefs reasonably well
 
-**When they don't:**
+**What do we do without them?:**
 
-- Complex, non-standard likelihoods
-- Prior beliefs don't match conjugate family
-- Multiple parameters with complex relationships
-
-:::
-
-## Example: When Conjugacy Fails
-
-:::{style="font-size: .8em"}
-
-**Problem:** Estimating both mean AND variance of a normal distribution
-
-**Challenge:**
-
-- No simple conjugate prior for both parameters jointly
-- Need more complex approach (e.g., Normal-Inverse-Gamma prior)
-- Or use MCMC methods (coming soon!)
-
-**Another example:** Logistic regression
-
-- Likelihood is not from exponential family
-- No conjugate prior exists
-- Must use numerical methods (MCMC, variational inference, etc.)
-
-**Bottom line:** Conjugate priors are powerful but limited to specific cases
-
-:::
+- We'll see after break!
+- Monte Carlo methods, MCMC
 
 
-## Summary
-
-:::{style="font-size: .7em"}
-
-**Three powerful conjugate pairs:**
-
-1. **Beta-Binomial** - proportions/probabilities
-2. **Gamma-Poisson** - rates/counts
-3. **Dirichlet-Multinomial** - categorical proportions
-
-**Key concepts:**
-
-- Conjugate priors = same family before and after update
-- Parameters as "pseudo-data"
-
-**Next time:** What to do when conjugate priors don't exist
-
-- Monte Carlo methods
-- Sampling-based inference
-- MCMC
 
 :::
 
@@ -655,17 +842,17 @@ display(HTML(html_content))
 
 :::{style="font-size: .6em"}
 
-**1. Piror:** Dir(1+50, 1+30, 1+20) = **Dir(51, 31, 21)**
+**1. Prior:** Dir(1+50, 1+30, 1+20) = **Dir(51, 31, 21)**
 
-**1. Posterior:** Dir(51+12, 31+5, 21+3) = **Dir(63, 36, 24)**
+**2. Posterior:** Dir(51+12, 31+5, 21+3) = **Dir(63, 36, 24)**
 
-**2. Posterior means:**
+**3. Posterior means:**
 
 - Coffee: $\frac{63}{123} \approx 0.512$
 - Tea: $\frac{36}{123} \approx 0.293$
 - Smoothies: $\frac{24}{123} \approx 0.195$
 
-**3. Comparison:**
+**4. Comparison:**
 
 | Drink | Prior Mean | Posterior Mean | Change |
 |-------|------------|----------------|--------|
@@ -700,7 +887,7 @@ In a poll of 100 voters:<br>
 <b>Your Tasks:</b><br>
 1. What is the posterior after this poll?<br>
 2. What is the posterior mean for Party A?<br>
-3. How many 50/50 polls of size 100 would it take to sway the political analyst so thier posterior mean was approximately 0.55 for Party A?<br>
+3. How many 50/50 polls of size 100 would it take to sway the political analyst so their posterior mean was approximately 0.55 for Party A?<br>
         </p>
     </div>
     """

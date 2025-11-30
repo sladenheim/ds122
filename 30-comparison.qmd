@@ -884,7 +884,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-<b>The Setup:</b> Holly the monkey received a mystery gift box containing bananas (B) and coconuts (C). She reaches in without looking and pulls out a <b>banana</b>!
+<b>The Setup:</b> Holly the monkey received a mystery gift box containing bananas (B) and coconuts (C). She reaches in without looking and pulls out one fruit at random and discovers - it's a <b>banana</b>!
 <br><br>
 <b>Your priors (before the observation):</b><br>
 • Number of bananas (B): Could be 1, 2, or 3<br>

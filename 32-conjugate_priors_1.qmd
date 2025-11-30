@@ -46,19 +46,19 @@ def update(distribution, likelihood):
 
 :::{style="font-size: .75em"}
 
-**Last lecture:** We used Naive Bayes for spam classification. A quick clarification about how we modeled the text:
+**Last lecture:** 
 
-**What we did:** We treated each email as a sequence of words drawn from a "bag of words" (multinomial distribution). Each word is like grabbing one item from the bag.
+- We used Naive Bayes for spam classification. 
+- We treated each email as a sequence of words drawn from a "bag of words" (multinomial distribution).
 - Only counted words that **appeared** in the email
 - Ignored words that didn't appear (zeros)
 - This is called **Multinomial Naive Bayes** (most common for text)
 
 **Alternative approach:** **Multivariate Bernoulli Naive Bayes**
-- Models the **presence or absence** of each word in a fixed dictionary
+
+- Models the **presence OR absence** of each word in a fixed dictionary
 - Takes all the zeros into account as well
 - Less common for text classification
-
-**Bottom line:** You don't need to worry about the alternative approach for this class, but knowing about both may help if you encounter them in the future!
 
 :::
 
@@ -183,21 +183,41 @@ print(comparison_df.round(4).to_string(index=False))
 
 :::
 
-## Why Formulas Are Better: Breaking Free from the Grid
+## One Catch: Normalizing the Formula
 
 :::{style="font-size: .7em"}
 
+We said the posterior is $\propto p^3(1-p)$, but to make it a proper probability distribution, we need to **normalize** it.
+
+**For continuous distributions:** Integrate to find the normalizing constant
+
+$$\int_0^1 p^3(1-p) \, dp = \text{?}$$
+
+**Calculate:**
+$$\int_0^1 p^3(1-p) \, dp = \int_0^1 (p^3 - p^4) \, dp = \left[\frac{p^4}{4} - \frac{p^5}{5}\right]_0^1 = \frac{1}{4} - \frac{1}{5} = \frac{1}{20}$$
+
+**Normalized posterior:**
+$$p(\theta \mid \text{data}) = 20 \cdot \theta^3(1-\theta)$$
+
+:::
+
+## Why Formulas Are Better: Breaking Free from the Grid
+
+:::{style="font-size: .6em"}
+
 **With the table:** We're stuck with 5 discrete values: {0.3, 0.4, 0.5, 0.6, 0.7}
 
-- MAP estimate: Just pick the highest posterior in the table (say 0.6)
-- MMSE estimate: Compute weighted average of those 5 values
+- MAP estimate: Just pick the highest posterior in the table (here 0.7)
+- MMSE estimate: Compute weighted average of those 5 values (here 0.57)$
 - **Limited by our grid granularity!** 
 
 **With the formula** $p^3(1-p)$: We can treat $p$ as **continuous**!
 
 - **MAP:** Find where $\frac{d}{dp}[p^3(1-p)] = 0$
+  - $\frac{d}{dp}[p^3 - p^4] = p^2(3 - 4p) = 0 \implies p = 0.75$
   - Solution: $p = 0.75$ (exact!)
 - **MMSE:** Integrate to find $E[p]$
+  - $E[p] = \int_0^1 p \cdot 20p^3(1-p) \, dp  = 20\left[\frac{p^5}{5} - \frac{p^6}{6}\right]_0^1 = 20\left(\frac{1}{5} - \frac{1}{6}\right)  = 0.80$
   - Solution: $p = 0.80$ (exact!)
 
 :::
@@ -257,39 +277,20 @@ plt.show()
 
 :::
 
-## One Catch: Normalizing the Formula
 
-:::{style="font-size: .7em"}
-
-We said the posterior is $\propto p^3(1-p)$, but to make it a proper probability distribution, we need to **normalize** it.
-
-**For continuous distributions:** Integrate to find the normalizing constant
-
-$$\int_0^1 p^3(1-p) \, dp = \text{?}$$
-
-**Calculate:**
-$$\int_0^1 p^3(1-p) \, dp = \int_0^1 (p^3 - p^4) \, dp = \left[\frac{p^4}{4} - \frac{p^5}{5}\right]_0^1 = \frac{1}{4} - \frac{1}{5} = \frac{1}{20}$$
-
-**Normalized posterior:**
-$$p(\theta \mid \text{data}) = 20 \cdot \theta^3(1-\theta)$$
-
-**Good news:** For conjugate priors, these integrals have known closed forms!
-
-:::
-
-## Summary: Two Approaches, Same Answer
+## <span style="font-size: 0.8em">Summary: Two Approaches, Same Answer</span>
 
 :::{style="font-size: .7em"}
 
 **Method 1: Bayes Table**
+
 - Make a table with rows for each discrete value
 - Compute prior, likelihood, and normalize
-- Works but limited to discrete grid points
 - MAP/MMSE limited by granularity
 
 **Method 2: Formula Approach**
-- Capture the posterior as a formula: $p^3(1-p)$
-- Can treat as continuous distribution
+
+- Capture the prior, likelihood, and posterior as formulas
 - Compute exact MAP, MMSE, credible intervals
 - Much more flexible!
 
@@ -378,7 +379,7 @@ When they don't match:
 
 :::
 
-## Warm-Up: Exponential Review
+## Quick Exponential Review
 
 :::{style="font-size: .7em"}
 
@@ -599,7 +600,7 @@ plt.show()
 
 ## Comparing to Grid Method
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 
 Let's verify this matches our old approach:
 
@@ -699,7 +700,7 @@ plt.show()
 
 ## Practical Example: Medical Test
 
-:::{style="font-size: .7em"}
+:::{style="font-size: .65em"}
 
 A new medical test is being evaluated. What's the true positive rate?
 
@@ -769,7 +770,7 @@ print(f"90% credible interval: ({lower:.3f}, {upper:.3f})")
 theta_vals = np.linspace(0.4, 0.7, 200)
 posterior_vals = beta.pdf(theta_vals, 141, 111)
 
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plt.subplots(figsize=(8, 4))
 ax.plot(theta_vals, posterior_vals, linewidth=3)
 ax.fill_between(theta_vals, 0, posterior_vals,
                  where=(theta_vals >= lower) & (theta_vals <= upper),
@@ -882,12 +883,13 @@ Starting with Beta(1, 1) before pilot, update with pilot data:
 
 
 Update priors with full study data:
+
 - Design A: Beta(6 + 120, 6 + 880) = **Beta(126, 886)**
 - Design B: Beta(4 + 180, 8 + 1020) = **Beta(184, 1028)**
 
 :::
 
-## Group Question 1: Solution (continued)
+## Group Question 1: Solution
 
 :::{style="font-size: .7em"}
 
@@ -964,12 +966,12 @@ def generate_html():
 <br>
 
 <b>Data:</b> You core the first tree and find it's \(x = 150\) years old. 
-<br>
+<br> <br>
 
 <b>Your Tasks:</b><br>
-1. Find the formula for the prior distribution of \(\mu\) for this forest.
-2. Find the formula for the likelihood of this first tree measurement.
-3. Find the formula for the (unnormalized) posterior.
+1. Find the formula for the prior distribution of \(\mu\) for this forest. <br>
+2. Find the formula for the likelihood of this first tree measurement. <br>
+3. Find the formula for the (unnormalized) posterior. <br>
 4. Playing with the posterior, what form does this have? <br>
         </p>
     </div>
