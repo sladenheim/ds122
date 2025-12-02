@@ -905,3 +905,69 @@ display(HTML(html_content))
 ```
 
 :::
+
+## Group Question 1: Solution
+
+:::{style="font-size: .55em"}
+
+**Part (a): Calculate the Bayes factor**
+
+Data: 8 defects in 50 items. Use Binomial likelihoods:
+
+$$P(\text{8 defects in 50} \mid H_{\text{claimed}}) = \binom{50}{8} (0.05)^8 (0.95)^{42} = 0.000886$$
+
+$$P(\text{8 defects in 50} \mid H_{\text{rumor}}) = \binom{50}{8} (0.20)^8 (0.80)^{42} = 0.0599$$
+
+**Bayes factor:**
+
+$$K = \frac{P(\text{Data} \mid H_{\text{claimed}})}{P(\text{Data} \mid H_{\text{rumor}})} = \frac{0.000886}{0.0599} = 0.0148$$
+
+**Part (b): Which hypothesis is supported?**
+
+K ≈ 0.015 means the data is about **1/0.015 ≈ 67 times more likely** under $H_{\text{rumor}}$ than under $H_{\text{claimed}}$.
+
+**Conclusion:** The data **strongly supports the rumor** (20% defect rate) over the factory's claim (5%).
+
+:::
+
+## Group Question 2: Solution
+
+:::{style="font-size: .6em"}
+
+**Part (a): Expected win probabilities**
+
+Machines A has the highest MMSE (0.78), Machine 2 has the highest MAP (1.0).  It makes the most sense to interpret highest win probability as MMSE here, so Machien A has the highest win probability.
+
+**Part (b): Thompson sampling selection**
+
+Thompson sampling draws a random sample from each posterior and picks the highest.
+
+- **Machine A**: Peaked around 0.7-0.8, moderate uncertainty
+- **Machine B**: Very wide/flat distribution (only 2 plays), high uncertainty
+- **Machine C**: Tightly peaked around 0.7, low uncertainty
+
+**Most likely to be selected:** **Machine B**! Despite lower mean, its wide posterior means it can sample very high values (close to 1.0), while Machine C's tight distribution rarely samples above 0.8.
+
+But any of the machines could be chosen next.
+
+:::
+
+## Group Question 2: Solution (cont'd)
+
+:::{style="font-size: .65em"}
+
+**Part (c): 1 turn vs 100 turns left**
+
+**If you have 1 turn left (pure exploitation):**
+
+Pick **Machine A** for highest MMSE or **C** for high MMSE and lower uncertainty.
+
+**If you have 100 turns left (exploration + exploitation):**
+
+Pick **Machine B** - it might turn out to be the best, and picking it lets us discover this.  If it's a bad machine we have only wasted one turn and can focus on A and C after that.
+
+**The key insight:** With many turns remaining, the **value of information** is high. Reducing uncertainty about Machine B could lead to much better long-term rewards.
+
+This is the essence of the **exploration-exploitation tradeoff**.
+
+:::

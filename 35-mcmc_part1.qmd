@@ -43,6 +43,7 @@ import networkx as nx
 **Last time:** We learned **accept-reject sampling** to sample from complex distributions
 
 **Key idea:**
+
 1. Find a proposal distribution $g(x)$ that's easy to sample from
 2. Find constant $M$ such that $M \cdot g(x) \geq p(x)$ for all $x$
 3. Sample $(x, y)$ uniformly under $M \cdot g(x)$
@@ -56,7 +57,7 @@ import networkx as nx
 
 :::
 
-## Practice: Accept-Reject Steps
+## <span style="font-size: 0.8em">Group Question 2: Accept-Reject Sampling</span>
 
 :::{style="font-size: .65em"}
 
@@ -67,21 +68,13 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-<b>Problem 1: Monte Carlo Integration</b><br>
-You want to estimate \(\int_0^1 x^3 \, dx\) using accept-reject sampling.<br><br>
+<b>Problem:</b> You want to sample from \(p(x) = 3x^2\) for \(x \in [0,1]\) using accept-reject sampling with a linear proposal function \(g(x) = 2x\).<br><br>
 
 <b>Tasks:</b><br>
-• What bounding box would you use?<br>
-• Describe the accept/reject criterion for a random point (x, y)<br>
-• If you generate 10,000 points and 2,500 fall under the curve, what's your estimate?<br><br>
-
-<b>Problem 2: Sampling from a Distribution</b><br>
-You want to sample from \(p(x) = 3x^2\) on [0,1] using proposal \(g(x) = 1\) (uniform).<br><br>
-
-<b>Tasks:</b><br>
-• What value of M ensures \(M \cdot g(x) \geq p(x)\) for all x?<br>
-• Walk through the accept-reject steps to generate one sample<br>
-• Why might this be inefficient for more complex target distributions?<br>
+1. What is the maximum value of the target PDF on [0,1]?<br>
+2. What value of \(M\) do you need so that \(M \cdot g(x) \geq p(x)\) for all \(x\)?<br>
+3. Describe the accept-reject algorithm steps for this specific problem<br>
+4. What fraction of proposals would you expect to accept? <br>
         </p>
     </div>
     """
@@ -91,29 +84,147 @@ display(HTML(html_content))
 
 :::
 
-## Solution: Accept-Reject Steps
+
+## Solution 2: Accept-Reject Sampling
+
+:::{style="font-size: .55em"}
+
+**Problem:**  Sample from $p(x) = 3x^2$ for $x \in [0,1]$ using proposal $g(x) = 2x$
+
+**1. Maximum value:** 
+$p(x) = 3x^2$ is maximized at $x=1$, so $\max p(x) = 3$
+
+**2. Finding M:** We need $M \cdot g(x) \geq p(x)$ for all $x$
+
+   - Need: $M \cdot 2x \geq 3x^2$ for all $x \in [0,1]$, so  $M \geq (3/2)x$
+   - Maximum at $x=1$: $M \geq 2$, so **M = 2**
+
+**3. Algorithm steps:**
+
+   1. Sample $x$ from $g(x) = 2x$
+   2. Sample $u \sim \text{Uniform}(0,1)$
+   3. Accept if $u \leq \frac{p(x)}{M \cdot g(x)} = \frac{2x^2}{2 \cdot x} = x$
+
+**4. Acceptance rate:**
+
+   - Area under target: $\int_0^1 3x^2 \, dx = (3/3-0) = 1$
+   - Area under $M \cdot g(x) = 2 \cdot 2x = 4x$: $\int_0^1 4x \, dx = 2$
+   - Acceptance rate: $\frac{1}{2} = \frac{1}{2}$
+
+:::
+
+## The Basketball Team Problem
 
 :::{style="font-size: .65em"}
 
-**Problem 1: Monte Carlo Integration for** $\int_0^1 x^3 \, dx$
+**Last class I started this analogy:** You want to generate data for a fake basketball team
 
-- **Bounding box:** $[0,1] \times [0,1]$ (since $\max(x^3) = 1$ on $[0,1]$)
-- **Accept/reject:** Accept point $(x, y)$ if $y \leq x^3$, reject otherwise
-- **Estimate:** $\text{Integral} \approx \text{Box Area} \times \frac{\text{Accepted}}{\text{Total}} = 1 \times \frac{2500}{10000} = 0.25$
-- **True value:** $\int_0^1 x^3 \, dx = \frac{x^4}{4}\Big|_0^1 = 0.25$ ✓
+- You have a "random person simulator" button
+- But you only want people tall enough to play professional basketball
 
-**Problem 2: Sampling from** $p(x) = 3x^2$
+```{python}
+#| echo: false
+#| fig-align: center
 
-- **Finding M:** Need $M \cdot 1 \geq 3x^2$ for all $x \in [0,1]$. Max is at $x=1$, so $M = 3$
-- **Steps:**
-  1. Sample $x \sim \text{Uniform}(0,1)$
-  2. Sample $y \sim \text{Uniform}(0, M) = \text{Uniform}(0, 3)$
-  3. Accept $x$ if $y \leq p(x) = 3x^2$, otherwise reject and repeat
-- **Inefficiency:** High dimensions → most proposals rejected (curse of dimensionality!)
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm, skewnorm
 
-**This motivates MCMC:** What if we could be smarter about proposals?
+# Create x-axis for heights (in inches)
+heights = np.linspace(55, 85, 300)
+
+# General population: Normal distribution (mean=69", sd=3")
+population_dist = norm.pdf(heights, loc=69, scale=3)
+
+# Basketball players: Right-skewed distribution (taller, mean=78", less variance)
+# Using skewnorm to create right-skewed distribution
+basketball_dist = skewnorm.pdf(heights, a=5, loc=75, scale=3)
+
+# Normalize basketball distribution to match population peak for visibility
+basketball_dist = basketball_dist * (population_dist.max() / basketball_dist.max())
+
+# Plot with minimal whitespace
+fig, ax = plt.subplots(figsize=(8, 3.5))
+
+ax.fill_between(heights, population_dist, alpha=0.4, color='blue',
+                label='General Population (proposal)')
+ax.plot(heights, population_dist, color='blue', linewidth=2)
+
+ax.fill_between(heights, basketball_dist, alpha=0.4, color='orange',
+                label='Basketball Players (target)')
+ax.plot(heights, basketball_dist, color='orange', linewidth=2)
+
+ax.set_xlabel('Height (inches)', fontsize=12)
+ax.set_ylabel('Probability Density', fontsize=12)
+ax.set_title('Height Distributions: General Population vs. Basketball Players', fontsize=13, fontweight='bold', pad=5)
+ax.legend(fontsize=10, loc='upper left')
+ax.grid(alpha=0.3)
+
+# Aggressive margin reduction - minimize bottom space
+plt.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0)
+plt.show()
+```
+
+:::{style="margin-top: -20px;"}
+**The mismatch:** Most people are too short for basketball. Need a better strategy!
+:::
 
 :::
+
+## The Accept-Reject Problem
+
+:::{style="font-size: .6em"}
+
+**Using accept-reject sampling:** M=50 is not even enough!
+
+- Acceptance rate ≈ $\frac{\text{orange area}}{\text{blue area}}$ ≈ **1-2%**
+- Need to press the "random person" button ~50-100 times to get one basketball player!
+- **Waste 98-99% of samples!**
+
+**Better idea:** What if, once we found someone tall enough, we could generate *similar* people more often?
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Create the same distributions
+heights = np.linspace(55, 85, 300)
+population_dist = norm.pdf(heights, loc=69, scale=3)
+basketball_dist = skewnorm.pdf(heights, a=5, loc=75, scale=3)
+
+# Scale proposal by M to envelope target
+M = 50
+scaled_proposal = M * population_dist
+
+# Plot with minimal whitespace
+fig, ax = plt.subplots(figsize=(8, 3.5))
+
+# Scaled proposal (the envelope)
+ax.fill_between(heights, scaled_proposal, alpha=0.3, color='lightblue',
+                label=f'M × Proposal (M={M})')
+ax.plot(heights, scaled_proposal, color='blue', linewidth=2, linestyle='--')
+
+# Target distribution
+ax.fill_between(heights, basketball_dist, alpha=0.5, color='orange',
+                label='Basketball Players (target)')
+ax.plot(heights, basketball_dist, color='orange', linewidth=2)
+
+ax.set_xlabel('Height (inches)', fontsize=12)
+ax.set_ylabel('Probability Density', fontsize=12)
+ax.set_title('Accept-Reject: Massive Waste When Proposal Mismatches Target', fontsize=13, fontweight='bold', pad=5)
+ax.legend(fontsize=10, loc='upper left')
+ax.grid(alpha=0.3)
+ax.set_ylim(0, scaled_proposal.max() * 1.1)
+
+# Aggressive margin reduction - minimize bottom space
+plt.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0)
+plt.show()
+```
+
+
+
+:::
+
 
 ## <span style="font-size: 0.8em">Motivation: Engineering a Therapeutic Virus</span>
 
@@ -292,15 +403,27 @@ plt.show()
 
 Good King Markov wanted to visit his people fairly - spending time on each island proportional to its population.
 
-**The constraint:** The king could only travel between adjacent islands (clockwise or counterclockwise)
+**The constraint:** 
 
-**The question:** How can the king visit islands proportional to population if he can only move to neighboring islands?
+The king could only travel between adjacent islands (clockwise or counterclockwise)
 
-**The king's plan:**
+**The question:** 
+
+How can the king visit islands proportional to population if he can only move to neighboring islands?
+
+
+:::
+
+## The King's Plan
+
+:::{style="font-size: .75em"}
 
 Each week:
 
-1. Flip a coin: heads = propose clockwise, tails = propose counterclockwise
+1. Flip a coin: 
+
+- heads = propose clockwise
+- tails = propose counterclockwise
 
 2. Compare populations: current island vs. proposed island
 
@@ -322,9 +445,11 @@ $$P(\text{move}) = \min\left(1, \frac{\text{population}_j}{\text{population}_i}\
 - If proposed island has **fewer** people: move with probability = ratio of populations
 
 **Example:** Currently on Island 8 (pop. 80), propose Island 9 (pop. 90)
+
 - $P(\text{move}) = \min(1, 9/8) = 1$ -> Always move!
 
 **Example:** Currently on Island 9 (pop. 90), propose Island 8 (pop. 80)
+
 - $P(\text{move}) = \min(1, 8/9) = 0.889$ -> Move 88.9% of the time
 
 :::
@@ -856,7 +981,8 @@ plt.show()
 
 **Metropolis algorithm** (1953): Requires *symmetric* proposals
 
-- The chance of proposing q' from q is the same as the chance of proposing q from q' ($q(\theta' \mid \theta) = q(\theta \mid \theta')$)
+- The chance of proposing q' from q is the same as proposing q from q' 
+- $q(\theta' \mid \theta) = q(\theta \mid \theta')$
 - Example: $\theta' = \theta + \text{Normal}(0, \sigma)$
 
 **Metropolis-Hastings algorithm** (1970): Allows *asymmetric* proposals

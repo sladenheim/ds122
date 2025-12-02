@@ -952,3 +952,88 @@ display(HTML(html_content))
 ```
 
 :::
+
+## Group Question: Solution (Part A)
+
+:::{style="font-size: .55em"}
+
+**Part (a): Joint prior P(B, C)**
+
+Since B and C are independent, $P(B, C) = P(B) \times P(C)$
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/4 × 1/4 = 1/16 | 1/4 × 1/2 = 1/8 | 1/4 × 1/4 = 1/16 |
+| **B=2** | 1/2 × 1/4 = 1/8 | 1/2 × 1/2 = 1/4 | 1/2 × 1/4 = 1/8 |
+| **B=3** | 1/4 × 1/4 = 1/16 | 1/4 × 1/2 = 1/8 | 1/4 × 1/4 = 1/16 |
+
+
+**Part (b): Likelihood P(banana | B, C)**
+
+The likelihood of drawing a banana is $\frac{B}{B+C}$ (probability of selecting a banana from the box):
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/2 | 1/3 | 1/4 |
+| **B=2** | 2/3 | 2/4 = 1/2 | 2/5 |
+| **B=3** | 3/4 | 3/5 | 3/6 = 1/2 |
+
+
+:::
+
+## Group Question: Solution (Part B)
+
+:::{style="font-size: .55em"}
+
+**Part (c): Joint posterior P(B, C | banana)**
+
+Multiply prior × likelihood, then normalize:
+
+**Unnormalized posterior** = Prior × Likelihood:
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/16 × 1/2 = 1/32 | 1/8 × 1/3 = 1/24 | 1/16 × 1/4 = 1/64 |
+| **B=2** | 1/8 × 2/3 = 1/12 | 1/4 × 1/2 = 1/8 | 1/8 × 2/5 = 1/20 |
+| **B=3** | 1/16 × 3/4 = 3/64 | 1/8 × 3/5 = 3/40 | 1/16 × 1/2 = 1/32 |
+
+Sum (marginal) = 1/32 + 1/24 + 1/64 + 1/12 + 1/8 + 1/20 + 3/64 + 3/40 + 1/32 = **0.4417**
+
+**Normalized posterior** (divide each cell by 0.4417):
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 0.071 | 0.094 | 0.035 |
+| **B=2** | 0.189 | 0.283 | 0.113 |
+| **B=3** | 0.106 | 0.170 | 0.071 |
+
+**Highest probability:** B=2, C=2 (28.3%) - observing a banana shifted mass toward more bananas!
+
+:::
+
+## Group Question: Solution (Part C)
+
+:::{style="font-size: .55em"}
+
+**Part (d): P(B > C | banana)**
+
+Sum posterior probabilities where B > C (cells above the diagonal):
+
+- B=2, C=1: 0.189
+- B=3, C=1: 0.106
+- B=3, C=2: 0.170
+
+$$P(B > C \mid \text{banana}) = 0.189 + 0.106 + 0.170 = 0.465$$
+
+About **46.5%** chance there are more bananas than coconuts.
+
+**Part (e): Are B and C still independent?**
+
+**No!** After observing the banana, B and C are now **dependent**.
+
+- **Before observation:** $P(B, C) = P(B) \times P(C)$ (independent)
+- **After observation:** $P(B, C \mid \text{banana}) \neq P(B \mid \text{banana}) \times P(C \mid \text{banana})$
+
+**Why?** Observing a banana tells us something about the **ratio** of bananas to coconuts. If we know there are many coconuts (high C), then seeing a banana becomes less likely, which reduces our belief in high B values. The observation creates a negative correlation between B and C.
+
+:::
