@@ -1040,3 +1040,55 @@ Each of the 9 cells is a **state** in the Markov chain. To compute transition pr
 
 
 :::
+
+## Look How Far We've Come!
+
+:::{style="font-size: .6em"}
+
+**From "What are the chances of seeing license plate ARW 357?" to Markov Chain Monte Carlo**
+
+This semester, you've mastered:
+
+**The Foundations**
+
+- Probability axioms and conditional probability
+- Random variables, distributions, and their properties
+- The Central Limit Theorem and Law of Large Numbers
+
+**Stochastic Processes**
+
+- Markov chains and how Google conquered web search
+- Hidden Markov Models for understanding sequences
+
+**Statistical Inference**
+
+- **Frequentist**: Maximum likelihood, method of moments, confidence intervals, hypothesis testing
+- **Bayesian**: Prior beliefs, posterior updating, conjugate priors, MAP estimation, Monte Carlo and MCMC
+
+:::
+
+
+## What You Can Do Now
+
+:::{style="font-size: .6em"}
+
+**With this foundation, you're prepared to continue your studies in:**
+
+- **Machine Learning & Data Science** – Classification, regression, causal inference, Bayesian methods
+- **Advanced ML Topics** – Probabilistic graphical models, deep learning, reinforcement learning
+- **Computational Statistics** – Advanced MCMC, variational inference, probabilistic programming
+- **Operations Research** – Queuing theory, optimization under uncertainty
+- **Quantitative Finance** – Risk modeling, options pricing, portfolio theory
+
+**Think Critically About:**
+
+- When reported statistics mislead
+- How to properly quantify uncertainty in data-driven decisions
+- The assumptions behind every model and algorithm
+
+**Build Real Systems:**
+
+- Recommendation engines, fraud detection, natural language processing
+
+:::
+

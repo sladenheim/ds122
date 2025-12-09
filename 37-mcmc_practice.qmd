@@ -30,9 +30,8 @@ warnings.filterwarnings('ignore')
 
 **Today:**
 
-- First half of the lecture will be reserved for teaching evaluations
-- Then we'll cover using **PyMC** for practical Bayesian inference
-- And applying MCMC to a **change point detection** problem
+- Using **PyMC** for practical Bayesian inference
+- Applying MCMC to a **change point detection** problem
 
 **The motivating question:** When did COVID cases start rising in our region?
 
@@ -45,6 +44,13 @@ warnings.filterwarnings('ignore')
 You have received a link to BU's system "Blue" for course evaluations.  
 
 Please take the next 25 minutes to complete (or make headway on) your evalutions for this course, including lectures and discussion sections.
+
+You should fill out TWO forms for this class 
+
+- A1 about lecture (and Prof. Wheelock and Prof. Woobes) 
+- A2/3/etc. about discussion / your TF.  
+
+If you've already done one, you can do the other now.  
 
 :::
 
@@ -119,8 +125,6 @@ ax.legend()
 plt.subplots_adjust(left=0.08, right=0.98, top=0.92, bottom=0.12)
 plt.show()
 ```
-
-**Our goal:** Detect when growth accelerated despite weekly noise
 
 :::
 
@@ -367,13 +371,13 @@ This is exactly why we needed MCMC - exploring this discrete + continuous poster
 
 ## More Diagnostics with arviz
 
-:::{style="font-size: .6em"}
+:::{style="font-size: .55em"}
 
 ```{python}
 #| echo: false
 #| fig-align: center
 axes = az.plot_trace(trace, var_names=['slow_slope', 'fast_slope'],
-                     figsize=(11, 4))
+                     figsize=(7, 3.5))
 
 # Add column titles
 axes[0, 0].set_title('Posterior Distributions (KDE)', fontsize=13, pad=10)
@@ -459,6 +463,13 @@ plt.tight_layout()
 plt.show()
 ```
 
+:::
+
+## <span style="font-size: 0.8em">Comprehensive Diagnostics: Changepoint</span>
+
+:::{style="font-size: .6em"}
+
+
 **Diagnostic checks (from L36):**
 
 - **Trace plot:** Fuzzy caterpillar ✓ - good mixing, explores full range
@@ -467,6 +478,7 @@ plt.show()
 - **Running mean:** Stabilizes after initial period - convergence achieved
 
 :::
+
 
 ## Visualizing the Fitted Model
 
@@ -619,8 +631,9 @@ This is exactly the type of problem MCMC was designed for!
 
 **Next steps:**
 
-- Review the practice questions posted on the course website
 - Come to the **review lecture on Wednesday** - bring your questions!
+- We will post a practice final exam shortly
+- If you haven't let us know you intend to take the final on 12/17 please do so ASAP
 
 :::
 

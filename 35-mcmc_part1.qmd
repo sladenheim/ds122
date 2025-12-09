@@ -46,8 +46,8 @@ import networkx as nx
 
 1. Find a proposal distribution $g(x)$ that's easy to sample from
 2. Find constant $M$ such that $M \cdot g(x) \geq p(x)$ for all $x$
-3. Sample $(x, y)$ uniformly under $M \cdot g(x)$
-4. **Accept** if $y \leq p(x)$ (keep $x$), **reject** otherwise
+3. Sample $x$ from $g$ and $u$ from a uniform distribution $U([0,1])
+4. **Accept** if $u \leq p(x)/ (Mg(x))$ (keep $x$), **reject** otherwise
 
 **Two applications:**
 
