@@ -1,0 +1,1217 @@
+---
+title: Monte Carlo Methods
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm, uniform
+from IPython.core.display import HTML
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- Review **grid methods** and **conjugate priors** for Bayesian inference
+- Learn the core idea behind **Monte Carlo simulation**
+- Apply Monte Carlo methods to **numerical integration**
+- Generate samples from distributions using **pseudo-random numbers**
+- Use **accept-reject sampling** to sample from complex distributions
+
+:::
+
+## Review: Grid Method
+
+:::{style="font-size: .75em"}
+
+**The grid approach** we've used throughout the course:
+
+1. Create a grid of possible hypotheses / parameter values
+2. Compute prior probability for each value
+3. Compute likelihood of data for each value
+4. Multiply: posterior $\propto$ prior $\times$ likelihood
+5. Normalize to get posterior distribution
+
+:::
+
+## Review: Grid Method
+
+:::{style="font-size: .75em"}
+
+**Example:** Euro coin with 7 heads in 10 flips
+
+```{python}
+#| echo: true
+from scipy.stats import binom
+
+# Step 1: Grid of possible p values
+p_grid = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+
+# Step 2: Prior (uniform)
+prior = np.ones(len(p_grid)) / len(p_grid)
+
+# Step 3: Likelihood
+likelihood = binom.pmf(7, 10, p_grid)
+
+# Step 4 & 5: Posterior
+posterior = prior * likelihood
+posterior = posterior / posterior.sum()
+
+# Posterior mean (MMSE)
+posterior_mean = np.sum(p_grid * posterior)
+print(f"Posterior mean (MMSE): {posterior_mean:.3f}")
+```
+
+:::
+
+## Review: Grid Method 
+
+:::{style="font-size: .75em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+# Prior
+axes[0].bar(p_grid, prior, width=0.08, alpha=0.7, color='gray')
+axes[0].set_xlabel('p (probability of heads)', size=12)
+axes[0].set_ylabel('Probability', size=12)
+axes[0].set_title('Step 2: Prior', size=14)
+axes[0].set_ylim(0, 0.5)
+
+# Likelihood
+axes[1].bar(p_grid, likelihood, width=0.08, alpha=0.7, color='orange')
+axes[1].set_xlabel('p', size=12)
+axes[1].set_ylabel('Likelihood', size=12)
+axes[1].set_title('Step 3: Likelihood (7H in 10 flips)', size=14)
+
+# Posterior
+axes[2].bar(p_grid, posterior, width=0.08, alpha=0.7, color='blue')
+axes[2].set_xlabel('p', size=12)
+axes[2].set_ylabel('Probability', size=12)
+axes[2].set_title('Steps 4-5: Posterior', size=14)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Grid method works great** for 1 parameter with small grid!
+
+:::
+
+## Review: Conjugate Priors
+
+:::{style="font-size: .75em"}
+
+**The conjugate prior approach:** If prior and posterior are in the same family, we can use formulas instead of grids!
+
+**Example:** Beta-Binomial conjugacy
+
+- **Prior:** Beta($\alpha$, $\beta$)
+- **Data:** k heads in n flips
+- **Posterior:** Beta($\alpha$ + k, $\beta$ + n - k)
+
+:::
+
+## Review: Conjugate Priors
+
+:::{style="font-size: .75em"}
+
+**Same problem** (7 heads in 10 flips) with Beta(1, 1) prior:
+
+```{python}
+#| echo: true
+from scipy.stats import beta
+
+# Prior: Beta(1, 1) = Uniform
+# Data: 7 heads, 3 tails
+# Posterior: Beta(1+7, 1+3) = Beta(8, 4)
+
+posterior_conjugate = beta(8, 4)
+
+# No grid needed! Just use the formula
+print(f"Posterior mean (MMSE): {posterior_conjugate.mean():.3f}")
+```
+
+**Conjugate priors are elegant** - analytical solution, no approximation!
+
+:::
+
+## Review: Conjugate Priors 
+
+:::{style="font-size: .75em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+p_range = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# Prior: Beta(1, 1)
+prior_conj = beta.pdf(p_range, 1, 1)
+ax.plot(p_range, prior_conj, '--', linewidth=3, label='Prior: Beta(1,1)', color='gray')
+
+# Posterior: Beta(8, 4)
+posterior_conj = beta.pdf(p_range, 8, 4)
+ax.plot(p_range, posterior_conj, linewidth=3, label='Posterior: Beta(8,4)', color='blue')
+
+ax.set_xlabel('p (probability of heads)', size=14)
+ax.set_ylabel('Density', size=14)
+ax.set_title('Conjugate Prior: Exact Posterior with Simple Formula', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+
+:::
+
+## Comparing Grid vs Conjugate Prior
+
+:::{style="font-size: .75em"}
+
+**Let's compare both approaches side-by-side:**
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+import pandas as pd
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+# Left: Grid method
+ax1.bar(p_grid, posterior, width=0.08, alpha=0.7, color='blue')
+ax1.axvline(x=posterior_mean, color='darkblue', linestyle='--', linewidth=2,
+            label=f'Mean: {posterior_mean:.3f}')
+ax1.set_xlabel('p (probability of heads)', size=14)
+ax1.set_ylabel('Probability', size=14)
+ax1.set_title('Grid Method (Discrete)', size=16)
+ax1.legend(fontsize=12)
+ax1.grid(alpha=0.3)
+ax1.set_ylim(0, ax1.get_ylim()[1])
+
+# Right: Conjugate prior
+p_range = np.linspace(0, 1, 200)
+posterior_conj = beta.pdf(p_range, 8, 4)
+ax2.plot(p_range, posterior_conj, linewidth=3, color='red')
+ax2.fill_between(p_range, posterior_conj, alpha=0.3, color='red')
+ax2.axvline(x=posterior_conjugate.mean(), color='darkred', linestyle='--', linewidth=2,
+            label=f'Mean: {posterior_conjugate.mean():.3f}')
+ax2.set_xlabel('p (probability of heads)', size=14)
+ax2.set_ylabel('Density', size=14)
+ax2.set_title('Conjugate Prior (Continuous)', size=16)
+ax2.legend(fontsize=12)
+ax2.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+:::
+
+## Quick Practice: Both Methods
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Problem:</b> You flip a coin 3 times and get 2 heads, 1 tail. Estimate \(p\) = P(heads).<br><br>
+
+<b>Part A: Grid Method</b><br>
+• Grid: p = {0.2, 0.5, 0.8}<br>
+• Using a uniform prior, compute the posterior distribution over these values and estimate the MMSE<br><br>
+
+<b>Part B: Conjugate Prior</b><br>
+• Using a uniform prior, use the conjugate prior approach to find a formula for the posterior and estimate the MMSE. <br>
+• Hint: the mean of Beta(\(\alpha, \beta\)) is \(\alpha/(\alpha+\beta)\)<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Solution: Both Methods
+
+:::{style="font-size: .65em"}
+
+**Part A: Grid Method**
+
+| p | Prior | Likelihood $\propto p^2(1-p)$ | Prior × Lik | Posterior |
+|---|-------|------------------------|-------------|-----------|
+| 0.2 | 1/3 | $(0.2)^2(0.8) = 0.032$ | 0.011 | 0.11 |
+| 0.5 | 1/3 | $(0.5)^2(0.5) = 0.125$ | 0.042 | 0.44 |
+| 0.8 | 1/3 | $(0.8)^2(0.2) = 0.128$ | 0.043 | 0.45 |
+|    |  | | sum = 0.096 |  |
+
+
+**MMSE (posterior mean):** $0.2(0.11) + 0.5(0.44) + 0.8(0.45) = 0.022 + 0.22 + 0.36 = 0.60$
+
+**Part B: Conjugate Prior**
+
+- Prior: Beta(1, 1), Data: 2 heads, 1 tail
+- **Posterior: Beta(1+2, 1+1) = Beta(3, 2)**
+- MMSE: $\frac{3}{3+2} = \frac{3}{5} = 0.6$
+
+:::
+
+## The Problem of Scaling
+
+:::{style="font-size: .75em"}
+
+**Both methods worked great** for one parameter!
+
+**But what if we have multiple parameters?**
+
+Let's say we're estimating **two** coin bias parameters: $p_1$ and $p_2$
+
+**Grid approach:** Need a grid over *both* parameters
+
+- If we use 10 values for each parameter
+- We need $10 \times 10 = 100$ grid points
+- Must compute 100 likelihoods
+
+**Let's see this visually...**
+
+:::
+
+## A Grid with Two Parameters
+
+:::{style="font-size: .7em"}
+
+**Example:** Two coins, estimating both $p_1$ and $p_2$
+
+```{python}
+#| echo: true
+# Just 5 values for each parameter (to keep it simple)
+p1_values = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
+p2_values = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
+
+hypotheses = []
+for p1 in p1_values:
+    for p2 in p2_values:
+        hypotheses.append((p1, p2))
+
+print(f"Number of hypotheses: {len(hypotheses)}\n")
+print("First 6 hypotheses (p1, p2):")
+for i, (p1, p2) in enumerate(hypotheses[:6]):
+    print(f"  Hypothesis {i+1}: (p1={p1:.2f}, p2={p2:.2f})")
+```
+
+**With just 5 values per parameter:** $5^2 = 25$ hypotheses
+
+:::
+
+## The Grid Explosion
+
+:::{style="font-size: .75em"}
+
+What if we are trying to estimate even more parameters, like the probability of seeing one of several species (multinomial), or looking at the joint distribution of several variables (like combinations of $\lambda$ scoring rates for several soccer teams) - each with their own resolution?
+
+```{python}
+#| echo: false
+data_grid = []
+for n_params in [1, 2, 3, 4, 5]:
+    for resolution in [10, 50, 100]:
+        n_points = resolution ** n_params
+        data_grid.append({
+            'Parameters': n_params,
+            'Grid resolution': resolution,
+            'Total points': f'{n_points:,}'
+        })
+
+df_grid = pd.DataFrame(data_grid)
+df_pivot = df_grid.pivot(index='Parameters', columns='Grid resolution', values='Total points')
+print(df_pivot)
+```
+
+**5 parameters with 100-point resolution:** 10 billion calculations!
+
+:::
+
+## What About Conjugate Priors?
+
+:::{style="font-size: .65em"}
+
+**Can conjugate priors save us from the curse of dimensionality?**
+
+Sometimes, but very limited!
+
+**Problem 1: Limited to specific distributions**
+
+- Binomial likelihood with Beta prior
+- Poisson likelihood with Gamma prior
+- Multinomial likelihood with Dirichlet prior
+- Normal (known $\sigma$) likelihood with Normal prior
+
+**Problem 2: What if your model doesn't fit these?**
+
+- Non-standard likelihood functions
+- Complex relationships between parameters
+- Real-world messiness!
+
+
+**Enter: Monte Carlo methods!**
+
+:::
+
+## Monte Carlo: A Different Approach
+
+:::{style="font-size: .8em"}
+
+Instead of computing the entire posterior distribution, what if we could:
+
+1. **Sample** from the distribution without computing it
+2. Use those samples to **approximate** what we need
+
+This is the essence of **Monte Carlo methods**: 
+
+- Use random sampling to solve problems that might be deterministic in principle
+
+High-level intuition - like getting the gist of a picture from a few pixels, or using a poll to estimate election outcomes. 
+
+
+:::
+
+## Why "Monte Carlo"?
+
+:::{style="font-size: .7em"}
+
+:::{.center-text}
+<img src="images/monte_carlo/casino-de-monte-carlo.jpg" width=500/>
+:::
+
+The name comes from the Monte Carlo Casino in Monaco, because these methods rely on randomness - like games of chance at a casino.
+
+Monte Carlo methods were developed in the 1940s by scientists working on the atomic bomb, including Stanislaw Ulam and John von Neumann.
+
+:::
+
+## Motivating Example: Estimating $\pi$
+
+:::{style="font-size: .75em"}
+
+**Classic problem:** Estimate $\pi$ by "throwing darts"
+
+Consider a circle of radius 1 inscribed in a 2 by 2 square:
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(5, 5))
+
+# Draw square
+square = plt.Rectangle((-1, -1), 2, 2, fill=False, edgecolor='black', linewidth=2)
+ax.add_patch(square)
+
+# Draw circle
+circle = plt.Circle((0, 0), 1, fill=False, edgecolor='blue', linewidth=2)
+ax.add_patch(circle)
+
+ax.set_xlim(-1.2, 1.2)
+ax.set_ylim(-1.2, 1.2)
+ax.set_aspect('equal')
+ax.axhline(y=0, color='gray', linestyle='--', alpha=0.3)
+ax.axvline(x=0, color='gray', linestyle='--', alpha=0.3)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('y', size=14)
+ax.set_title('Circle (radius 1) inside Square (side 2)', size=14)
+plt.show()
+```
+
+
+:::
+
+## Monte Carlo Estimation of $\pi$
+
+:::{style="font-size: .7em"}
+
+**Strategy:**
+
+1. Throw random "darts" uniformly in the square
+2. Count how many land inside the circle
+3. Use the ratio to estimate $\pi$
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n_samples = 5000
+
+x = np.random.uniform(-1, 1, n_samples)
+y = np.random.uniform(-1, 1, n_samples)
+
+# Check if inside circle
+inside_circle = (x**2 + y**2) <= 1
+
+# Estimate pi
+pi_estimate = 4 * np.sum(inside_circle) / n_samples
+
+```
+
+:::
+
+## Visualizing the Monte Carlo Approach
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(5, 5))
+
+# Use fewer points for visualization
+n_viz = 1000
+x_viz = np.random.uniform(-1, 1, n_viz)
+y_viz = np.random.uniform(-1, 1, n_viz)
+inside_viz = (x_viz**2 + y_viz**2) <= 1
+
+# Plot points
+ax.scatter(x_viz[inside_viz], y_viz[inside_viz], c='blue', s=5, alpha=0.5, label='Inside circle')
+ax.scatter(x_viz[~inside_viz], y_viz[~inside_viz], c='red', s=5, alpha=0.5, label='Outside circle')
+
+# Draw shapes
+square = plt.Rectangle((-1, -1), 2, 2, fill=False, edgecolor='black', linewidth=2)
+ax.add_patch(square)
+circle = plt.Circle((0, 0), 1, fill=False, edgecolor='blue', linewidth=2)
+ax.add_patch(circle)
+
+ax.set_xlim(-1.2, 1.2)
+ax.set_ylim(-1.2, 1.2)
+ax.set_aspect('equal')
+ax.legend(fontsize=10)
+ax.set_title(f'Monte Carlo Estimation of π\n{n_viz} random points', size=14)
+plt.show()
+
+print(f"Estimate of π with {n_samples} samples: {pi_estimate:.4f}")
+print(f"True value of π: {np.pi:.4f}")
+print(f"Error: {abs(pi_estimate - np.pi):.4f}")
+```
+
+
+:::
+
+## How Good Is Our Estimate?
+
+:::{style="font-size: .75em"}
+
+The more samples we use, the better our estimate:
+
+```{python}
+#| echo: false
+#| fig-align: center
+np.random.seed(42)
+sample_sizes = [10, 20, 50, 100, 500, 1000, 5000, 10000]
+estimates = []
+
+for n in sample_sizes:
+    x = np.random.uniform(-1, 1, n)
+    y = np.random.uniform(-1, 1, n)
+    inside = (x**2 + y**2) <= 1
+    pi_est = 4 * np.sum(inside) / n
+    estimates.append(pi_est)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.semilogx(sample_sizes, estimates, 'o-', linewidth=2, markersize=8, label='Monte Carlo estimate')
+ax.axhline(y=np.pi, color='red', linestyle='--', linewidth=2, label='True value of π')
+ax.set_xlabel('Number of samples', size=14)
+ax.set_ylabel('Estimate of π', size=14)
+ax.set_title('Convergence of Monte Carlo Estimate', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+With enough samples, Monte Carlo converges to the true value!
+
+:::
+
+## Monte Carlo Integration
+
+:::{style="font-size: .7em"}
+
+**General principle:** Estimate the area under any curve
+
+$$\text{Area} = \int_a^b f(x) \, dx$$
+
+**Monte Carlo approach:**
+
+1. Draw a bounding box around the region 
+2. Generate random points uniformly in the box
+3. Count what fraction fall under the curve
+4. Multiply the fraction by the area of the box to find the area of the curve
+
+$$\int_a^b f(x) \, dx \approx \text{Box Area} \times \frac{\text{Points under curve}}{\text{Total points}}$$
+
+:::
+
+## Example: A Tricky Integral
+
+:::{style="font-size: .7em"}
+
+Let's estimate $\int_0^2 e^{-x^2} \, dx$ (this has no closed-form solution!)
+
+```{python}
+#| echo: false
+#| fig-align: center
+x_range = np.linspace(0, 2, 400)
+y_range = np.exp(-x_range**2)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(x_range, y_range, linewidth=3, color='blue', label='$f(x) = e^{-x^2}$')
+ax.fill_between(x_range, y_range, alpha=0.3)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('f(x)', size=14)
+ax.set_title('$\int_0^2 e^{-x^2} dx$ = ?', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+:::
+
+## Visualizing Monte Carlo Integration
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+from scipy.integrate import quad
+from scipy.stats import expon
+
+np.random.seed(42)
+n_viz = 2000
+x_viz = np.random.uniform(0, 2, n_viz)
+y_viz = np.random.uniform(0, 1, n_viz)
+f_x_viz = np.exp(-x_viz**2)
+under_viz = y_viz <= f_x_viz
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(x_viz[under_viz], y_viz[under_viz], c='blue', s=5, alpha=0.4, label='Under curve')
+ax.scatter(x_viz[~under_viz], y_viz[~under_viz], c='red', s=5, alpha=0.4, label='Above curve')
+
+x_curve = np.linspace(0, 2, 400)
+ax.plot(x_curve, np.exp(-x_curve**2), linewidth=3, color='darkblue', label='$f(x) = e^{-x^2}$')
+
+ax.add_patch(plt.Rectangle((0, 0), 2, 1, fill=False, edgecolor='black', linewidth=2, linestyle='--'))
+ax.set_xlim(-0.1, 2.1)
+ax.set_ylim(-0.05, 1.05)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('y', size=14)
+ax.legend(fontsize=10)
+ax.set_title('Monte Carlo Integration with Random Points', size=14)
+plt.show()
+```
+
+:::
+
+## Monte Carlo Solution
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n_samples = 10000
+
+# Bounding box: [0, 2] x [0, 1] (since max of e^(-x^2) on [0,2] is 1)
+x = np.random.uniform(0, 2, n_samples)
+y = np.random.uniform(0, 1, n_samples)
+
+# Function values at random x points
+f_x = np.exp(-x**2)
+
+# Check if points are under the curve
+under_curve = y <= f_x
+
+# Estimate the integral
+box_area = 2 * 1  # width x height
+integral_estimate = box_area * np.sum(under_curve) / n_samples
+print(f"Monte Carlo estimate: {integral_estimate:.4f}")
+
+# Compare with numerical integration
+true_value, _ = quad(lambda x: np.exp(-x**2), 0, 2)
+print(f"Numerical integration: {true_value:.4f}")
+```
+
+:::
+
+
+## Pseudo-Random Numbers
+
+:::{style="font-size: .75em"}
+
+How do computers generate "random" numbers?
+
+They don't! They use **pseudo-random number generators** (PRNGs):
+
+- **Deterministic algorithms** that produce sequences that "look" random
+- Given the same **seed**, always produce the same sequence
+- Pass statistical tests for randomness
+- Basic RNGs use techniques that generate **uniform** distributions
+
+```{python}
+#| echo: true
+# Same seed -> same sequence
+np.random.seed(42)
+print("First run:", np.random.uniform(0, 1, 5))
+
+np.random.seed(42)  # Reset with same seed
+print("Second run:", np.random.uniform(0, 1, 5))
+```
+
+:::
+
+## From Uniform to Any Distribution
+
+:::{style="font-size: .75em"}
+
+But what if we want numbers from some other distribution?
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Inverse CDF Sampling</span>
+        <p>
+        Let \(U \sim \text{Uniform}(0,1)\) and let \(F\) be the CDF of a distribution with PDF \(f\).<br><br>
+
+        Then if \(u_1, u_2, \ldots, u_n\) are uniform random samples, the transformed values:
+        $$x_i = F^{-1}(u_i)$$
+
+        will be distributed according to the PDF \(f\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**Example:** Generate samples from Exponential($\lambda$) distribution
+
+- CDF: $F(x) = 1 - e^{-\lambda x}$
+- Inverse CDF: $F^{-1}(u) = -\frac{1}{\lambda}\ln(1-u)$
+
+:::
+
+## Inverse Transform Example
+
+:::{style="font-size: .7em"}
+
+Let's generate exponential random variables from uniform ones:
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n = 1000
+lambda_param = 2.0
+
+u = np.random.uniform(0, 1, n)
+x = -np.log(1 - u) / lambda_param
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.hist(x, bins=50, density=True, alpha=0.6, label='Our samples')
+x_range = np.linspace(0, 5, 100)
+ax.plot(x_range, expon.pdf(x_range, scale=1/lambda_param),
+        'r-', linewidth=3, label='True Exponential(2) PDF')
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('Density', size=14)
+ax.legend(fontsize=12)
+ax.set_title('Inverse Transform Sampling for Exponential Distribution', size=14)
+plt.show()
+```
+
+:::
+
+## But What If No Closed-Form Inverse?
+
+:::{style="font-size: .8em"}
+
+Many distributions don't have a simple inverse CDF:
+
+- Normal distribution (need numerical methods)
+- Beta distribution
+- Complex custom distributions
+- Bayesian posteriors!
+
+**Solution:** Accept-Reject Sampling
+
+
+:::
+
+## Accept-Reject Sampling: The Idea
+
+:::{style="font-size: .7em"}
+
+**Goal:** Sample from target distribution $p(x)$ (which might be hard)
+
+**Strategy:**
+
+1. Find a **proposal distribution** $g(x)$ that's easy to sample from (like uniform or normal)
+2. Find constant $M$ such that $M \cdot g(x) \geq p(x)$ for all $x$ - this creates the "bounding box"!
+3. Sample from $g(x)$, then "accept" or "reject" strategically - red vs blue points!
+
+**Think of it like:**
+
+- Throw darts at the proposal distribution
+- Keep only the ones that also fit under the target distribution
+- This gives you samples from the target
+
+:::
+
+## Accept-Reject Visual Intuition
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Target distribution (mixture of two normals)
+def target(x):
+    return 0.3 * norm.pdf(x, -2, 0.5) + 0.7 * norm.pdf(x, 1, 0.8)
+
+# Proposal distribution (normal)
+def proposal(x):
+    return norm.pdf(x, 0, 2)
+
+x_range = np.linspace(-5, 5, 500)
+M = 2.5  # Chosen so M*g(x) >= f(x)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x_range, target(x_range), linewidth=3, color='blue', label='Target $p(x)$')
+ax.plot(x_range, M * proposal(x_range), linewidth=3, color='red',
+        linestyle='--', label='$M \cdot g(x)$ (proposal)')
+ax.fill_between(x_range, target(x_range), alpha=0.3, color='blue')
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('Density', size=14)
+ax.legend(fontsize=12)
+ax.set_title('Accept-Reject Setup: Proposal "Covers" Target', size=14)
+plt.show()
+```
+
+Sample from red curve, accept with probability based on blue curve!
+
+:::
+
+## Accept-Reject in Action
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Generate random samples for visualization
+np.random.seed(42)
+n_samples = 200
+
+# Sample x from proposal g(x)
+x_samples = np.random.normal(0, 2, n_samples)
+# Sample y uniformly between 0 and M*g(x)
+y_samples = np.random.uniform(0, M * proposal(x_samples))
+
+# Determine which to accept (y < target(x)) vs reject (y > target(x))
+accept_mask = y_samples < target(x_samples)
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x_range, target(x_range), linewidth=3, color='blue',
+        label='Target $p(x)$', zorder=3)
+ax.plot(x_range, M * proposal(x_range), linewidth=3, color='red',
+        linestyle='--', label='$M \cdot g(x)$ (proposal)', zorder=3)
+
+# Plot accepted points (blue) and rejected points (red)
+ax.scatter(x_samples[accept_mask], y_samples[accept_mask],
+           s=20, color='blue', alpha=0.6, label='Accepted samples', zorder=2)
+ax.scatter(x_samples[~accept_mask], y_samples[~accept_mask],
+           s=20, color='red', alpha=0.6, label='Rejected samples', zorder=2)
+
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('Density', size=14)
+ax.legend(fontsize=11)
+ax.set_title('Accept-Reject Sampling: Keep Blue, Discard Red', size=14)
+ax.set_ylim(0, M * proposal(x_range).max() * 1.05)
+plt.show()
+```
+
+**Blue points:** Under target curve → **Accept**
+
+**Red points:** Between curves → **Reject**
+
+:::
+
+## Accept-Reject Algorithm
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Accept-Reject Algorithm</span>
+        <p>
+        To sample from target distribution \(p(x)\) using proposal \(g(x)\):<br><br>
+
+        <b>Step 1:</b> Sample \(x\) from proposal distribution \(g(x)\)<br>
+        <b>Step 2:</b> Sample \(u\) from Uniform(0, 1)<br>
+        <b>Step 3:</b> If \(u \leq \frac{p(x)}{M \cdot g(x)}\), <b>accept</b> \(x\) as a sample<br>
+        <b>Step 4:</b> Otherwise, <b>reject</b> \(x\) and return to Step 1<br><br>
+
+        Repeat until you have enough accepted samples.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**Intuition:** We accept $x$ with probability proportional to how close $p(x)$ is to $M \cdot g(x)$
+
+- If $p(x)$ is high relative to $M \cdot g(x)$: accept with high probability
+- If $p(x)$ is low: reject with high probability
+
+:::
+
+## Accept-Reject Example
+
+:::{style="font-size: .65em"}
+
+Let's sample from $p(x) = 3x^2$ for $x \in [0,1]$ using uniform proposal:
+
+```{python}
+#| echo: true
+def target_pdf(x):
+    return 3 * x**2
+
+def accept_reject(n_samples):
+    samples = []
+    M = 3  # Max of target is 3 at x=1
+
+    while len(samples) < n_samples:
+        # Step 1: Sample from proposal (uniform on [0,1])
+        x = np.random.uniform(0, 1)
+        # Step 2: Sample u from uniform
+        u = np.random.uniform(0, 1)
+        # Step 3: Accept if u <= target(x) / (M * proposal(x))
+        # Since proposal is uniform(0,1), proposal(x) = 1
+        if u <= target_pdf(x) / M:
+            samples.append(x)
+
+    return np.array(samples)
+
+np.random.seed(42)
+samples = accept_reject(10000)
+```
+
+:::
+
+## Visualizing Accept-Reject Results
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# Histogram of samples
+ax.hist(samples, bins=50, density=True, alpha=0.6, color='skyblue', label='Accepted samples')
+
+# True target distribution
+x_range = np.linspace(0, 1, 100)
+ax.plot(x_range, target_pdf(x_range), 'r-', linewidth=3, label='Target: $3x^2$')
+
+# Proposal distribution
+ax.axhline(y=3, color='green', linestyle='--', linewidth=2, label='Proposal: $M \cdot$Uniform')
+
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('Density', size=14)
+ax.legend(fontsize=12)
+ax.set_title('Accept-Reject Sampling Results', size=14)
+ax.set_xlim(-0.05, 1.05)
+plt.show()
+```
+
+The histogram of accepted samples matches our target distribution!
+
+:::
+
+## <span style="font-size: 0.8em">Accept-Reject with Non-Uniform Proposal</span>
+
+
+:::{style="font-size: .65em"}
+
+**More realistic scenario:** Sample from Beta(2, 5) distribution using a Normal proposal
+
+We'll use a Normal(0.25, 0.2) as our proposal - very different from the target!
+
+```{python}
+#| echo: true
+from scipy.stats import beta as beta_dist, norm
+
+def target_pdf(x):
+    """Target: Beta(2, 5) - skewed toward 0"""
+    return beta_dist.pdf(x, 2, 5)
+
+def proposal_pdf(x):
+    """Proposal: Normal(0.25, 0.2) - different shape entirely"""
+    return norm.pdf(x, 0.25, 0.2)
+
+def accept_reject_beta(n_samples):
+    samples = []
+    M = 1.6  # Envelope constant to ensure M*proposal >= target
+
+    while len(samples) < n_samples:
+        # Step 1: Sample from proposal Normal(0.25, 0.2)
+        x = np.random.normal(0.25, 0.2)
+
+        # Skip if outside [0,1] (Beta is only defined on [0,1])
+        if x < 0 or x > 1:
+            continue
+
+        # Step 2: Sample u from uniform
+        u = np.random.uniform(0, 1)
+        # Step 3: Accept if u <= target(x) / (M * proposal(x))
+        acceptance_prob = target_pdf(x) / (M * proposal_pdf(x))
+
+        if u <= acceptance_prob:
+            samples.append(x)
+
+    return np.array(samples)
+
+np.random.seed(42)
+samples_beta = accept_reject_beta(10000)
+```
+
+
+
+:::
+
+## Comparing Proposals
+
+:::{style="font-size: .7em"}
+
+Better proposal → more efficient sampling (fewer rejections)!
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# Histogram of samples
+ax.hist(samples_beta, bins=50, density=True, alpha=0.6, color='skyblue', label='Accepted samples')
+
+# True target
+x_range = np.linspace(0, 1, 200)
+target_vals = beta_dist.pdf(x_range, 2, 5)
+ax.plot(x_range, target_vals, 'r-', linewidth=3, label='Target: Beta(2,5)')
+
+# Proposal distribution
+M = 1.6
+proposal_vals = M * norm.pdf(x_range, 0.25, 0.2)
+ax.plot(x_range, proposal_vals, 'g--', linewidth=2, label='Proposal: $M \\cdot$ N(0.25, 0.2)')
+
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('Density', size=14)
+ax.legend(fontsize=12)
+ax.set_title('Accept-Reject with Normal Proposal\n(very different from target!)', size=14)
+ax.set_xlim(-0.05, 1.05)
+ax.set_ylim(0, 4)
+plt.show()
+```
+
+
+:::
+
+## Beyond Accept-Reject
+
+:::{style="font-size: .75em"}
+
+**Accept-reject is powerful, but has limitations:**
+
+- Need to find good proposal distribution
+- Can be inefficient if proposal doesn't match target well
+- Harder in high dimensions
+
+**What if we could be smarter about proposals?**
+
+- Use information from current sample to propose next sample
+- Create a *sequence* of samples that "explores" the distribution
+- This is where **Markov chains** come in!
+
+**Preview of MCMC:** Combine Monte Carlo sampling with Markov chains to efficiently sample from complex posterior distributions.
+
+:::
+
+
+
+## <span style="font-size: 0.8em">Group Question 1: Monte Carlo Integration</span>
+
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Problem:</b> Use Monte Carlo integration to estimate \(\int_0^1 \sqrt{1-x^2} \, dx\)<br><br>
+
+<b>Tasks:</b><br>
+1. Describe the Monte Carlo approach: What bounding box would you use?<br>
+2. How would you determine if a random point falls under the curve?<br>
+3. Write the formula for estimating the integral<br>
+4. What famous constant is this integral related to? (Hint: think about the geometry!)<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+## <span style="font-size: 0.8em">Group Question 2: Accept-Reject Sampling</span>
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Problem:</b> You want to sample from \(p(x) = 2x^2\) for \(x \in [0,1]\) using accept-reject sampling with a linear proposal function \(g(x) = x\).<br><br>
+
+<b>Tasks:</b><br>
+1. What is the maximum value of the target PDF on [0,1]?<br>
+2. What value of \(M\) do you need so that \(M \cdot g(x) \geq p(x)\) for all \(x\)?<br>
+3. Describe the accept-reject algorithm steps for this specific problem<br>
+4. What fraction of proposals would you expect to accept? <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Solution 1: Monte Carlo Integration
+
+:::{style="font-size: .65em"}
+
+**Problem:** Estimate $\int_0^1 \sqrt{1-x^2} \, dx$
+
+**1. Bounding box:** 
+- $[0,1] \times [0,1]$ (since $\sqrt{1-x^2} \leq 1$ for $x \in [0,1]$)
+
+**2. Point under curve:** 
+- A point $(x,y)$ is under the curve if $y \leq \sqrt{1-x^2}$
+
+**3. Formula:**
+$$\int_0^1 \sqrt{1-x^2} \, dx \approx 1 \times 1 \times \frac{\text{points under curve}}{\text{total points}}$$
+
+**4. Connection to $\pi$:** 
+
+- This integral is the area of a quarter circle with radius 1!
+
+$$\int_0^1 \sqrt{1-x^2} \, dx = \frac{\pi}{4} \approx 0.785$$
+
+The curve $y = \sqrt{1-x^2}$ is the upper half of the circle $x^2 + y^2 = 1$.
+
+:::
+
+## Solution 1: Code
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n_samples = 10000
+
+# Generate random points in [0,1] x [0,1]
+x = np.random.uniform(0, 1, n_samples)
+y = np.random.uniform(0, 1, n_samples)
+
+# Check if under curve
+under_curve = y <= np.sqrt(1 - x**2)
+
+# Estimate integral
+box_area = 1 * 1
+integral_estimate = box_area * np.sum(under_curve) / n_samples
+
+print(f"Monte Carlo estimate: {integral_estimate:.4f}")
+print(f"True value (π/4): {np.pi/4:.4f}")
+print(f"Error: {abs(integral_estimate - np.pi/4):.4f}")
+```
+
+:::
+
+## Solution 2: Accept-Reject Sampling
+
+:::{style="font-size: .55em"}
+
+**Problem:**  Sample from $p(x) = 2x^2$ for $x \in [0,1]$ using proposal $g(x) \propto x$
+
+**1. Maximum value:** 
+$p(x) = 2x^2$ is maximized at $x=1$, so $\max p(x) = 2$
+
+**2. Finding M:** We need $M \cdot g(x) \geq p(x)$ for all $x$
+
+   - Need: $M \cdot x \geq 2x^2$ for all $x \in [0,1]$, so  $M \geq 2x$
+   - Maximum at $x=1$: $M \geq 2$, so **M = 2**
+
+**3. Algorithm steps:**
+
+   1. Sample $x$ from $g(x) \propto x$
+   2. Sample $u \sim \text{Uniform}(0,1)$
+   3. Accept if $u \leq \frac{p(x)}{M \cdot g(x)} = \frac{2x^2}{2 \cdot x} = x$
+
+**4. Acceptance rate:**
+
+   - Area under target: $\int_0^1 2x^2 \, dx = \frac{2}{3}$
+   - Area under $M \cdot g(x) = 2 \cdot x = 2x$: $\int_0^1 2x \, dx = 1$
+   - Acceptance rate: $\frac{2/3}{1} = \frac{2}{3}$
+
+:::

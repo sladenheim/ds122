@@ -1,0 +1,1094 @@
+---
+title: Markov Chain Monte Carlo Part 2
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom, beta, norm
+from IPython.core.display import HTML
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- Understand **detailed balance** and prove why Metropolis-Hastings works
+- Learn how to choose effective **proposal distributions**
+- Apply **convergence diagnostics** to assess MCMC results
+- Implement MCMC for the **Euro coin problem** from scratch
+- Compare MCMC results to grid methods and analytical solutions
+
+:::
+## <span style="font-size: 0.8em">Recap: The Metropolis-Hastings Algorithm</span>
+
+
+:::{style="font-size: .65em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Metropolis-Hastings Algorithm</span>
+        <p>
+        To sample from posterior \(p(\theta \mid \text{data})\):<br>
+
+        1. Start with initial value \(\theta_0\)<br>
+        2. At iteration \(t\), propose \(\theta^*\) from proposal distribution \(q(\theta^* \mid \theta_t)\)<br>
+        3. Compute acceptance probability:
+        $$\alpha = \min\left(1, \frac{p(\theta^* \mid \text{data}) \cdot q(\theta_t \mid \theta^*)}{p(\theta_t \mid \text{data}) \cdot q(\theta^* \mid \theta_t)}\right)$$
+        4. With probability \(\alpha\), set \(\theta_{t+1} = \theta^*\); otherwise \(\theta_{t+1} = \theta_t\)<br>
+        5. Repeat
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**Today's questions:**
+
+- Why does this algorithm work?
+- How do we choose $q$?
+- How do we know if it's working?
+
+:::
+
+## What Are We Actually Trying to Do?
+
+:::{style="font-size: .75em"}
+
+**The big picture:** We want to sample from the posterior $p(\theta \mid \text{data})$
+
+**Why?** Because sampling lets us:
+
+- Compute expectations: $E[\theta] = \int \theta \cdot p(\theta \mid \text{data}) \, d\theta$
+- Find credible intervals
+- Make predictions
+- Visualize the full distribution
+
+**The problem:** We can't sample directly from $p(\theta \mid \text{data})$
+
+- Too complex, high-dimensional, or unknown normalizing constant
+
+**The MCMC solution:** Build a Markov chain whose samples *eventually* come from $p(\theta \mid \text{data})$
+
+But **why** would this work? We need a guarantee!
+
+:::
+
+## The Markov Chain Connection
+
+:::{style="font-size: .75em"}
+
+**Recall:** Markov chains have **steady states**
+
+If you run a chain long enough, it "settles down" to a steady-state distribution.
+
+**The key insight for MCMC:**
+
+If we can design a Markov chain where:
+
+- The stationary distribution $\pi$ **equals** our target posterior $p(\theta \mid \text{data})$
+- The chain actually **converges** to this stationary distribution
+
+Then: **Samples from the chain (after convergence) = samples from the posterior!**
+
+**Question:** How do we guarantee this? Enter: **detailed balance**
+
+:::
+
+## Why Does Metropolis-Hastings Work?
+
+:::{style="font-size: .75em"}
+
+**The key concept:** Detailed Balance
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Detailed Balance</span>
+        <p>
+        A Markov chain with transition probabilities \(P_{ij}\) satisfies <b>detailed balance</b> with respect to distribution \(\pi\) if:
+
+        $$\pi_i \cdot P_{ji} = \pi_j \cdot P_{ij} \quad \text{for all states } i, j$$
+
+        <b>Interpretation:</b> The "flow" from state \(i\) to state \(j\) equals the "flow" from \(j\) to \(i\).
+        <br><br>
+        <b>Important result:</b> If detailed balance holds, then \(\pi\) is a stationary distribution of the chain.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**Our goal:** Prove that Metropolis-Hastings satisfies detailed balance!
+
+:::
+
+## Why Detailed Balance Matters
+
+:::{style="font-size: .75em"}
+
+**The guarantee we need:**
+
+If Metropolis-Hastings satisfies detailed balance with respect to $p(\theta \mid \text{data})$, then:
+
+1. The posterior **is** a stationary distribution of our Markov chain
+2. The chain **will converge** to this distribution (under mild conditions)
+3. Samples from the chain **are** samples from the posterior!
+
+**What we'll prove:**
+
+For any two states $i$ and $j$:
+$$\underbrace{p(\theta_i \mid \text{data})}_{\text{posterior at } i} \cdot \underbrace{P_{ji}}_{\text{prob } i \to j} = \underbrace{p(\theta_j \mid \text{data})}_{\text{posterior at } j} \cdot \underbrace{P_{ij}}_{\text{prob } j \to i}$$
+
+**Translation:** "Flow from $i$ to $j$" = "Flow from $j$ to $i$" when weighted by posterior
+
+
+:::
+
+## Setting Up the Proof
+
+:::{style="font-size: .7em"}
+
+**Simplification:** We'll prove this for **Metropolis** (symmetric proposals)
+
+For symmetric proposals: $q(j|i) = q(i|j)$ for all $i,j$
+
+Examples: random walk $\theta' = \theta + \epsilon$ where $\epsilon \sim N(0, \sigma^2)$
+
+With symmetry, the acceptance probability simplifies to:
+$$\alpha_{ij} = \min\left(1, \frac{p(\theta_j \mid \text{data})}{p(\theta_i \mid \text{data})}\right)$$
+
+The transition probability is: $P_{ij} = q(j|i) \cdot \alpha_{ij}$
+
+**Note:** Metropolis-Hastings handles asymmetric proposals with a bit more algebra, but the idea is identical!
+
+:::
+
+
+## <span style="font-size: 0.8em">Proving Detailed Balance for Metropolis</span>
+
+:::{style="font-size: .7em"}
+
+We need to show $\pi_i P_{ji} = \pi_j P_{ij}$ where $\pi_i = p(\theta_i \mid \text{data})$
+
+Suppose $\pi_j > \pi_i$ (state $j$ has higher posterior) (if not, rename them!)
+
+Since $\frac{\pi_j}{\pi_i} > 1$:
+
+- $\alpha_{ij} = \min(1, \frac{\pi_j}{\pi_i}) = 1$ (always accept $i \to j$)
+- $\alpha_{ji} = \min(1, \frac{\pi_i}{\pi_j}) = \frac{\pi_i}{\pi_j}$ (sometimes accept $j \to i$)
+
+:::
+
+## Proving Detailed Balance: Case 1
+
+:::{style="font-size: .65em"}
+
+**We know:** $\pi_j > \pi_i$, so $\alpha_{ij} = 1$ and $\alpha_{ji} = \frac{\pi_i}{\pi_j}$
+
+**Compute flow from $i$ to $j$:**
+
+$$\begin{align}
+\pi_i P_{ji} &= \pi_i \cdot \underbrace{q(j|i)}_{\text{propose}} \cdot \underbrace{\alpha_{ij}}_{\text{accept}} \\
+&= \pi_i \cdot q(j|i) \cdot 1 \\
+&= \pi_i \, q(j|i)
+\end{align}$$
+
+
+:::
+
+## Completing the Proof
+
+:::{style="font-size: .7em"}
+
+**We know:** 
+
+- $\pi_j > \pi_i$, so $\alpha_{ij} = 1$ and $\alpha_{ji} = \frac{\pi_i}{\pi_j}$
+- $\pi_i P_{ji} = \pi_i q(j|i)$
+
+**Compute flow from $j$ to $i$:**
+
+$$\begin{align}
+\pi_j P_{ij} &= \pi_j \cdot \underbrace{q(i|j)}_{\text{propose}} \cdot \underbrace{\alpha_{ji}}_{\text{accept}} \\
+&= \pi_j \cdot q(i|j) \cdot \frac{\pi_i}{\pi_j} \\
+&= \pi_i \, q(i|j) \\
+&= \pi_i \, q(j|i) \quad \text{(since symmetric!)}
+\end{align}$$
+
+
+:::
+
+## Completing the Proof
+
+:::{style="font-size: .7em"}
+
+**We showed:** 
+
+- $\pi_j > \pi_i$, so $\alpha_{ij} = 1$ and $\alpha_{ji} = \frac{\pi_i}{\pi_j}$
+- $\pi_i P_{ji} = \pi_i q(j|i)$
+- $\pi_j P_{ij} = \pi_i q(j|i)$
+- $\pi_i P_{ji} = \pi_j P_{ij}$
+
+**Conclusion:** Metropolis satisfies detailed balance for **all** state pairs!
+
+**What this means:**
+
+- The posterior is a stationary distribution of our chain
+- Running the chain long enough → samples from posterior
+- MCMC actually works! We have a mathematical guarantee!
+
+**Extension:** Metropolis-Hastings uses the same logic but with $q(j|i) \cdot q(i|j)$ terms that don't cancel (but still works!)
+
+:::
+
+## Why This Matters
+
+:::{style="font-size: .75em"}
+
+**The power of detailed balance:**
+
+1. **Guaranteed convergence** to target distribution (under mild conditions)
+2. **Works with unnormalized posteriors** - only need ratios!
+3. **General framework** - works for any posterior
+
+**What we've proven:**
+
+If you follow the Metropolis-Hastings acceptance rule, your Markov chain will eventually have the posterior distribution as its steady state.
+
+**This is why MCMC works!**
+
+The mathematical guarantee lets us trust samples from the chain (after burn-in) as samples from the posterior.
+
+:::
+
+## Example: Good King Markov
+
+:::{style="font-size: .7em"}
+
+**Recall from L35:** King visits 10 islands with populations [10, 20, 30, ..., 100]
+
+**King's rule:** From island $i$ to adjacent island $j$:
+
+$$P(\text{move}) = \min\left(1, \frac{\text{pop}_j}{\text{pop}_i}\right)$$
+
+**Proposal:** Flip coin → clockwise or counterclockwise with probability 1/2 each
+
+**Target distribution:** Visit islands proportional to population
+
+**Question:** Does this satisfy detailed balance? Let's check!
+
+:::
+
+## Detailed Balance: King Markov
+
+:::{style="font-size: .65em"}
+
+**Check detailed balance:** Does $\pi_i P_{ji} = \pi_j P_{ij}$?
+
+**Example:** Island 6 (pop 60) vs Island 7 (pop 70)
+
+**Left side:** $\pi_6 \cdot P_{76}$
+
+- $\pi_6 = \frac{60}{550}$ (proportion of time at island 6, where 550 = total population)
+- $P_{76} = q(7|6) \cdot \alpha_{76} = \frac{1}{2} \cdot \min\left(1, \frac{70}{60}\right) = \frac{1}{2} \cdot 1 = \frac{1}{2}$
+- $\pi_6 \cdot P_{76} = \frac{60}{550} \cdot \frac{1}{2} = \frac{30}{550}$
+
+**Right side:** $\pi_7 \cdot P_{67}$
+
+- $\pi_7 = \frac{70}{550}$
+- $P_{67} = q(6|7) \cdot \alpha_{67} = \frac{1}{2} \cdot \min\left(1, \frac{60}{70}\right) = \frac{1}{2} \cdot \frac{6}{7} = \frac{3}{7}$
+- $\pi_7 \cdot P_{67} = \frac{70}{550} \cdot \frac{3}{7} = \frac{70 \cdot 3}{550 \cdot 7} = \frac{210}{3850} = \frac{30}{550}$
+
+**They're equal!** Detailed balance holds, so steady state represents the posterior!
+
+:::
+
+## Practical MCMC: Burn-in
+
+:::{style="font-size: .7em"}
+
+**Burn-in period:** Initial samples before the chain reaches steady state
+
+**Problem:** Estimating coin bias (14 heads, 6 tails)
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Need to set up the posterior function for coin example
+def posterior_unnormalized(p, heads, tails):
+    """Posterior up to a constant (uniform prior)"""
+    if p < 0 or p > 1:
+        return 0
+    return p**heads * (1-p)**tails
+
+n_heads, n_tails = 14, 6
+
+# Generate MCMC samples for the histogram
+np.random.seed(42)
+n_samples = 10000
+current = 0.5
+mcmc_samples = []
+for i in range(n_samples):
+    proposed = current + np.random.normal(0, 0.1)
+    if 0 < proposed < 1:
+        posterior_current = posterior_unnormalized(current, n_heads, n_tails)
+        posterior_proposed = posterior_unnormalized(proposed, n_heads, n_tails)
+        alpha = min(1, posterior_proposed / posterior_current)
+        if np.random.rand() < alpha:
+            current = proposed
+    if i >= 100:  # After burn-in
+        mcmc_samples.append(current)
+
+mcmc_samples = np.array(mcmc_samples)
+
+# Analytical posterior for comparison
+from scipy.stats import beta as beta_dist
+p_range = np.linspace(0, 1, 200)
+analytical_posterior = beta_dist.pdf(p_range, n_heads + 1, n_tails + 1)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Show effect of starting point
+starts = [0.1, 0.5, 0.9]
+colors = ['blue', 'green', 'red']
+
+for start, color in zip(starts, colors):
+    current = start
+    chain = [current]
+    for i in range(200):
+        proposed = current + np.random.normal(0, 0.1)
+        if 0 < proposed < 1:
+            posterior_current = posterior_unnormalized(current, n_heads, n_tails)
+            posterior_proposed = posterior_unnormalized(proposed, n_heads, n_tails)
+            alpha = min(1, posterior_proposed / posterior_current)
+            if np.random.rand() < alpha:
+                current = proposed
+        chain.append(current)
+
+    ax1.plot(chain, alpha=0.7, color=color, label=f'Start at p={start}')
+
+ax1.axhspan(0.6, 0.8, alpha=0.2, color='gray', label='Steady state region')
+ax1.set_xlabel('Iteration', size=12)
+ax1.set_ylabel('p value', size=12)
+ax1.set_title('Different Starting Points → Same Distribution', size=14)
+ax1.legend()
+ax1.grid(alpha=0.3)
+
+# Histogram after burn-in
+ax2.hist(mcmc_samples, bins=40, density=True, alpha=0.6)
+ax2.plot(p_range, analytical_posterior, 'r-', linewidth=3)
+ax2.set_xlabel('p', size=12)
+ax2.set_ylabel('Density', size=12)
+ax2.set_title('Distribution After Burn-in', size=14)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Rule of thumb:** Discard first 10-50% of samples
+
+:::
+
+## <span style="font-size: 0.8em">Practical MCMC: Proposal Distributions</span>
+
+
+:::{style="font-size: .75em"}
+
+**The proposal distribution** $q(\theta'|\theta)$ is **your choice**!
+
+Good proposals make MCMC:
+
+- Converge faster
+- Explore efficiently
+- Avoid getting stuck
+
+**Common choices:**
+
+1. **Random walk:** $\theta' = \theta + \epsilon$ where $\epsilon \sim N(0, \sigma^2)$
+2. **Uniform window:** $\theta' \sim \text{Uniform}(\theta - w, \theta + w)$
+3. **Adaptive proposals:** Learn from previous samples (advanced!)
+
+:::
+
+## The Proposal Distribution Matters
+
+:::{style="font-size: .75em"}
+
+**How we propose new values affects efficiency:**
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+# Three different proposal widths
+proposal_stds = [0.01, 0.1, 0.5]
+titles = ['Too narrow:\nsmall steps', 'Just right:\nmedium steps', 'Too wide:\nmany rejections']
+
+for ax, std, title in zip(axes, proposal_stds, titles):
+    np.random.seed(42)
+    current = 0.5
+    chain = [current]
+
+    for i in range(500):
+        proposed = current + np.random.normal(0, std)
+        if 0 < proposed < 1:
+            posterior_current = posterior_unnormalized(current, n_heads, n_tails)
+            posterior_proposed = posterior_unnormalized(proposed, n_heads, n_tails)
+            alpha = min(1, posterior_proposed / posterior_current)
+            if np.random.rand() < alpha:
+                current = proposed
+        chain.append(current)
+
+    ax.plot(chain[:200], linewidth=1, alpha=0.7)
+    ax.set_xlabel('Iteration', size=10)
+    ax.set_ylabel('p value', size=10)
+    ax.set_title(f'{title}\n(proposal SD = {std})', size=11)
+    ax.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Goldilocks principle:** Not too small, not too large, just right!
+
+:::
+
+## Random Walk Proposals
+
+:::{style="font-size: .75em"}
+
+**Most common:** $\theta' = \theta + \epsilon$ where $\epsilon \sim N(0, \sigma^2)$
+
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+def run_mcmc(proposal_std, n_steps=1000):
+    """Run MCMC with given proposal std"""
+    np.random.seed(42)
+    current = 0.5
+    samples = [current]
+    n_accepts = 0
+
+    for _ in range(n_steps):
+        proposed = current + np.random.normal(0, proposal_std)
+        if 0 < proposed < 1:
+            # Target: Beta(15, 7) unnormalized
+            alpha = min(1, (proposed**14 * (1-proposed)**6) / (current**14 * (1-current)**6))
+            if np.random.rand() < alpha:
+                current = proposed
+                n_accepts += 1
+        samples.append(current)
+
+    return np.array(samples), n_accepts / n_steps
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 5))
+sigmas = [0.01, 0.05, 0.1, 0.2, 0.5, 1.0]
+
+for ax, sigma in zip(axes.flat, sigmas):
+    samples, accept_rate = run_mcmc(sigma, 500)
+    ax.plot(samples[:200], linewidth=1, alpha=0.8)
+    ax.set_title(f'$\sigma$ = {sigma}\nAcceptance: {accept_rate:.1%}', size=11)
+    ax.set_xlabel('Iteration', size=10)
+    ax.set_ylabel('$\\theta$', size=10)
+    ax.set_ylim(0, 1)
+    ax.grid(alpha=0.3)
+
+plt.suptitle('Effect of Proposal Width on MCMC', size=16)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
+## Convergence Diagnostics
+
+:::{style="font-size: .75em"}
+
+**Big question:** How do we know MCMC has converged?
+
+**Problem:** We can't directly see the "true" posterior to compare!
+
+**Solution:** Multiple diagnostic tools
+
+1. **Trace plots** 
+2. **Running statistics** 
+3. **Multiple chains** 
+4. **Autocorrelation** 
+
+Let's look at each!
+
+:::
+
+## Diagnostic 1: Trace Plots
+
+:::{style="font-size: .7em"}
+
+**Trace plot:** Parameter value vs. iteration
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+np.random.seed(42)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Good mixing
+current = 0.5
+good_chain = [current]
+for _ in range(1000):
+    proposed = current + np.random.normal(0, 0.1)
+    if 0 < proposed < 1:
+        alpha = min(1, (proposed**14 * (1-proposed)**6) / (current**14 * (1-current)**6))
+        if np.random.rand() < alpha:
+            current = proposed
+    good_chain.append(current)
+
+ax1.plot(good_chain, linewidth=0.8, alpha=0.7)
+ax1.set_xlabel('Iteration', size=12)
+ax1.set_ylabel('$\\theta$', size=12)
+ax1.set_title('Good: "Fuzzy caterpillar"\n(exploring well)', size=13, color='green')
+ax1.grid(alpha=0.3)
+
+# Poor mixing
+current = 0.3
+poor_chain = [current]
+for _ in range(1000):
+    proposed = current + np.random.normal(0, 0.01)  # Too small!
+    if 0 < proposed < 1:
+        alpha = min(1, (proposed**14 * (1-proposed)**6) / (current**14 * (1-current)**6))
+        if np.random.rand() < alpha:
+            current = proposed
+    poor_chain.append(current)
+
+ax2.plot(poor_chain, linewidth=0.8, alpha=0.7)
+ax2.set_xlabel('Iteration', size=12)
+ax2.set_ylabel('$\\theta$', size=12)
+ax2.set_title('Bad: Slow trends\n(not exploring)', size=13, color='red')
+ax2.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Look for:** "Fuzzy caterpillar" - rapid up/down fluctuations, exploring full range
+
+:::
+
+## Diagnostic 2: Running Mean
+
+:::{style="font-size: .7em"}
+
+Watch the mean parameter value stabilize over iterations:
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# Calculate running mean
+running_mean = np.cumsum(good_chain) / np.arange(1, len(good_chain)+1)
+
+ax.plot(running_mean, linewidth=2, label='Running mean')
+ax.axhline(y=14/20, color='r', linestyle='--', linewidth=2, label='True mean (0.70)')
+ax.set_xlabel('Iteration', size=14)
+ax.set_ylabel('Running mean', size=14)
+ax.set_title('Convergence: Running Mean Stabilizes', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+
+plt.show()
+```
+
+**Look for:** Stabilization after initial burn-in period
+
+:::
+
+## Diagnostic 3: Multiple Chains
+
+:::{style="font-size: .7em"}
+
+**Best practice:** Run multiple chains from different starting points
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+np.random.seed(42)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+starts = [0.2, 0.5, 0.8]
+colors = ['blue', 'green', 'red']
+
+all_chains = []
+
+for start, color in zip(starts, colors):
+    current = start
+    chain = [current]
+    for _ in range(1000):
+        proposed = current + np.random.normal(0, 0.1)
+        if 0 < proposed < 1:
+            alpha = min(1, (proposed**14 * (1-proposed)**6) / (current**14 * (1-current)**6))
+            if np.random.rand() < alpha:
+                current = proposed
+        chain.append(current)
+    all_chains.append(chain)
+
+    ax1.plot(chain, linewidth=0.8, alpha=0.7, color=color, label=f'Start={start}')
+
+ax1.set_xlabel('Iteration', size=12)
+ax1.set_ylabel('$\\theta$', size=12)
+ax1.set_title('Multiple Chains Converge to Same Distribution', size=13)
+ax1.legend()
+ax1.grid(alpha=0.3)
+
+# Histograms after burn-in
+burn = 200
+for chain, color, start in zip(all_chains, colors, starts):
+    ax2.hist(chain[burn:], bins=30, alpha=0.4, density=True, color=color, label=f'Start={start}')
+
+ax2.set_xlabel('$\\theta$', size=12)
+ax2.set_ylabel('Density', size=12)
+ax2.set_title('Posterior Samples (after burn-in)', size=13)
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+**Look for:** All chains should give similar results after burn-in
+
+:::
+
+## Diagnostic 4: Autocorrelation
+
+:::{style="font-size: .75em"}
+
+**Problem:** MCMC samples are correlated (by design!)
+
+**Autocorrelation:** Correlation between $\theta_t$ and $\theta_{t+k}$
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+from statsmodels.graphics.tsaplots import plot_acf
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+# Good mixing chain
+plot_acf(good_chain[100:], lags=50, ax=ax1, alpha=0.05)
+ax1.set_title('Good: Fast decay of autocorrelation', size=13, color='green')
+ax1.set_xlabel('Lag', size=12)
+
+# Poor mixing chain
+plot_acf(poor_chain[100:], lags=50, ax=ax2, alpha=0.05)
+ax2.set_title('Bad: Slow decay (high correlation)', size=13, color='red')
+ax2.set_xlabel('Lag', size=12)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Look for:** Autocorrelation should decay quickly to near zero
+
+:::
+
+
+## <span style="font-size: 0.8em">Complete Example: Euro Coin Problem</span>
+
+:::{style="font-size: .7em"}
+
+**The classic problem:** 250 flips, 140 heads. Estimate $p$ = P(heads).
+
+**Let's implement MCMC from scratch and diagnose it properly!**
+
+```{python}
+#| echo: true
+def metropolis_coin(n_heads, n_tails, n_samples=10000,
+                    proposal_std=0.1, initial=0.5):
+    current = initial
+    samples = [current]
+    n_accepts = 0
+
+    for i in range(n_samples):
+        # Propose new value
+        proposed = current + np.random.normal(0, proposal_std)
+
+        # Check bounds
+        if proposed < 0 or proposed > 1:
+            samples.append(current)  # Reject
+            continue
+
+        # Compute acceptance probability
+        # Posterior ∝ p^heads * (1-p)^tails (assuming uniform prior)
+        log_ratio = (n_heads * (np.log(proposed) - np.log(current)) +
+                     n_tails * (np.log(1-proposed) - np.log(1-current)))
+        alpha = min(1, np.exp(log_ratio))
+
+        # Accept or reject
+        if np.random.rand() < alpha:
+            current = proposed
+            n_accepts += 1
+
+        samples.append(current)
+
+    acceptance_rate = n_accepts / n_samples
+    return np.array(samples), acceptance_rate
+```
+
+:::
+
+## Running the Euro Coin MCMC
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: true
+np.random.seed(42)
+
+# Data: 140 heads in 250 flips
+n_heads, n_tails = 140, 110
+
+# Run MCMC
+samples, accept_rate = metropolis_coin(n_heads, n_tails, n_samples=20000)
+
+print(f"Acceptance rate: {accept_rate:.1%}")
+print(f"Mean of p: {samples[1000:].mean():.4f}")
+print(f"Std of p: {samples[1000:].std():.4f}")
+
+# True posterior is Beta(141, 111) with uniform prior
+true_mean = 141 / 252
+true_std = np.sqrt(141 * 111 / (252**2 * 253))
+print(f"\nTrue mean: {true_mean:.4f}")
+print(f"True std: {true_std:.4f}")
+```
+
+:::
+
+## Diagnostic Plots for Euro Coin
+
+:::{style="font-size: .65em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+fig = plt.figure(figsize=(10, 6.5))
+gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
+
+# Trace plot
+ax1 = fig.add_subplot(gs[0, :])
+ax1.plot(samples[:1000], linewidth=0.8, alpha=0.7)
+ax1.axvline(x=100, color='red', linestyle='--', linewidth=2, label='Burn-in cutoff')
+ax1.set_xlabel('Iteration', size=10)
+ax1.set_ylabel('p', size=10)
+ax1.set_title('Trace Plot: First 1000 Iterations', size=11)
+ax1.legend()
+ax1.grid(alpha=0.3)
+
+# Running mean
+ax2 = fig.add_subplot(gs[1, 0])
+running_mean = np.cumsum(samples) / np.arange(1, len(samples)+1)
+ax2.plot(running_mean, linewidth=2)
+ax2.axhline(y=true_mean, color='r', linestyle='--', linewidth=2)
+ax2.set_xlabel('Iteration', size=10)
+ax2.set_ylabel('Running mean', size=10)
+ax2.set_title('Convergence of Mean', size=11)
+ax2.grid(alpha=0.3)
+
+# Histogram vs true posterior
+ax3 = fig.add_subplot(gs[1, 1])
+burn_in = 1000
+p_range = np.linspace(0.45, 0.65, 100)
+true_posterior = beta.pdf(p_range, 141, 111)
+
+ax3.hist(samples[burn_in:], bins=50, density=True, alpha=0.6, color='skyblue', label='MCMC samples')
+ax3.plot(p_range, true_posterior, 'r-', linewidth=3, label='True posterior')
+ax3.set_xlabel('p', size=10)
+ax3.set_ylabel('Density', size=10)
+ax3.set_title('Posterior Distribution', size=11)
+ax3.legend()
+
+# Autocorrelation
+ax4 = fig.add_subplot(gs[2, 0])
+from statsmodels.tsa.stattools import acf
+autocorr = acf(samples[burn_in:], nlags=100)
+ax4.plot(autocorr, linewidth=2)
+ax4.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
+ax4.axhline(y=0.05, color='red', linestyle='--', linewidth=1, alpha=0.5)
+ax4.axhline(y=-0.05, color='red', linestyle='--', linewidth=1, alpha=0.5)
+ax4.set_xlabel('Lag', size=10)
+ax4.set_ylabel('Autocorrelation', size=10)
+ax4.set_title('Autocorrelation Plot', size=11)
+ax4.grid(alpha=0.3)
+
+# Multiple chains comparison
+ax5 = fig.add_subplot(gs[2, 1])
+starts = [0.3, 0.5, 0.7]
+colors_multi = ['blue', 'green', 'red']
+for start, color in zip(starts, colors_multi):
+    chain, _ = metropolis_coin(n_heads, n_tails, n_samples=5000, initial=start)
+    ax5.hist(chain[500:], bins=30, alpha=0.3, density=True, color=color, label=f'Start={start}')
+
+ax5.set_xlabel('p', size=10)
+ax5.set_ylabel('Density', size=10)
+ax5.set_title('Multiple Chains (different starts)', size=11)
+ax5.legend()
+
+plt.show()
+```
+
+:::
+
+## Comparing Methods: Grid vs MCMC
+
+:::{style="font-size: .65em"}
+
+Let's compare computational cost and accuracy:
+
+```{python}
+#| echo: true
+import time
+
+# Grid method
+start = time.time()
+p_grid = np.linspace(0, 1, 1000)
+prior = np.ones(1000)
+likelihood = binom.pmf(140, 250, p_grid)
+posterior_grid = prior * likelihood
+posterior_grid = posterior_grid / posterior_grid.sum()
+grid_time = time.time() - start
+
+# MCMC method
+start = time.time()
+mcmc_samples, _ = metropolis_coin(140, 110, n_samples=10000)
+mcmc_time = time.time() - start
+
+print(f"Grid method: {grid_time:.4f} seconds")
+print(f"MCMC method: {mcmc_time:.4f} seconds")
+print(f"\nGrid mean: {(p_grid * posterior_grid).sum():.4f}")
+print(f"MCMC mean: {mcmc_samples[1000:].mean():.4f}")
+print(f"True mean: {true_mean:.4f}")
+```
+
+**For 1 parameter:** Grid is faster. **For 5+ parameters:** MCMC is the only option!
+
+:::
+
+## Group Question 1: Diagnosing MCMC
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Scenario:</b> You run MCMC for 5,000 iterations to estimate a parameter \(\theta\). You observe:<br><br>
+
+• The trace plot shows the chain slowly drifting from 0.3 to 0.6 over all 5,000 iterations<br>
+• The running mean hasn't stabilized yet<br>
+• Autocorrelation is very high (>0.8) even at lag 50<br>
+• Acceptance rate is 95%<br><br>
+
+<b>Questions:</b><br>
+1. What is the likely problem?<br>
+2. What would you change to fix it?<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 1: Solution
+
+:::{style="font-size: .7em"}
+
+**1. Problem:** Proposal width is too small
+
+- Very high acceptance rate (95%) so proposals are too similar to current value
+- Chain takes tiny steps so there's slow exploration
+- High autocorrelation confirms samples are very similar
+
+**2. Fix:** Increase proposal standard deviation
+
+- Try doubling or tripling $\sigma$
+- Aim for acceptance rate around 20-40%
+
+:::
+
+
+## Group Question 2: Robot Revisited
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>The Robot's Search:</b> A robot is searching a 3×3 grid for the warmest spot. Each cell has a temp:<br>
+
+<table style="margin: 10px auto; border-collapse: collapse;">
+<tr><td style="border: 1px solid black; padding: 8px; text-align: center;">20°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">40°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">30°</td></tr>
+<tr><td style="border: 1px solid black; padding: 8px; text-align: center;">50°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">80°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">60°</td></tr>
+<tr><td style="border: 1px solid black; padding: 8px; text-align: center;">40°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">70°</td><td style="border: 1px solid black; padding: 8px; text-align: center;">50°</td></tr>
+</table>
+
+
+The robot can only move to adjacent cells (up, down, left, right - no diagonals). It uses Metropolis-Hastings to visit cells in proportion to their temperature.<br><br>
+
+<b>Questions:</b><br>
+1. If the robot is at the center and proposes the cell above it, what's the probability of moving?<br>
+2. If the robot is at top-left and proposes the cell to its right, what's the probability of moving?<br>
+3. In the long run, what fraction of time should the robot spend at the warmest cell?<br>
+4. Represent the robot's positions as a Markov chain (draw it!) - how could you compute the transition probabilities for the robot's movements?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2: Solution
+
+:::{style="font-size: .6em"}
+
+**1. Moving from center (80°) to above (40°):**
+
+$$\alpha = \min\left(1, \frac{40}{80}\right) = 0.5$$
+
+The robot accepts with 50% probability - moving to a colder spot is sometimes accepted
+
+**2. Moving from top-left (20°) to right (40°):**
+
+$$\alpha = \min\left(1, \frac{40}{20}\right) = \min(1, 2) = 1$$
+
+Moving to warmer areas is always accepted.
+
+**3. Fraction of time at warmest cell:**
+
+Total temperature: 20+40+30+50+80+60+40+70+50 = 440°
+
+Fraction at center: $\frac{80}{440} = \frac{2}{11} \approx 18.2\%$
+
+:::
+
+## Group Question 2: Solution 
+
+
+:::{style="font-size: .6em"}
+
+**4. Markov chain representation and transition probabilities:**
+
+Each of the 9 cells is a **state** in the Markov chain. To compute transition probability from cell $i$ to cell $j$:
+
+- If cells aren't adjacent: $P_{ij} = 0$ (can't jump!)
+- If adjacent: $P_{ij} = (\text{proposal prob}) \times (\text{acceptance prob})$
+  - Proposal prob is uniform over neighbors (1/4 leaving center, 1/3 leaving edges, 1/2 leaving corners)
+  - Acceptance prob = $\min\left(1, \frac{\text{temp}_j}{\text{temp}_i}\right)$
+- There's a self-loop capturing the remaining probability (if proposals aren't accepted)
+
+**Example:** Top-center (40°) has 3 neighbors (left, right, down)
+
+- To left (20°): Proposal = $\frac{1}{3}$, Accept = $\min(1, 20/40) = 0.5$ -> $P = \frac{1}{3} \times 0.5 = \frac{1}{6}$
+- To right (30°): Proposal = $\frac{1}{3}$, Accept = $\min(1, 30/40) = 0.75$ -> $P = \frac{1}{3} \times 0.75 = 0.25$
+- To down (80°): Proposal = $\frac{1}{3}$, Accept = $\min(1, 80/40) = 1$ -> $P = \frac{1}{3} \times 1 = \frac{1}{3}$
+- Self-loop: $P_{self} = 1 - \frac{1}{6} - 0.25 - \frac{1}{3} = 0.25$ (stays put 25% of time!)
+
+
+:::
+
+## Look How Far We've Come!
+
+:::{style="font-size: .6em"}
+
+**From "What are the chances of seeing license plate ARW 357?" to Markov Chain Monte Carlo**
+
+This semester, you've mastered:
+
+**The Foundations**
+
+- Probability axioms and conditional probability
+- Random variables, distributions, and their properties
+- The Central Limit Theorem and Law of Large Numbers
+
+**Stochastic Processes**
+
+- Markov chains and how Google conquered web search
+- Hidden Markov Models for understanding sequences
+
+**Statistical Inference**
+
+- **Frequentist**: Maximum likelihood, method of moments, confidence intervals, hypothesis testing
+- **Bayesian**: Prior beliefs, posterior updating, conjugate priors, MAP estimation, Monte Carlo and MCMC
+
+:::
+
+
+## What You Can Do Now
+
+:::{style="font-size: .6em"}
+
+**With this foundation, you're prepared to continue your studies in:**
+
+- **Machine Learning & Data Science** – Classification, regression, causal inference, Bayesian methods
+- **Advanced ML Topics** – Probabilistic graphical models, deep learning, reinforcement learning
+- **Computational Statistics** – Advanced MCMC, variational inference, probabilistic programming
+- **Operations Research** – Queuing theory, optimization under uncertainty
+- **Quantitative Finance** – Risk modeling, options pricing, portfolio theory
+
+**Think Critically About:**
+
+- When reported statistics mislead
+- How to properly quantify uncertainty in data-driven decisions
+- The assumptions behind every model and algorithm
+
+**Build Real Systems:**
+
+- Recommendation engines, fraud detection, natural language processing
+
+:::
+

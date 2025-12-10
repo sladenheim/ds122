@@ -1,0 +1,1039 @@
+---
+title: Comparing Distributions
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+from IPython.core.display import HTML
+
+```
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Constructing **joint prior distributions** for two uncertain parameters
+- **Updating joint distributions** with observed data using Bayes' rule (Bayes' table)
+- Computing **marginal and conditional posteriors** from joint distributions
+- Using **Bayesian inference** to compare two groups or quantities
+- Applying Bayesian comparison methods to **A/B testing** 
+
+:::
+
+## Warm-up: Coffee Shop Orders
+
+:::{style="font-size: .7em"}
+
+**Scenario:** Alice and Bob grab coffee together every morning. Based on past observations, here's the joint distribution for the espresso shots each orders:
+
+|       | Bob: 1 | Bob: 2 | Bob: 3 |
+|-------|--------|--------|--------|
+| **Alice: 1** | 0.15   | 0.10   | 0.05   |
+| **Alice: 2** | 0.10   | 0.20   | 0.10   |
+| **Alice: 3** | 0.05   | 0.10   | 0.15   |
+
+
+**Quick questions:**
+
+a. Are Alice's and Bob's orders dependent or indepenedent?
+
+b. What's the marginal probability that Alice orders 2 shots?
+
+c. What's P(Alice > Bob)?
+
+d. What's the conditional distribution of Alice's order if we know Alice and Bob placed the same order today?
+
+:::
+
+## The Flood Protection Problem
+
+:::{style="font-size: .6em"}
+
+**Scenario:** A coastal town prepares for hurricane season. Homeowners protect their properties with sandbag barriers, but the water level varies with each storm.
+
+:::{.center-text}
+<img src="images/comparison/sandbags.jpeg" width=400/>
+:::
+
+We observe the aftermath of a storm and want to make inferences:
+
+- If a house didn't flood, how high was the water?
+- If a house flooded with 2 feet of water inside, how high were their sandbags?
+
+This is a **comparison problem** - we're comparing two uncertain quantities!
+
+:::
+
+## A Bayesian Strategy
+
+:::{style="font-size: .8em"}
+
+1. Establish priors for both water level and sandbag height
+2. Construct a joint prior distribution
+3. Update with observations
+4. Extract marginal and conditional distributions
+
+:::
+
+## Step 1: Priors
+
+:::{style="font-size: .8em"}
+
+Based on historical data:
+
+**Water levels** in this area average 2 feet above ground with standard deviation 1.5 feet
+
+**Sandbag walls** built by homeowners average 3 feet high with standard deviation 2 feet
+
+```{python}
+#| echo: true
+# Prior for water level (feet above ground)
+water_prior = pd.DataFrame(index=np.linspace(0, 10, 201))
+water_prior['probs'] = norm.pdf(water_prior.index, 2, 1.5)
+water_prior['probs'] = water_prior['probs'] / water_prior['probs'].sum()
+
+# Prior for sandbag height (feet)
+sandbag_prior = pd.DataFrame(index=np.linspace(0, 10, 201))
+sandbag_prior['probs'] = norm.pdf(sandbag_prior.index, 3, 2.0)
+sandbag_prior['probs'] = sandbag_prior['probs'] / sandbag_prior['probs'].sum()
+```
+
+:::
+
+## Visualizing the Priors
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 4))
+
+water_prior.plot(ax=ax1, lw=3, legend=False, color='blue')
+ax1.set_xlabel('Water Level (feet)', size=14)
+ax1.set_ylabel('Probability', size=14)
+ax1.set_title('Prior: Water Level', size=16)
+
+sandbag_prior.plot(ax=ax2, lw=3, legend=False, color='green')
+ax2.set_xlabel('Sandbag Height (feet)', size=14)
+ax2.set_ylabel('Probability', size=14)
+ax2.set_title('Prior: Sandbag Height', size=16);
+```
+
+Notice: On average, sandbags (3 ft) are slightly higher than typical water levels (2 ft) - most houses are protected, but it's closer!
+
+:::
+
+## Step 2: Joint Prior Distribution
+
+:::{style="font-size: .8em"}
+
+We need the **joint distribution** for water level and sandbag height:
+
+$$P(W=x, S=y) = \text{Probability that water is } x \text{ feet and sandbags are } y \text{ feet}$$
+
+**Key assumption:** Before a specific storm, these are **independent**:
+
+- Water level depends on the storm
+- Sandbag height depends on homeowner preparation
+- They don't affect each other directly
+
+$$P(W=x, S=y) = P(W=x) \cdot P(S=y)$$
+
+:::
+## Step 2: Joint Prior Distribution
+
+:::{style="font-size: .8em"}
+
+We need the **joint distribution** for water level and sandbag height:
+
+$$P(W=x, S=y) = \text{Probability that water is } x \text{ feet and sandbags are } y \text{ feet}$$
+
+$$P(W=x, S=y) = P(W=x) \cdot P(S=y)$$
+
+:::
+## Step 2: Joint Prior Distribution
+
+:::{style="font-size: .8em"}
+
+We need the **joint distribution** for water level and sandbag height:
+
+$$P(W=x, S=y) = \text{Probability that water is } x \text{ feet and sandbags are } y \text{ feet}$$
+
+$$P(W=x, S=y) = P(W=x) \cdot P(S=y)$$
+
+```{python}
+#| echo: true
+def make_joint(pmf1, pmf2):
+    '''Compute outer product of two distributions'''
+    X, Y = np.meshgrid(pmf1['probs'], pmf2['probs'])
+    return pd.DataFrame(X * Y, columns=pmf1.index, index=pmf2.index)
+
+joint_prior = make_joint(water_prior, sandbag_prior)
+```
+
+:::
+
+
+## Visualizing the Joint Prior
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(8, 6))
+plt.pcolormesh(joint_prior.columns, joint_prior.index, joint_prior, cmap='Blues')
+plt.colorbar(label='Probability')
+plt.xlabel('Water Level (feet)', size=14)
+plt.ylabel('Sandbag Height (feet)', size=14)
+plt.title('Joint Prior Distribution', size=16)
+# Add diagonal line where water = sandbag
+plt.plot([0, 10], [0, 10], 'r--', lw=2, label='Water = Sandbags')
+plt.legend(fontsize=12);
+```
+
+
+:::
+
+##  <span style="font-size: 0.9em">Scenario 1: House Didn't Flood</span>
+
+:::{style="font-size: .8em"}
+
+**Observation:** After the storm, a house did NOT flood.
+
+**What does this tell us?**
+
+This means: $S > W$
+
+We update our joint distribution with this evidence.
+
+:::
+
+## The Likelihood (No Flooding)
+
+:::{style="font-size: .8em"}
+
+For each hypothesis (each cell in our grid):
+
+- If $S > W$: likelihood = 1 (consistent with no flooding)
+- If $S \leq W$: likelihood = 0 (would have flooded)
+
+```{python}
+#| echo: true
+# Create grids
+W, S = np.meshgrid(joint_prior.columns, joint_prior.index)
+
+# Likelihood for "no flooding" means sandbags > water
+likelihood_no_flood = pd.DataFrame((S > W) + 0,
+                                   columns=joint_prior.columns,
+                                   index=joint_prior.index)
+```
+
+:::
+
+##  <span style="font-size: 0.7em">Visualizing the Likelihood (No Flooding)</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(8, 6))
+plt.pcolormesh(likelihood_no_flood.columns, likelihood_no_flood.index,
+               likelihood_no_flood, cmap='Blues')
+plt.colorbar(label='Likelihood')
+plt.xlabel('Water Level (feet)', size=14)
+plt.ylabel('Sandbag Height (feet)', size=14)
+plt.title('Likelihood: House Did NOT Flood', size=16)
+plt.plot([0, 10], [0, 10], 'r--', lw=2, label='Water = Sandbags');
+```
+
+
+:::
+
+## The Update (No Flooding)
+
+:::{style="font-size: .8em"}
+
+Standard Bayesian update: **Posterior ∝ Prior × Likelihood**
+
+```{python}
+#| echo: true
+# Posterior is prior times likelihood
+posterior_no_flood = joint_prior * likelihood_no_flood
+
+# Normalize (sum over entire grid)
+prob_data = posterior_no_flood.to_numpy().sum()
+posterior_no_flood = posterior_no_flood / prob_data
+```
+
+:::
+
+##  <span style="font-size: 0.7em">Visualizing the Posterior (No Flooding)</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(8, 6))
+plt.pcolormesh(posterior_no_flood.columns, posterior_no_flood.index,
+               posterior_no_flood, cmap='Blues')
+plt.colorbar(label='Probability')
+plt.xlabel('Water Level (feet)', size=14)
+plt.ylabel('Sandbag Height (feet)', size=14)
+plt.title('Joint Posterior: Given House Did NOT Flood', size=16)
+plt.plot([0, 10], [0, 10], 'r--', lw=2, label='Water = Sandbags');
+```
+
+:::
+
+## Inferring the Water Level
+
+:::{style="font-size: .8em"}
+
+Now that we know the house didn't flood, what can we infer about the water level?
+
+We compute the **marginal distribution** for water level.
+
+Recall that to get the distribution of one variable from a joint distribution, sum over all values of the other variable: P(W) = \sum_S P(W, S)$
+
+<br> 
+
+```{python}
+#| echo: true
+# Sum over sandbag heights (sum over rows)
+marginal_water = posterior_no_flood.sum(axis=0)
+```
+
+:::
+
+##  <span style="font-size: 0.8em">Prior vs. Posterior for Water Level</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(water_prior.index, water_prior['probs'], '--', lw=3, label='Prior', color='gray')
+ax.plot(marginal_water.index, marginal_water, lw=3, label='Posterior (given no flood)', color='blue')
+ax.legend(fontsize=14, loc='best')
+ax.set_xlabel('Water Level (feet)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('What We Learned About Water Level', size=18);
+```
+
+
+- Posterior shifted **left** (water was probably lower than average)
+- Posterior is narrower (we have more information)
+- Expected value (MMSE) decreased from 2 ft to around 1.8 ft
+
+:::
+
+## Estimating the Water Level
+
+:::{style="font-size: .8em"}
+
+**Question:** How high was the water?
+
+```{python}
+#| echo: true
+# Posterior mean (MMSE estimate)
+expected_water = np.sum(marginal_water.index * marginal_water)
+print(f"Expected water level: {expected_water:.1f} feet")
+```
+
+**Answer:** Given the house didn't flood, we estimate the water reached about 1.8 feet (MMSE).
+
+This is lower than the historical average (2 ft), which makes sense - we observed no flooding!
+
+:::
+
+##  <span style="font-size: 0.8em">Conditional Posterior: Sandbags</span>
+
+:::{style="font-size: .8em"}
+
+Suppose we now get additional information: a neighbor measured the flood at exactly 4 feet.
+
+**New question:** Given $W = 4$ feet and the house didn't flood, how high were the sandbags?
+
+From the joint posterior, we can extract the **conditional distribution** for sandbags given $W = 4$:
+
+```{python}
+#| echo: true
+# Select column for water = 4 feet
+column_4 = posterior_no_flood[4.0]
+
+# Normalize to get conditional distribution
+conditional_sandbag = column_4 / column_4.sum()
+```
+
+:::
+
+##  <span style="font-size: 0.7em">Prior vs. Conditional Posterior (Sandbags)</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(sandbag_prior.index, sandbag_prior['probs'], '--', lw=3, label='Prior for sandbags', color='gray')
+ax.plot(conditional_sandbag.index, conditional_sandbag, lw=3, label='Posterior | Water=4 ft', color='green')
+ax.legend(fontsize=14, loc='best')
+ax.set_xlabel('Sandbag Height (feet)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('What We Learn About Sandbags From Water=4 ft', size=18);
+```
+
+Sandbag distribution shifted **right** and narrowed - we know $S > 4$ ft (otherwise the house would have flooded)!
+
+:::
+
+##  <span style="font-size: 0.8em">Observations Create Dependence</span>
+
+:::{style="font-size: .7em"}
+
+**Before observing anything (Prior):**
+
+- Water level and sandbag height are **independent**
+- Makes sense: storm intensity is unrelated to homeowner preparation
+
+**After observing "no flooding" (Posterior):**
+
+- Water level and sandbag height **become dependent**
+- If we learn $W = 4$ ft, we know $S > 4$ ft
+- If we learn $S = 2$ ft, we know $W < 2$ ft
+- The observation "no flooding" constrains both parameters simultaneously
+
+**Key point:** Dependence emerges from the **data constraint** ($S > W$), not from any physical relationship between storm intensity and homeowner preparation
+
+:::
+
+##  <span style="font-size: 0.8em">Scenario 2: House Barely Flooded</span>
+
+:::{style="font-size: .8em"}
+
+**New observation:** 
+
+- In a different storm, a different house experienced **minimal flooding** - just a thin layer of water inside (about 1-2 inches).
+- The homeowners conclude: "The water must have *just barely* exceeded our sandbag height."
+
+**Our interpretation:**
+
+- $S < W \leq S + 0.18$ ft
+
+Let's update our beliefs for this house.
+
+:::
+
+##  <span style="font-size: 0.8em">The Likelihood (Flooding)</span>
+
+:::{style="font-size: .8em"}
+
+For each hypothesis (each cell in our grid):
+
+- If $S < W \leq S + 0.18$ then likelihood = 1
+- Otherwise likelihood = 0
+
+```{python}
+#| echo: true
+# Create grids
+W, S = np.meshgrid(joint_prior.columns, joint_prior.index)
+
+# Likelihood for "minimal flooding" means water barely exceeded sandbags
+likelihood_flood = pd.DataFrame(((W > S) & (W <= S + 0.18)) + 0,
+                                columns=joint_prior.columns,
+                                index=joint_prior.index)
+```
+
+:::
+
+##  <span style="font-size: 0.8em">The Likelihood (Flooding)</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(8, 6))
+plt.pcolormesh(likelihood_flood.columns, likelihood_flood.index,
+               likelihood_flood, cmap='Blues')
+plt.colorbar(label='Likelihood')
+plt.xlabel('Water Level (feet)', size=14)
+plt.ylabel('Sandbag Height (feet)', size=14)
+plt.title('Likelihood: House Had Minimal Flooding', size=16)
+# Add diagonal and +0.18 line
+plt.plot([0, 10], [0, 10], 'r--', lw=2, label='Water = Sandbags')
+plt.plot([0.18, 10], [0, 9.82], 'orange', linestyle='--', lw=2, label='Water = Sandbags + 0.18');
+plt.legend();
+```
+
+
+:::
+
+## The Update (Flooding)
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+# Posterior is prior times likelihood
+posterior_flood = joint_prior * likelihood_flood
+
+# Normalize
+prob_data_flood = posterior_flood.to_numpy().sum()
+posterior_flood = posterior_flood / prob_data_flood
+```
+
+:::
+
+##  <span style="font-size: 0.8em">The Posterior (Flooding)</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+plt.figure(figsize=(8, 6))
+plt.pcolormesh(posterior_flood.columns, posterior_flood.index,
+               posterior_flood, cmap='Blues')
+plt.colorbar(label='Probability')
+plt.xlabel('Water Level (feet)', size=14)
+plt.ylabel('Sandbag Height (feet)', size=14)
+plt.title('Joint Posterior: Given Minimal Flooding', size=16)
+# Add diagonal and +0.18 line
+plt.plot([0, 10], [0, 10], 'r--', lw=2, label='Water = Sandbags')
+plt.plot([0.18, 10], [0, 9.82], 'orange', linestyle='--', lw=2, label='Water = Sandbags + 0.18');
+plt.legend();
+```
+
+
+:::
+
+##  <span style="font-size: 0.7em">Marginal Posteriors (Flooding)</span>
+
+:::{style="font-size: .8em"}
+
+What can we infer about water level and sandbag height individually?
+
+We compute the **marginal distributions** from the joint posterior:
+
+```{python}
+#| echo: true
+# Marginal for water level (sum over sandbag heights)
+marginal_water_flood = posterior_flood.sum(axis=0)
+
+# Marginal for sandbag height (sum over water levels)
+marginal_sandbag_flood = posterior_flood.sum(axis=1)
+```
+
+:::
+
+##  <span style="font-size: 0.8em">Posteriors for Water Level</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(water_prior.index, water_prior['probs'], '--', lw=3, label='Prior', color='gray')
+ax.plot(marginal_water.index, marginal_water, lw=3, label='House 1 (no flood)', color='blue')
+ax.plot(marginal_water_flood.index[3:], marginal_water_flood.iloc[3:], lw=3, label='House 2 (minimal flood)', color='red')
+ax.legend(fontsize=14, loc='best')
+ax.set_xlabel('Water Level (feet)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('Water Level Posteriors for Both Houses', size=18);
+```
+
+
+:::
+
+##  <span style="font-size: 0.8em">Posteriors for Sandbag Height</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(sandbag_prior.index, sandbag_prior['probs'], '--', lw=3, label='Prior', color='gray')
+ax.plot(marginal_sandbag_flood.index, marginal_sandbag_flood, lw=3, label='House 2 (minimal flood)', color='red')
+ax.legend(fontsize=14, loc='best')
+ax.set_xlabel('Sandbag Height (feet)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('Sandbag Height Posterior (Minimal Flooding)', size=18);
+```
+
+
+:::
+
+## Comparing Two Houses
+
+:::{style="font-size: .8em"}
+
+We can now infer different things about these two houses:
+
+**House 1 (didn't flood):**
+
+- Water level probably **lower** than average (~1.8 ft)
+- Sandbags probably **higher** than average
+- Wide range of possibilities consistent with observation
+
+**House 2 (minimal flooding):**
+
+- Water level probably **higher** than average (~2.2 ft)
+- Water and sandbag heights are now **tightly coupled**
+
+:::
+
+##  <span style="font-size: 0.8em">Scenario 3: Multiple Observations</span>
+
+:::{style="font-size: .8em"}
+
+**New scenario:** A different storm hits the area. We observe three houses that all experienced flooding.
+
+**Question:** How should our beliefs about the water level update as we see more evidence?
+
+Let's track how the marginal posterior for water level evolves:
+
+- After observing the 1st flooded house
+- After observing the 2nd flooded house
+- After observing the 3rd flooded house
+
+Each observation gives us more information and narrows our uncertainty!
+
+:::
+
+##  <span style="font-size: 0.8em">Sequential Updating</span>
+
+:::{style="font-size: .7em"}
+
+Each house has different sandbag heights (unknown to us).
+
+All we observe is: each house flooded, meaning $W > S$ for that house.
+
+**Key insight:** After each observation, the marginal posterior for water becomes the prior for the next update!
+
+```{python}
+#| echo: true
+#| code-line-numbers: false
+water_prior_seq = water_prior.copy()
+marginals_seq = []
+
+for i in range(3):
+    joint_prior_seq = make_joint(water_prior_seq, sandbag_prior)
+    W, S = np.meshgrid(joint_prior_seq.columns, joint_prior_seq.index)
+    likelihood_flooded = pd.DataFrame((W > S) + 0,
+                                       columns=joint_prior_seq.columns,
+                                       index=joint_prior_seq.index)
+    posterior_seq = joint_prior_seq * likelihood_flooded
+    posterior_seq = posterior_seq / posterior_seq.to_numpy().sum()
+
+    marginal_water_seq = posterior_seq.sum(axis=0)
+    marginals_seq.append(marginal_water_seq.copy())
+    water_prior_seq = pd.DataFrame({'probs': marginal_water_seq},
+                                    index=marginal_water_seq.index)
+```
+
+:::
+
+##  <span style="font-size: 0.8em">Watching Beliefs Evolve</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(water_prior.index, water_prior['probs'], '--', lw=3,
+        label='Prior (before any observations)', color='gray')
+ax.plot(marginals_seq[0].index, marginals_seq[0], lw=3,
+        label='After 1st flooded house', color='lightblue')
+ax.plot(marginals_seq[1].index, marginals_seq[1], lw=3,
+        label='After 2nd flooded house', color='blue')
+ax.plot(marginals_seq[2].index, marginals_seq[2], lw=3,
+        label='After 3rd flooded house', color='darkblue')
+ax.legend(fontsize=12, loc='best')
+ax.set_xlabel('Water Level (feet)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('Sequential Updating: Learning from Multiple Flooded Houses', size=18);
+```
+
+With each flooded house we observe, we become more confident the water was high, and the distribution shifts right and narrows!
+
+:::
+
+##  <span style="font-size: 0.7em">Physical Comparisons to Decision-Making</span>
+
+:::{style="font-size: .7em"}
+
+**What we just learned:**
+
+- Comparing two uncertain quantities (water level vs. sandbag height)
+- Using joint distributions to model both simultaneously
+- Computing P(A > B) to answer comparison questions
+
+**The same framework applies to many domains:**
+
+- **E-commerce:** Is Version B's conversion rate higher than Version A's?
+- **Medicine:** Is Treatment A's recovery rate better than Treatment B's?
+- **Sports:** Is Team A's scoring rate higher than Team B's? (Recall: France vs Croatia!)
+
+Let's apply this to a classic problem: **A/B testing**
+
+:::
+
+## Application: A/B Testing
+
+:::{style="font-size: .8em"}
+
+**Real-world scenario:** You're testing two versions of a website:
+
+- **Version A:** 45 conversions out of 100 visitors (45% conversion rate)
+- **Version B:** 52 conversions out of 100 visitors (52% conversion rate)
+
+**Question:** Is Version B actually better, or could this be random chance?
+
+**Bayesian approach:**
+
+1. Create priors for both conversion rates
+2. Update with observed data
+3. Compute P(B > A) from the joint posterior
+
+:::
+
+##  <span style="font-size: 0.7em">Connection: Probability of Superiority</span>
+
+:::{style="font-size: .8em"}
+
+**Recall from our Poisson processes lecture:**
+
+We computed P(λ_France > λ_Croatia) ≈ 75% using probability of superiority
+
+The key steps were: 
+
+- Create posterior distributions for both parameters
+- Enumerate all pairs of values
+- Sum probabilities where one exceeded the other
+
+**Today's A/B testing uses the exact same technique!**
+
+:::
+
+## A/B Testing Setup
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+# Use uniform priors for conversion rates (0-100%)
+conversion_grid = pd.DataFrame(index=np.linspace(0, 100, 101))
+conversion_grid['probs'] = 1/101  # Uniform
+
+# Update A with 45 successes in 100 trials
+from scipy.stats import binom
+likelihood_A = [binom.pmf(45, 100, p/100) for p in conversion_grid.index]
+conversion_A = conversion_grid.copy()
+conversion_A['probs'] = conversion_A['probs'] * likelihood_A
+conversion_A['probs'] = conversion_A['probs'] / conversion_A['probs'].sum()
+
+# Update B with 52 successes in 100 trials
+likelihood_B = [binom.pmf(52, 100, p/100) for p in conversion_grid.index]
+conversion_B = conversion_grid.copy()
+conversion_B['probs'] = conversion_B['probs'] * likelihood_B
+conversion_B['probs'] = conversion_B['probs'] / conversion_B['probs'].sum()
+```
+
+:::
+
+##  <span style="font-size: 0.8em">A/B Testing: Posteriors</span>
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(conversion_A.index, conversion_A['probs'], lw=3, label='Version A', color='blue')
+ax.plot(conversion_B.index, conversion_B['probs'], lw=3, label='Version B', color='orange')
+ax.legend(fontsize=14, loc='best')
+ax.set_xlabel('Conversion Rate (%)', size=16)
+ax.set_ylabel('Probability', size=16)
+ax.set_title('Posterior Distributions for Both Versions', size=18);
+```
+
+The distributions overlap significantly. Let's quantify: **What's the probability that B is actually better?**
+
+:::
+
+
+## The Joint Posterior
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+joint_ab = make_joint(conversion_A, conversion_B)
+
+# Where is B > A?
+B_grid, A_grid = np.meshgrid(joint_ab.index, joint_ab.columns)
+B_better = joint_ab.to_numpy() * (B_grid > A_grid)
+
+# Probability B > A
+prob_B_better = B_better.sum()
+
+plt.figure(figsize=(6, 4))
+plt.pcolormesh(joint_ab.columns, joint_ab.index, joint_ab, cmap='Blues')
+plt.colorbar(label='Probability')
+plt.xlabel('Version A Conversion Rate (%)', size=14)
+plt.ylabel('Version B Conversion Rate (%)', size=14)
+plt.title('Joint Posterior Distribution (A/B Testing)', size=16)
+# Add diagonal line where B = A
+plt.plot([0, 100], [0, 100], 'r--', lw=2, label='B = A')
+plt.legend(fontsize=12);
+```
+
+Most of the probability mass is above the diagonal (where B > A), indicating Version B is likely better!
+
+:::
+
+## Computing P(B > A)
+
+:::{style="font-size: .8em"}
+
+Create joint posterior and count how often B > A:
+
+```{python}
+#| echo: true
+# Joint posterior
+joint_ab = make_joint(conversion_A, conversion_B)
+
+# Where is B > A?
+B_grid, A_grid = np.meshgrid(joint_ab.index, joint_ab.columns)
+B_better = joint_ab.to_numpy() * (B_grid > A_grid)
+
+# Probability B > A
+prob_B_better = B_better.sum()
+print(f"P(Version B > Version A) = {prob_B_better:.2%}")
+```
+
+**Conclusion:** There's about an 85% chance that Version B is genuinely better than Version A.
+
+:::
+
+## Decision Making in A/B Testing
+
+:::{style="font-size: .8em"}
+
+**Typical decision thresholds:**
+
+- P(B > A) > 95%: Strong evidence, safe to switch to B
+- P(B > A) = 85%: Moderate evidence, might want more data
+- P(B > A) = 50-70%: Weak evidence, keep testing
+
+**Advantage over frequentist testing:**
+
+- Direct probability statement about which is better
+- Can incorporate prior knowledge
+- Natural framework for decision making under uncertainty
+
+:::
+
+## Summary
+
+:::{style="font-size: .7em"}
+
+**Comparing Uncertain Quantities:**
+
+1. **Joint posteriors** capture our updated beliefs about both parameters simultaneously after observing data
+
+2. **Probability of superiority** P(A > B) directly answers "which is better?" by summing over all pairs where A exceeds B
+
+3. **Observations create dependence** - even when parameters start independent, data constrains them together (e.g., knowing water = 4 ft tells us about sandbag height)
+
+
+:::
+
+## Group Question: Holly's Mystery Gift Box!
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>The Setup:</b> Holly the monkey received a mystery gift box containing bananas (B) and coconuts (C). She reaches in without looking and pulls out one fruit at random and discovers - it's a <b>banana</b>!
+<br><br>
+<b>Your priors (before the observation):</b><br>
+• Number of bananas (B): Could be 1, 2, or 3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;P(B=1) = 1/4, P(B=2) = 1/2, P(B=3) = 1/4<br>
+• Number of coconuts (C): Could be 1, 2, or 3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;P(C=1) = 1/4, P(C=2) = 1/2, P(C=3) = 1/4<br>
+• B and C are independent
+<br><br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+
+:::
+
+## Group Question: Part A
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>a.</b> Draw a 3×3 grid with B on one axis and C on the other. Sketch the <b>joint prior</b> distribution P(B, C) in your grid. What should each cell contain?
+<br><br><br><br><br><br>
+<b>b.</b> Holly pulls out a banana. What's the <b>likelihood</b> for each cell in the grid?  (You can draw this as a new grid.)
+<br><br><br><br><br><br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question: Part B
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>c.</b> Compute the <b>joint posterior</b> P(B, C | banana). Which cells in your grid should have the most probability mass after seeing the banana?
+<br><br><br><br><br><br>
+<b>d.</b> What is the probability now that there are more bananas than coconuts in the box?<br><br><br><br>
+<b>e.</b> Based on your posterior, is there now a relationship between B and C? Or are they still independent given the observation?
+<br><br><br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question: Solution (Part A)
+
+:::{style="font-size: .55em"}
+
+**Part (a): Joint prior P(B, C)**
+
+Since B and C are independent, $P(B, C) = P(B) \times P(C)$
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/4 × 1/4 = 1/16 | 1/4 × 1/2 = 1/8 | 1/4 × 1/4 = 1/16 |
+| **B=2** | 1/2 × 1/4 = 1/8 | 1/2 × 1/2 = 1/4 | 1/2 × 1/4 = 1/8 |
+| **B=3** | 1/4 × 1/4 = 1/16 | 1/4 × 1/2 = 1/8 | 1/4 × 1/4 = 1/16 |
+
+
+**Part (b): Likelihood P(banana | B, C)**
+
+The likelihood of drawing a banana is $\frac{B}{B+C}$ (probability of selecting a banana from the box):
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/2 | 1/3 | 1/4 |
+| **B=2** | 2/3 | 2/4 = 1/2 | 2/5 |
+| **B=3** | 3/4 | 3/5 | 3/6 = 1/2 |
+
+
+:::
+
+## Group Question: Solution (Part B)
+
+:::{style="font-size: .55em"}
+
+**Part (c): Joint posterior P(B, C | banana)**
+
+Multiply prior × likelihood, then normalize:
+
+**Unnormalized posterior** = Prior × Likelihood:
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 1/16 × 1/2 = 1/32 | 1/8 × 1/3 = 1/24 | 1/16 × 1/4 = 1/64 |
+| **B=2** | 1/8 × 2/3 = 1/12 | 1/4 × 1/2 = 1/8 | 1/8 × 2/5 = 1/20 |
+| **B=3** | 1/16 × 3/4 = 3/64 | 1/8 × 3/5 = 3/40 | 1/16 × 1/2 = 1/32 |
+
+Sum (marginal) = 1/32 + 1/24 + 1/64 + 1/12 + 1/8 + 1/20 + 3/64 + 3/40 + 1/32 = **0.4417**
+
+**Normalized posterior** (divide each cell by 0.4417):
+
+|     | **C=1** | **C=2** | **C=3** |
+|-----|---------|---------|---------|
+| **B=1** | 0.071 | 0.094 | 0.035 |
+| **B=2** | 0.189 | 0.283 | 0.113 |
+| **B=3** | 0.106 | 0.170 | 0.071 |
+
+**Highest probability:** B=2, C=2 (28.3%) - observing a banana shifted mass toward more bananas!
+
+:::
+
+## Group Question: Solution (Part C)
+
+:::{style="font-size: .55em"}
+
+**Part (d): P(B > C | banana)**
+
+Sum posterior probabilities where B > C (cells above the diagonal):
+
+- B=2, C=1: 0.189
+- B=3, C=1: 0.106
+- B=3, C=2: 0.170
+
+$$P(B > C \mid \text{banana}) = 0.189 + 0.106 + 0.170 = 0.465$$
+
+About **46.5%** chance there are more bananas than coconuts.
+
+**Part (e): Are B and C still independent?**
+
+**No!** After observing the banana, B and C are now **dependent**.
+
+- **Before observation:** $P(B, C) = P(B) \times P(C)$ (independent)
+- **After observation:** $P(B, C \mid \text{banana}) \neq P(B \mid \text{banana}) \times P(C \mid \text{banana})$
+
+**Why?** Observing a banana tells us something about the **ratio** of bananas to coconuts. If we know there are many coconuts (high C), then seeing a banana becomes less likely, which reduces our belief in high B values. The observation creates a negative correlation between B and C.
+
+:::

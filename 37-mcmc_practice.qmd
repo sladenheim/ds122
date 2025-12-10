@@ -1,0 +1,639 @@
+---
+title: MCMC in Practice with PyMC
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.core.display import HTML
+import warnings
+warnings.filterwarnings('ignore')
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+**Today:**
+
+- Using **PyMC** for practical Bayesian inference
+- Applying MCMC to a **change point detection** problem
+
+**The motivating question:** When did COVID cases start rising in our region?
+
+:::
+
+## Teaching evaluations
+
+:::{style="font-size: .75em"}
+
+You have received a link to BU's system "Blue" for course evaluations.  
+
+Please take the next 25 minutes to complete (or make headway on) your evalutions for this course, including lectures and discussion sections.
+
+You should fill out TWO forms for this class 
+
+- A1 about lecture (and Prof. Wheelock and Prof. Woobes) 
+- A2/3/etc. about discussion / your TF.  
+
+If you've already done one, you can do the other now.  
+
+:::
+
+## Why PyMC?
+
+:::{style="font-size: .75em"}
+
+**What we've learned:** How to implement MCMC from scratch
+
+**In practice:** Use a library that does this well!
+
+**PyMC advantages:**
+
+- Automatic proposal tuning
+- Built-in diagnostics
+- Handles complex models
+
+We'll walk through a change point detection problem - perfect for showing why MCMC is essential!
+
+:::
+
+## The Problem: Detecting a COVID Surge
+
+:::{style="font-size: .75em"}
+
+**Scenario:** You're a public health analyst tracking daily COVID cases
+
+**The data:** 100 days of reported cases in a small town
+
+**Something happened** - cases started rising. When? How much?
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Generate synthetic data with a changepoint
+np.random.seed(41)
+n_days = 100
+true_changepoint = 60
+
+# Weekly seasonality (weekday effect - lower on weekends)
+days = np.arange(n_days)
+weekly_pattern = 5 * np.sin(2 * np.pi * days / 7)  # ±5 cases weekend/weekday variation
+
+# Before changepoint: slow linear growth (slope=0.15)
+# After changepoint: faster linear growth (slope=0.5)
+baseline_start = 30
+slow_slope = 0.15
+fast_slope = 0.5
+
+trend_before = baseline_start + slow_slope * days[:true_changepoint]
+trend_after = (baseline_start + slow_slope * true_changepoint) + fast_slope * (days[true_changepoint:] - true_changepoint)
+
+# Add weekly pattern and noise
+cases_before = trend_before + weekly_pattern[:true_changepoint] + np.random.normal(0, 4, true_changepoint)
+cases_after = trend_after + weekly_pattern[true_changepoint:] + np.random.normal(0, 4, n_days - true_changepoint)
+
+cases = np.concatenate([cases_before, cases_after])
+# Ensure non-negative (it's count data)
+cases = np.maximum(cases, 0)
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(range(1, n_days+1), cases, 'o-', alpha=0.6, markersize=4, linewidth=1, color='darkred')
+ax.axvline(x=true_changepoint, color='red', linestyle='--', linewidth=2,
+           alpha=0.3, label='True changepoint (unknown to us)')
+ax.set_xlabel('Day', size=12)
+ax.set_ylabel('Daily COVID Cases', size=12)
+ax.set_title('Daily COVID Cases - When Did Growth Accelerate?', size=14)
+ax.grid(alpha=0.3)
+ax.legend()
+plt.subplots_adjust(left=0.08, right=0.98, top=0.92, bottom=0.12)
+plt.show()
+```
+
+:::
+
+## The Model: Piecewise Linear with Seasonality
+
+:::{style="font-size: .75em"}
+
+**Intuition:** Cases grow linearly, but growth rate changes at the changepoint
+
+**Parameters we don't know:**
+
+1. $\tau$ = the changepoint day (when growth accelerated)
+2. $\beta_0$ = initial baseline rate (intercept)
+3. $\beta_1$ = slow growth rate *before* day $\tau$ (slope)
+4. $\beta_2$ = fast growth rate *after* day $\tau$ (slope)
+5. $A, \phi$ = weekly seasonality (amplitude and phase)
+6. $\sigma$ = day-to-day variation
+
+
+
+:::
+
+## The Model: Piecewise Linear with Seasonality
+
+:::{style="font-size: .75em"}
+
+
+**The likelihood:**
+
+$$\text{cases}_t \sim \begin{cases}
+\text{Normal}(\beta_0 + \beta_1 t + A\sin(2\pi t/7 + \phi), \sigma) & \text{if } t < \tau \\
+\text{Normal}(\mu_\tau + \beta_2(t-\tau) + A\sin(2\pi t/7 + \phi), \sigma) & \text{if } t \geq \tau
+\end{cases}$$
+
+where $\mu_\tau = \beta_0 + \beta_1 \tau$ (continuous at changepoint)
+
+**The challenge:** Discrete changepoint + continuous trends + seasonality
+
+:::
+
+## Why Not Grid Methods?
+
+:::{style="font-size: .75em"}
+
+**Remember grid methods?** Evaluate posterior on a grid of parameter values
+
+**For this problem:**
+
+- $\tau \in \{1, 2, ..., 100\}$ -> 100 values
+- $\beta_0 \in [20, 50]$ -> say 30 values (intercept)
+- $\beta_1 \in [0, 1]$ -> say 20 values (slow slope)
+- $\beta_2 \in [0, 2]$ -> say 40 values (fast slope)
+- $A \in [0, 10]$ -> say 20 values (seasonality amplitude)
+- $\phi \in [0, 2\pi]$ -> say 20 values (seasonality phase)
+- $\sigma \in [3, 15]$ -> say 24 values
+
+**Total grid size:** $100 \times 30 \times 20 \times 40 \times 20 \times 20 \times 24 = 1.15$ **billion** points!
+
+**Solution:** MCMC explores the posterior efficiently! 
+
+:::
+
+## Setting Up Priors
+
+:::{style="font-size: .57em"}
+
+1. **Changepoint** $\tau$: Discrete uniform over days 1-100
+   - `Discrete Uniform(1, 100)`
+
+2. **Intercept** $\beta_0$: Starting case level
+   - `Normal(35, 15)` - weakly informative
+
+3. **Slow slope** $\beta_1$: Growth rate before changepoint
+   - `Normal(0.3, 0.5)` - allows slow increase or decrease
+
+4. **Fast slope** $\beta_2$: Growth rate after changepoint
+   - `Normal(0.5, 0.5)` - data will tell us if it's faster
+
+5. **Seasonality amplitude** $A$: Size of weekly pattern
+   - `Gamma(2, 0.5)` - positive, mean≈4, allows moderate variation
+
+6. **Seasonality phase** $\phi$: Which day is peak
+   - `Uniform(0, 2$\pi$)` - no preference
+
+7. **Noise** $\sigma$: Unexplained day-to-day variation
+   - `Gamma(2, 0.5)` - positive (it's a std dev), mean≈4
+
+**Key:** These priors are weakly informative - the data will dominate
+
+:::
+
+## Implementing in PyMC
+
+:::{style="font-size: .65em"}
+
+**First: Import PyMC and arviz (diagnostics library)**
+
+```{python}
+#| echo: true
+import pymc as pm
+import arviz as az
+```
+
+**The trick:** Use `pm.math.switch` to toggle between trend regimes
+
+```{python}
+#| echo: true
+#| output: false
+#| classes: "code-max-height"
+with pm.Model() as changepoint_model:
+    # Priors
+    tau = pm.DiscreteUniform('changepoint', lower=1, upper=n_days-1)
+    beta_0 = pm.Normal('intercept', mu=35, sigma=15)
+    beta_1 = pm.Normal('slow_slope', mu=0.3, sigma=0.5)
+    beta_2 = pm.Normal('fast_slope', mu=0.5, sigma=0.5)
+    A = pm.Gamma('seasonality_amp', alpha=2, beta=0.5)
+    phi = pm.Uniform('seasonality_phase', lower=0, upper=2*np.pi)
+    sigma = pm.Gamma('noise', alpha=2, beta=0.5)
+
+    # Days and seasonality
+    days = np.arange(n_days)
+    seasonal = A * pm.math.sin(2 * np.pi * days / 7 + phi)
+
+    # Piecewise linear trends
+    mu_at_tau = beta_0 + beta_1 * tau  # Value at changepoint
+    trend_before = beta_0 + beta_1 * days
+    trend_after = mu_at_tau + beta_2 * (days - tau)
+
+    # Switch between regimes
+    trend = pm.math.switch(tau >= days, trend_before, trend_after)
+    mu = trend + seasonal
+
+    # Likelihood
+    obs = pm.Normal('obs', mu=mu, sigma=sigma, observed=cases)
+
+    # Sample from posterior
+    trace = pm.sample(2000, tune=1000, random_seed=42,
+                      return_inferencedata=True, target_accept=0.95)
+```
+
+**That's it!** PyMC handles the discrete+continuous MCMC sampling.
+
+:::
+
+## Examining the Results
+
+:::{style="font-size: .6em"}
+
+```{python}
+#| echo: true
+# Summary statistics
+az.summary(trace, var_names=['changepoint', 'intercept', 'slow_slope', 'fast_slope',
+                             'seasonality_amp', 'noise'])
+```
+
+**Columns:**
+
+- **mean/sd:** Posterior mean and standard deviation
+- **hdi_3%, hdi_97%:** 94% highest density interval (credible interval)
+- **mcse_mean/sd:** Monte Carlo standard error (sampling uncertainty)
+- **ess_bulk/tail:** Effective sample sizes (want >100)
+- **r_hat:** Convergence diagnostic (want ≈1.0, definitely <1.1)
+
+:::
+
+
+## Examining the Results
+
+:::{style="font-size: .6em"}
+
+```{python}
+#| echo: true
+# Summary statistics
+az.summary(trace, var_names=['changepoint', 'intercept', 'slow_slope', 'fast_slope',
+                             'seasonality_amp', 'noise'])
+```
+
+**Parameter interpretation:**
+
+- **Changepoint:** Growth accelerated around day 60 (recovered true value)
+- **Slopes:** Slow growth (0.15) to Fast growth (0.5) - both recovered
+- **Seasonality amp:** Weekly variation ~5 cases (true: 5)
+- **All r_hat ≈ 1.00:** Great convergence
+
+:::
+
+
+## Visualizing the Posterior
+
+:::{style="font-size: .65em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+az.plot_posterior(trace, var_names=['changepoint', 'intercept', 'slow_slope',
+                                     'fast_slope', 'seasonality_amp'],
+                  figsize=(10, 4))
+plt.tight_layout()
+plt.show()
+```
+
+- **Changepoint posterior:** Some uncertainty in exact day (likely 55-65 range)
+- **Slope estimates:** Clear difference between slow (0.15) and fast (0.5) growth
+- **Seasonality:** Weekly pattern amplitude well-recovered (~5 cases)
+- **Intercept:** Starting baseline well-estimated
+
+
+:::
+
+## The Changepoint Trace Plot
+
+:::{style="font-size: .7em"}
+
+**This is where change point detection gets really cool!**
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Create trace plot just for changepoint
+fig, ax = plt.subplots(figsize=(11, 3.5))
+
+# Get changepoint samples from all chains
+cp_samples = trace.posterior['changepoint'].values
+
+# Plot each chain
+for chain_idx in range(cp_samples.shape[0]):
+    ax.plot(cp_samples[chain_idx, :], alpha=0.6, linewidth=0.8,
+            label=f'Chain {chain_idx+1}')
+
+ax.set_xlabel('Iteration', size=12)
+ax.set_ylabel('Changepoint (day)', size=12)
+ax.set_title('Trace Plot: Changepoint Parameter - Notice the Discrete Jumps!', size=13)
+ax.legend(fontsize=9)
+ax.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+**See the discrete jumps?** This is MCMC exploring different changepoint days
+
+This is exactly why we needed MCMC - exploring this discrete + continuous posterior.
+
+:::
+
+## More Diagnostics with arviz
+
+:::{style="font-size: .55em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+axes = az.plot_trace(trace, var_names=['slow_slope', 'fast_slope'],
+                     figsize=(7, 3.5))
+
+# Add column titles
+axes[0, 0].set_title('Posterior Distributions (KDE)', fontsize=13, pad=10)
+axes[0, 1].set_title('Trace Plots (MCMC Samples)', fontsize=13, pad=10)
+
+plt.tight_layout()
+plt.show()
+```
+
+**What to look for:**
+
+- **Good mixing:** Fuzzy caterpillar (not stuck in one region)
+- **Convergence:** All chains reach the same distribution
+- **Parameter recovery:** Slow (0.15) and fast (0.5) growth rates well-separated
+
+:::
+
+## <span style="font-size: 0.8em">Comprehensive Diagnostics: Changepoint</span>
+
+:::{style="font-size: .6em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Create comprehensive diagnostics figure
+fig, axes = plt.subplots(2, 2, figsize=(10, 6))
+
+# 1. Trace plot (top left)
+cp_samples = trace.posterior['changepoint'].values.flatten()
+axes[0, 0].plot(cp_samples, linewidth=0.5, alpha=0.7)
+axes[0, 0].axhline(y=true_changepoint, color='red', linestyle='--',
+                   linewidth=2, label=f'True value ({true_changepoint})')
+axes[0, 0].set_xlabel('Iteration', fontsize=11)
+axes[0, 0].set_ylabel('Changepoint (day)', fontsize=11)
+axes[0, 0].set_title('Trace Plot', fontsize=12, fontweight='bold')
+axes[0, 0].legend(fontsize=9)
+axes[0, 0].grid(True, alpha=0.3)
+
+# 2. Posterior histogram (top right)
+axes[0, 1].hist(cp_samples, bins=50, density=True, alpha=0.6, edgecolor='black')
+axes[0, 1].axvline(x=true_changepoint, color='red', linestyle='--',
+                   linewidth=2, label=f'True value ({true_changepoint})')
+axes[0, 1].axvline(x=np.mean(cp_samples), color='blue', linestyle='-',
+                   linewidth=2, label=f'Posterior mean ({np.mean(cp_samples):.1f})')
+axes[0, 1].set_xlabel('Changepoint (day)', fontsize=11)
+axes[0, 1].set_ylabel('Density', fontsize=11)
+axes[0, 1].set_title('Posterior Distribution', fontsize=12, fontweight='bold')
+axes[0, 1].legend(fontsize=9)
+axes[0, 1].grid(True, alpha=0.3)
+
+# 3. Autocorrelation (bottom left)
+from scipy.stats import pearsonr
+max_lag = 100
+autocorr = []
+for lag in range(max_lag):
+    if lag == 0:
+        autocorr.append(1.0)
+    else:
+        corr, _ = pearsonr(cp_samples[:-lag], cp_samples[lag:])
+        autocorr.append(corr)
+
+axes[1, 0].bar(range(max_lag), autocorr, width=1.0, alpha=0.7)
+axes[1, 0].axhline(y=0, color='black', linestyle='-', linewidth=0.5)
+axes[1, 0].set_xlabel('Lag', fontsize=11)
+axes[1, 0].set_ylabel('Autocorrelation', fontsize=11)
+axes[1, 0].set_title('Autocorrelation Plot', fontsize=12, fontweight='bold')
+axes[1, 0].grid(True, alpha=0.3, axis='y')
+axes[1, 0].set_xlim(0, max_lag)
+
+# 4. Running mean (bottom right)
+running_mean = np.cumsum(cp_samples) / np.arange(1, len(cp_samples) + 1)
+axes[1, 1].plot(running_mean, linewidth=1.5, alpha=0.8)
+axes[1, 1].axhline(y=true_changepoint, color='red', linestyle='--',
+                   linewidth=2, label=f'True value ({true_changepoint})')
+axes[1, 1].set_xlabel('Iteration', fontsize=11)
+axes[1, 1].set_ylabel('Running mean', fontsize=11)
+axes[1, 1].set_title('Running Mean (Convergence Check)', fontsize=12, fontweight='bold')
+axes[1, 1].legend(fontsize=9)
+axes[1, 1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
+## <span style="font-size: 0.8em">Comprehensive Diagnostics: Changepoint</span>
+
+:::{style="font-size: .6em"}
+
+
+**Diagnostic checks (from L36):**
+
+- **Trace plot:** Fuzzy caterpillar ✓ - good mixing, explores full range
+- **Posterior:** Unimodal, concentrated near true value (day {true_changepoint})
+- **Autocorrelation:** Decays quickly to near zero - efficient sampling
+- **Running mean:** Stabilizes after initial period - convergence achieved
+
+:::
+
+
+## Visualizing the Fitted Model
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Get posterior means
+cp_mean = int(trace.posterior['changepoint'].mean().values)
+beta_0_mean = trace.posterior['intercept'].mean().values
+beta_1_mean = trace.posterior['slow_slope'].mean().values
+beta_2_mean = trace.posterior['fast_slope'].mean().values
+A_mean = trace.posterior['seasonality_amp'].mean().values
+
+# Reconstruct fitted model (use phase=0 to match data generation)
+days_plot = np.arange(n_days)
+seasonal_mean = A_mean * np.sin(2 * np.pi * days_plot / 7)
+
+# Piecewise linear trends
+mu_at_cp = beta_0_mean + beta_1_mean * cp_mean
+trend_before = beta_0_mean + beta_1_mean * days_plot[:cp_mean]
+trend_after = mu_at_cp + beta_2_mean * (days_plot[cp_mean:] - cp_mean)
+
+fitted_before = trend_before + seasonal_mean[:cp_mean]
+fitted_after = trend_after + seasonal_mean[cp_mean:]
+
+# Plot data and fit
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(range(1, n_days+1), cases, 'o', alpha=0.4, markersize=4,
+        label='Observed cases', color='darkred')
+
+# Plot fitted trends (connect at changepoint)
+ax.plot(range(1, cp_mean+1), fitted_before, color='blue', linewidth=2.5,
+        label=f'Slow growth (slope={beta_1_mean:.2f})')
+# Prepend the last value from fitted_before to connect the lines
+fitted_after_connected = np.concatenate([[fitted_before[-1]], fitted_after])
+ax.plot(range(cp_mean, n_days+1), fitted_after_connected, color='red', linewidth=2.5,
+        label=f'Fast growth (slope={beta_2_mean:.2f})')
+ax.axvline(x=cp_mean, color='orange', linestyle='--', linewidth=2,
+           label=f'Changepoint: day {cp_mean}')
+
+ax.set_xlabel('Day', size=12)
+ax.set_ylabel('Daily COVID Cases', size=12)
+ax.set_title('Fitted Piecewise Linear Model with Seasonality', size=14)
+ax.legend(fontsize=10)
+ax.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+**Perfect!** The model detected when growth accelerated and captured the weekly pattern!
+
+:::
+
+## Answering the Public Health Question
+
+:::{style="font-size: .75em"}
+
+**Remember the original question:** When did growth accelerate? How much faster?
+
+```{python}
+#| echo: true
+# Extract posterior samples
+cp_posterior = trace.posterior['changepoint'].values.flatten()
+slow_slope_posterior = trace.posterior['slow_slope'].values.flatten()
+fast_slope_posterior = trace.posterior['fast_slope'].values.flatten()
+
+# Compute acceleration for each posterior sample
+acceleration = fast_slope_posterior - slow_slope_posterior
+acceleration_pct = 100 * acceleration / slow_slope_posterior
+
+print(f"Growth accelerated: Day {np.median(cp_posterior):.0f} (95% CI: [{np.percentile(cp_posterior, 2.5):.0f}, {np.percentile(cp_posterior, 97.5):.0f}])")
+print(f"Slow growth rate: {np.median(slow_slope_posterior):.2f} cases/day/day (95% CI: [{np.percentile(slow_slope_posterior, 2.5):.2f}, {np.percentile(slow_slope_posterior, 97.5):.2f}])")
+print(f"Fast growth rate: {np.median(fast_slope_posterior):.2f} cases/day/day (95% CI: [{np.percentile(fast_slope_posterior, 2.5):.2f}, {np.percentile(fast_slope_posterior, 97.5):.2f}])")
+print(f"Acceleration: {np.median(acceleration):.2f} cases/day/day ({np.median(acceleration_pct):.0f}% increase in growth rate)")
+```
+
+
+:::
+
+## Why This Problem Needed MCMC
+
+:::{style="font-size: .57em"}
+
+**1. Complex posterior landscape**
+
+- Discrete changepoint + continuous slopes + seasonality
+- Natural variability in case counts makes detection challenging
+
+**2. High-dimensional exploration**
+
+- 7 parameters ($\tau$, $\beta_0$, $\beta_1$, $\beta_2$, $A$, $\phi$, $\sigma$)
+- Grid methods would need over **1 billion** evaluations!
+
+**3. Efficient sampling**
+
+- MCMC explores high-probability regions
+- Spends time where posterior mass is concentrated
+
+**4. Uncertainty quantification**
+
+- Get full posterior distributions for all parameters
+- Understand uncertainty in changepoint and growth rates
+
+This is exactly the type of problem MCMC was designed for!
+
+:::
+
+## Extensions: What Else Could We Do?
+
+:::{style="font-size: .6em"}
+
+**What if there were multiple waves (Delta, Omicron, etc.)**
+
+- Model: Multiple discrete changepoints with different growth rates
+
+**What if growth was exponential rather than linear?**
+
+- Model: Piecewise exponential with different rates
+
+**Maybe reporting consistency changed?**
+
+- Model: Different $\sigma$ before and after changepoint
+
+**What if weekly patterns changed over time?**
+
+- Model: Allow seasonality amplitude A(t) to vary
+
+**Could we use a different model for count data?**
+
+- We Normal likelihood - could use Poisson or Negative Binomial
+
+**The beauty of Bayesian MCMC:** All of these are possible with PyMC! Just specify the model, let MCMC do the work. 
+
+:::
+
+
+## Summary
+
+:::{style="font-size: .65em"}
+
+**Our Bayesian inference journey:**
+
+- **L25-27:** Bayes' rule, MAP and MMSE
+- **L28-L31:** Bayesian grid methods for comparison, classification, and decision-making - numerical methods
+- **L32-L33:** Conjugate priors - analytical methods
+- **L34-L37:** Monte Carlo sampling and MCMC - sampling methods
+
+**Next steps:**
+
+- Come to the **review lecture on Wednesday** - bring your questions!
+- We will post a practice final exam shortly
+- If you haven't let us know you intend to take the final on 12/17 please do so ASAP
+
+:::
+

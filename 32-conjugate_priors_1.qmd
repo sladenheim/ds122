@@ -1,0 +1,1022 @@
+---
+title: Conjugate Priors Part 1
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import binom, beta, uniform
+
+def update(distribution, likelihood):
+    '''Standard Bayesian update function'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- Understand how **formulas** can replace **tables** for Bayesian updates
+- Learn what a **conjugate prior** is and why it's useful
+- Apply the **Beta-Binomial** conjugate pair to real problems
+- Interpret conjugate prior parameters as **"pseudo-data"**
+
+
+:::
+
+## Clarification: Naive Bayes Text Models
+
+:::{style="font-size: .75em"}
+
+**Last lecture:** 
+
+- We used Naive Bayes for spam classification. 
+- We treated each email as a sequence of words drawn from a "bag of words" (multinomial distribution).
+- Only counted words that **appeared** in the email
+- Ignored words that didn't appear (zeros)
+- This is called **Multinomial Naive Bayes** (most common for text)
+
+**Alternative approach:** **Multivariate Bernoulli Naive Bayes**
+
+- Models the **presence OR absence** of each word in a fixed dictionary
+- Takes all the zeros into account as well
+- Less common for text classification
+
+:::
+
+## Review: The Grid Method
+
+:::{style="font-size: .8em"}
+
+So far, we've done Bayesian inference using a **grid approach**:
+
+1. Break parameter space into discrete values
+2. Calculate prior probability for each value
+3. Calculate likelihood for each value
+4. Multiply: Posterior $\propto$ Prior × Likelihood
+5. Normalize to sum to 1
+
+**Today:** Can we express these updates as **formulas** instead of tables?
+
+:::
+
+## A Toy Example: Discrete Prior
+
+:::{style="font-size: .7em"}
+
+Let's start with a simple problem to compare **tables vs formulas**.
+
+**Setup:** A coin has probability $p$ of landing heads. You're not sure what $p$ is, but you know it's one of these 5 values:
+
+$$p \in \{0.3, 0.4, 0.5, 0.6, 0.7\}$$
+
+**Prior belief:** Higher values are more likely. Specifically: $P(p) \propto p$
+
+**Data:** You flip the coin 3 times and get 2 heads, 1 tail
+
+**Question:** What's your posterior belief about $p$?
+
+:::
+
+## The Table Method
+
+:::{style="font-size: .7em"}
+
+Let's solve this with a Bayes table:
+
+```{python}
+#| echo: false
+import pandas as pd
+from scipy.stats import binom
+
+# Create the table
+p_values = [0.3, 0.4, 0.5, 0.6, 0.7]
+prior_unnorm = p_values  # proportional to p
+prior = [p / sum(prior_unnorm) for p in prior_unnorm]  # normalize
+likelihood = [binom.pmf(2, 3, p) for p in p_values]  # P(2 heads in 3 flips | p)
+
+df = pd.DataFrame({
+    'p': p_values,
+    'Prior': prior,
+    'Likelihood': likelihood
+})
+
+df['Prior × Likelihood'] = df['Prior'] * df['Likelihood']
+normalizing_constant = df['Prior × Likelihood'].sum()
+df['Posterior'] = df['Prior × Likelihood'] / normalizing_constant
+
+# Round for display
+df_display = df.round(4)
+print(df_display.to_string(index=False))
+```
+
+**This works!** But we had to store and compute everything as a 5-row table.
+
+:::
+
+## The Formula Method
+
+:::{style="font-size: .7em"}
+
+Instead of storing 5 rows, can we capture the pattern with a **formula**?
+
+**Prior:** $P(p) \propto p$
+
+**Likelihood** (2 heads in 3 flips): $P(\text{data} \mid p) \propto p^2(1-p)$
+
+**Posterior (multiply):**
+$$P(p \mid \text{data}) \propto p \times p^2(1-p) = p^3(1-p)$$
+
+**That's it!** The entire posterior is captured by the formula $p^3(1-p)$.
+
+No need to store 5 rows - just remember the formula!
+
+:::
+
+## Seeing It Both Ways
+
+:::{style="font-size: .7em"}
+
+Let's verify the formula $p^3(1-p)$ matches our table:
+
+```{python}
+#| echo: false
+# Show that p^3(1-p) gives the same posterior when normalized
+p_values = [0.3, 0.4, 0.5, 0.6, 0.7]
+
+# Formula approach (unnormalized)
+formula_unnorm = [p**3 * (1-p) for p in p_values]
+# Normalize
+total = sum(formula_unnorm)
+formula_posterior = [x/total for x in formula_unnorm]
+
+# Compare to table method
+comparison_df = pd.DataFrame({
+    'p': p_values,
+    'p³(1-p)': formula_unnorm,
+    'Formula Posterior': formula_posterior,
+    'Table Posterior': df['Posterior'].values
+})
+
+print(comparison_df.round(4).to_string(index=False))
+```
+
+**They're identical!** One formula $p^3(1-p)$ replaces the entire 5-row table.
+
+:::
+
+## One Catch: Normalizing the Formula
+
+:::{style="font-size: .7em"}
+
+We said the posterior is $\propto p^3(1-p)$, but to make it a proper probability distribution, we need to **normalize** it.
+
+**For continuous distributions:** Integrate to find the normalizing constant
+
+$$\int_0^1 p^3(1-p) \, dp = \text{?}$$
+
+**Calculate:**
+$$\int_0^1 p^3(1-p) \, dp = \int_0^1 (p^3 - p^4) \, dp = \left[\frac{p^4}{4} - \frac{p^5}{5}\right]_0^1 = \frac{1}{4} - \frac{1}{5} = \frac{1}{20}$$
+
+**Normalized posterior:**
+$$p(\theta \mid \text{data}) = 20 \cdot \theta^3(1-\theta)$$
+
+:::
+
+## Why Formulas Are Better: Breaking Free from the Grid
+
+:::{style="font-size: .6em"}
+
+**With the table:** We're stuck with 5 discrete values: {0.3, 0.4, 0.5, 0.6, 0.7}
+
+- MAP estimate: Just pick the highest posterior in the table (here 0.7)
+- MMSE estimate: Compute weighted average of those 5 values (here 0.57)$
+- **Limited by our grid granularity!** 
+
+**With the formula** $p^3(1-p)$: We can treat $p$ as **continuous**!
+
+- **MAP:** Find where $\frac{d}{dp}[p^3(1-p)] = 0$
+  - $\frac{d}{dp}[p^3 - p^4] = p^2(3 - 4p) = 0 \implies p = 0.75$
+  - Solution: $p = 0.75$ (exact!)
+- **MMSE:** Integrate to find $E[p]$
+  - $E[p] = \int_0^1 p \cdot 20p^3(1-p) \, dp  = 20\left[\frac{p^5}{5} - \frac{p^6}{6}\right]_0^1 = 20\left(\frac{1}{5} - \frac{1}{6}\right)  = 0.80$
+  - Solution: $p = 0.80$ (exact!)
+
+:::
+
+## Visualizing: Table vs Formula
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| fig-width: 10
+#| fig-height: 4.5
+#| fig-align: center
+
+# Continuous version
+p_continuous = np.linspace(0, 1, 200)
+posterior_continuous = p_continuous**3 * (1 - p_continuous)
+posterior_continuous = posterior_continuous / np.trapz(posterior_continuous, p_continuous)
+
+# Discrete version (from table)
+p_discrete = [0.3, 0.4, 0.5, 0.6, 0.7]
+posterior_discrete = df['Posterior'].values
+
+# MAP for continuous
+from scipy.optimize import minimize_scalar
+map_result = minimize_scalar(lambda p: -(p**3 * (1-p)), bounds=(0, 1), method='bounded')
+map_estimate = map_result.x
+
+# Create figure with dual y-axes
+fig, ax1 = plt.subplots(figsize=(10, 4.5))
+
+# Left y-axis: discrete probabilities
+ax1.bar(p_discrete, posterior_discrete, width=0.08, alpha=0.6, label='Table Method (5 values)', color='steelblue')
+ax1.set_xlabel('p', fontsize=14)
+ax1.set_ylabel('Probability (Table)', fontsize=14, color='steelblue')
+ax1.tick_params(axis='y', labelcolor='steelblue')
+
+# Right y-axis: continuous PDF
+ax2 = ax1.twinx()
+ax2.plot(p_continuous, posterior_continuous, linewidth=3, label='Formula Method (continuous)', color='darkorange')
+ax2.set_ylabel('Density (Formula)', fontsize=14, color='darkorange')
+ax2.tick_params(axis='y', labelcolor='darkorange')
+
+# Add MAP line
+ax1.axvline(map_estimate, color='red', linestyle='--', linewidth=2, label=f'MAP: {map_estimate:.2f}', zorder=10)
+
+# Combine legends
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2, fontsize=11, loc='upper left')
+
+ax1.set_title('Table (discrete) vs Formula (continuous)', fontsize=16)
+ax1.grid(alpha=0.3)
+plt.show()
+```
+
+**The formula captures the full continuous distribution, not just 5 points!**
+
+:::
+
+
+## <span style="font-size: 0.8em">Summary: Two Approaches, Same Answer</span>
+
+:::{style="font-size: .7em"}
+
+**Method 1: Bayes Table**
+
+- Make a table with rows for each discrete value
+- Compute prior, likelihood, and normalize
+- MAP/MMSE limited by granularity
+
+**Method 2: Formula Approach**
+
+- Capture the prior, likelihood, and posterior as formulas
+- Compute exact MAP, MMSE, credible intervals
+- Much more flexible!
+
+**Today's goal:** Learn when we can use formulas instead of tables, and how to update them efficiently.
+
+:::
+
+## But Wait... When Do Formulas Work?
+
+:::{style="font-size: .7em"}
+
+Our toy example worked beautifully: $p \times p^2(1-p) = p^3(1-p)$ stayed simple!
+
+**Question:** Does this always work? Can we always use formulas?
+
+**Answer:** No! Only when prior and likelihood have **compatible functional forms**.
+
+Let's see what happens when they don't...
+
+:::
+
+## Anti-Example 1: Normal -> Binomial
+
+:::{style="font-size: .6em"}
+
+**Scenario:** Estimating coin bias $\theta \in [0,1]$
+
+**Prior:** Normal distribution centered at 0.5
+$$p(\theta) \propto e^{-\frac{(\theta-0.5)^2}{2\sigma^2}}$$
+
+**Data:** 5 heads in 10 flips
+
+**Likelihood:** Binomial
+$$p(\text{data} \mid \theta) \propto \theta^5(1-\theta)^5$$
+
+**Posterior:**
+$$p(\theta \mid \text{data}) \propto e^{-\frac{(\theta-0.5)^2}{2\sigma^2}} \cdot \theta^5(1-\theta)^5$$
+
+**Problem:** This is a **mess**! Mixture of exponential and polynomial terms. No clear form for MAP, MMSE, or normalizing constant!
+
+:::
+## <span style="font-size: 0.85em">Anti-Example 2: Exponential ->  Binomial</span>
+
+:::{style="font-size: .65em"}
+
+**Prior:** Exponential 
+$$p(\theta) \propto e^{-\lambda \theta}$$
+
+
+**Likelihood:**
+$$p(\text{data} \mid \theta) \propto \theta^k(1-\theta)^{n-k}$$
+
+**Posterior:**
+$$p(\theta \mid \text{data}) \propto e^{-\lambda \theta} \cdot \theta^k(1-\theta)^{n-k}$$
+
+**Problems:**
+
+1. Normalizing constant doesn't have a closed form
+2. MAP requires numerical optimization (derivative is complicated)
+3. MMSE requires numerical integration
+
+**We're stuck back with approximations or numerical methods!**
+
+:::
+
+## The Key Insight
+
+:::{style="font-size: .7em"}
+
+**The problem:** Not all prior-likelihood combinations "play nice"
+
+When they don't match:
+
+- Posterior has ugly functional form
+- No closed-form normalizing constant
+- MAP/MMSE require numerical methods
+- We lose the advantages of formulas!
+
+**The solution:** Use **conjugate priors**
+
+- Priors specifically chosen to match the likelihood's functional form
+- Prior × Likelihood = Same family
+- Everything stays tractable!
+
+**Question:** Which prior-likelihood pairs work? Let's find out...
+
+:::
+
+## Quick Exponential Review
+
+:::{style="font-size: .7em"}
+
+This property is **crucial** for what's coming:
+
+$$x^a \cdot x^b = x^{a+b}$$
+
+**Your task:** Simplify these expressions
+
+1. $e^{3x} \cdot e^{2x}$
+2. $p^{2x+5} \cdot p^3$
+3. $\theta^{10} \cdot (1-\theta)^{20} \cdot \theta^{3} \cdot (1-\theta)^{7}$
+
+
+:::
+
+
+## Conjugate Priors: The Magic
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Conjugate Prior</span>
+        <p>
+        A <b>conjugate prior</b> is a prior distribution that, when combined with a particular likelihood, gives a posterior in the <b>same family</b>.
+        <br><br>
+        $$\text{Prior (formula)} \times \text{Likelihood} = \text{Posterior (same family of formulas)}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+**This is exactly what we saw in our toy example!**
+
+- Prior: $\propto p^1(1-p)^0$
+- Likelihood: $\propto p^2(1-p)^1$
+- Posterior: $\propto p^3(1-p)^1$ (same form, updated exponents!)
+
+**No grids needed!** Just update the parameters with addition.
+
+:::
+
+## The Beta-Binomial Conjugate Pair
+
+:::{style="font-size: .8em"}
+
+Let's formalize what we just discovered.
+
+**Problem:** Estimating probability $\theta$ of success (heads, clicks, etc.)
+
+**Likelihood:** Binomial - observe $k$ successes in $n$ trials
+
+$$P(k \mid \theta) = \binom{n}{k} \theta^k (1-\theta)^{n-k} \propto \theta^k (1-\theta)^{n-k}$$
+
+**Conjugate prior:** Beta distribution with parameters $\alpha, \beta$
+
+$$P(\theta \mid \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$$
+
+
+:::
+
+## The Beta Distribution
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Beta Distribution</span>
+        <p>
+        A continuous distribution for a parameter \(\theta \in [0,1]\) with parameters \(\alpha > 0\) and \(\beta > 0\):
+        <br><br>
+        $$\text{Beta}(\theta \mid \alpha, \beta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)} \theta^{\alpha-1}(1-\theta)^{\beta-1}$$
+        <br>
+        where:
+        <ul>
+        <li>\(\Gamma\) is the gamma function (like factorial for real numbers)</li>
+        <li>The fraction is just a normalizing constant</li>
+        <li>The important part is: \(\theta^{\alpha-1}(1-\theta)^{\beta-1}\)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Visualizing Beta Distributions
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| fig-width: 10
+#| fig-height: 4
+#| fig-align: center
+
+theta_vals = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+params = [(1, 1), (2, 2), (5, 5), (2, 5), (10, 2), (20, 10)]
+titles = ['Beta(1,1) - Uniform', 'Beta(2,2)', 'Beta(5,5)',
+          'Beta(2,5) - Skewed left', 'Beta(10,2) - Skewed right', 'Beta(20,10)']
+
+for i, (a, b) in enumerate(params):
+    row, col = i // 3, i % 3
+    ax[row, col].plot(theta_vals, beta.pdf(theta_vals, a, b), linewidth=2)
+    ax[row, col].set_title(titles[i])
+    ax[row, col].set_xlabel('θ')
+    ax[row, col].set_ylabel('Density')
+    ax[row, col].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+:::
+
+## Why Beta and Binomial Work Together
+
+:::{style="font-size: .7em"}
+
+**Prior (Beta):**
+$$P(\theta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$$
+
+**Likelihood (Binomial):**
+$$P(k \mid \theta) \propto \theta^k(1-\theta)^{n-k}$$
+
+**Unnormalized Posterior (multiply prior × likelihood):**
+$$P(\theta \mid k) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1} \cdot \theta^k(1-\theta)^{n-k}$$
+
+$$P(\theta \mid k) \propto \theta^{(\alpha-1)+k}(1-\theta)^{(\beta-1)+(n-k)}$$
+
+$$P(\theta \mid k) \propto \theta^{(\alpha+k)-1}(1-\theta)^{(\beta+n-k)-1}$$
+
+**This is Beta($\alpha+k, \beta+n-k$)!** Multiplication became addition.
+
+:::
+
+## The Update Rule
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Theorem: Beta-Binomial Conjugacy</span>
+        <p>
+        If the prior distribution for a parameter \(\theta\) is \(\theta \sim \text{Beta}(\alpha, \beta)\) and we see data consisting of \(k\) successes in \(n\) independent trials, then the posterior distribution for the parameter is:
+        <br><br>
+        $$\theta \mid \text{data} \sim \text{Beta}(\alpha + k, \beta + (n-k))$$
+        
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+In other words: just add successes to $\alpha$ and failures to $\beta$.
+
+:::
+
+## Return to the Euro Problem
+
+:::{style="font-size: .8em"}
+
+Remember: 140 heads, 110 tails from 250 flips
+
+**Using a uniform prior:** Beta(1, 1)
+
+**After observing data:** Beta(1 + 140, 1 + 110) = Beta(141, 111)
+
+```{python}
+#| fig-width: 10
+#| fig-height: 4
+#| fig-align: center
+
+theta_vals = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots(1, 2, figsize=(11, 4))
+
+# Prior
+ax[0].plot(theta_vals, beta.pdf(theta_vals, 1, 1), linewidth=3)
+ax[0].set_title('Prior: Beta(1, 1)', fontsize=14)
+ax[0].set_xlabel('θ', fontsize=12)
+ax[0].set_ylabel('Density', fontsize=12)
+ax[0].set_ylim(0, 10)
+
+# Posterior
+ax[1].plot(theta_vals, beta.pdf(theta_vals, 141, 111), linewidth=3, color='orange')
+ax[1].set_title('Posterior: Beta(141, 111)', fontsize=14)
+ax[1].set_xlabel('θ', fontsize=12)
+ax[1].set_ylabel('Density', fontsize=12)
+
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
+## Comparing to Grid Method
+
+:::{style="font-size: .7em"}
+
+Let's verify this matches our old approach:
+
+```{python}
+#| echo: true
+# Grid method
+theta_grid = np.linspace(0, 1, 101)
+prior_grid = pd.DataFrame({'theta': theta_grid, 'probs': 1/101})
+likelihood = binom.pmf(140, 250, theta_grid)
+update(prior_grid, likelihood)
+# Conjugate prior method
+theta_vals = np.linspace(0, 1, 200)
+conjugate_posterior = beta.pdf(theta_vals, 141, 111)
+```
+
+```{python}
+#| fig-width: 8
+#| fig-height: 4
+#| fig-align: center
+# Plot
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(prior_grid['theta'], prior_grid['probs'], 'o', markersize=4, label='Grid Method', alpha=0.6)
+ax.plot(theta_vals, conjugate_posterior/100, linewidth=3, label='Conjugate Prior (Beta)', color='orange')
+ax.set_xlabel('θ', fontsize=14)
+ax.set_ylabel('Probability', fontsize=14)
+ax.legend(fontsize=12)
+ax.set_title('Grid Method vs Conjugate Prior - Identical Results!', fontsize=14)
+plt.show()
+```
+
+**They match perfectly!** But conjugate prior is much faster.
+
+:::
+
+## Parameters as "Pseudo-Data"
+
+:::{style="font-size: .6em"}
+
+**Key insight:** Beta parameters can be interpreted as **prior observations**
+
+Beta($\alpha$, $\beta$) represents having already seen:
+
+- $\alpha - 1$ prior successes
+- $\beta - 1$ prior failures
+
+**Examples:**
+
+- **Beta(1, 1):** $0$ prior successes, $0$ prior failures (uniform, no prior data)
+- **Beta(3, 2):** Like seeing $2$ heads, $1$ tail before (our toy example!)
+- **Beta(51, 51):** Like seeing $50$ heads, $50$ tails before (strong belief in fairness)
+
+**Update rule makes sense:**
+
+- Start with $\alpha-1$ pseudo-successes, $\beta-1$ pseudo-failures
+- Observe $k$ real successes, $n-k$ real failures
+- End with $(\alpha-1) + k$ total successes, $(\beta-1) + (n-k)$ total failures
+- Which is Beta($\alpha+k$, $\beta+n-k$)!
+
+:::
+
+## Effect of Prior Strength
+
+:::{style="font-size: .8em"}
+
+Let's see how different priors affect the posterior with the same data (10 heads, 5 tails):
+
+```{python}
+#| fig-width: 12
+#| fig-height: 4
+
+theta_vals = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots(1, 3, figsize=(13, 4))
+
+priors = [(1, 1), (5, 5), (20, 20)]
+titles = ['Weak Prior: Beta(1,1)', 'Medium Prior: Beta(5,5)', 'Strong Prior: Beta(20,20)']
+
+for i, (a, b) in enumerate(priors):
+    # Posterior after seeing 10 heads, 5 tails
+    post_a, post_b = a + 10, b + 5
+
+    ax[i].plot(theta_vals, beta.pdf(theta_vals, a, b), '--', label='Prior', alpha=0.7)
+    ax[i].plot(theta_vals, beta.pdf(theta_vals, post_a, post_b), linewidth=2.5, label='Posterior')
+    ax[i].axvline(10/15, color='red', linestyle=':', label='Data: 10/15', alpha=0.7)
+    ax[i].set_title(titles[i])
+    ax[i].set_xlabel('θ')
+    ax[i].legend(fontsize=9)
+    ax[i].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Strong priors resist data more!** (They have more "pseudo-data")
+
+:::
+
+## Practical Example: Medical Test
+
+:::{style="font-size: .65em"}
+
+A new medical test is being evaluated. What's the true positive rate?
+
+**Scenario:** Expert believes true positive rate is around 85-90%
+
+**Prior:** Beta(17, 3) - represents belief like seeing 16 true positives, 2 false negatives
+
+**Data:** Test 50 patients, get 45 true positives
+
+**Posterior:** Beta(17 + 45, 3 + 5) = Beta(62, 8)
+
+```{python}
+#| fig-align: center
+theta_vals = np.linspace(0.5, 1, 200)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(theta_vals, beta.pdf(theta_vals, 17, 3), '--', linewidth=2, label='Prior: Beta(17, 3)', alpha=0.7)
+ax.plot(theta_vals, beta.pdf(theta_vals, 62, 8), linewidth=3, label='Posterior: Beta(62, 8)')
+ax.set_xlabel('True Positive Rate θ', fontsize=12)
+ax.set_ylabel('Density', fontsize=12)
+ax.legend(fontsize=12)
+ax.set_title('Bayesian Update for Medical Test Accuracy', fontsize=14)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+:::
+
+## Computing Point Estimates
+
+:::{style="font-size: .7em"}
+
+With Beta posterior, everything is easy to compute!
+
+**Mean (MMSE estimate):**
+$$E[\theta] = \frac{\alpha}{\alpha + \beta}$$
+
+**Mode (MAP estimate, when $\alpha, \beta > 1$):**
+$$\text{Mode}[\theta] = \frac{\alpha - 1}{\alpha + \beta - 2}$$
+
+**For our Euro problem - Beta(141, 111):**
+
+- Mean: $\frac{141}{252} = 0.560$
+- Mode: $\frac{140}{250} = 0.560$
+
+(MAP and MMSE are similar with lots of data!)
+
+:::
+
+## Computing Credible Intervals
+
+:::{style="font-size: .8em"}
+
+**Credible intervals are also straightforward - we just use the CDF:**
+
+```{python}
+#| echo: true
+# 90% credible interval for Beta(141, 111)
+lower = beta.ppf(0.05, 141, 111)
+upper = beta.ppf(0.95, 141, 111)
+print(f"90% credible interval: ({lower:.3f}, {upper:.3f})")
+```
+```{python}
+#| fig-align: center
+#| echo: false
+# Visualize
+theta_vals = np.linspace(0.4, 0.7, 200)
+posterior_vals = beta.pdf(theta_vals, 141, 111)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(theta_vals, posterior_vals, linewidth=3)
+ax.fill_between(theta_vals, 0, posterior_vals,
+                 where=(theta_vals >= lower) & (theta_vals <= upper),
+                 alpha=0.3, label='90% Credible Interval')
+ax.axvline(lower, color='red', linestyle='--', alpha=0.5)
+ax.axvline(upper, color='red', linestyle='--', alpha=0.5)
+ax.set_xlabel('θ', fontsize=14)
+ax.set_ylabel('Density', fontsize=14)
+ax.set_title('Posterior with 90% Credible Interval', fontsize=14)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+:::
+
+
+## Why Conjugate Priors Matter
+
+:::{style="font-size: .7em"}
+
+**Advantages:**
+
+- **Fast computation:** No grids, just parameter updates
+- **Exact results:** Not approximations
+- **Interpretable parameters:** "Pseudo-data" intuition
+- **Easy point estimates and intervals**
+
+**Limitations:**
+
+- Only works for specific likelihood-prior pairs
+- Sometimes the conjugate prior doesn't match your true beliefs
+- Most real problems don't have conjugate priors
+
+**When to use them:** When you have the right likelihood (Binomial, Poisson, etc.) and the conjugate prior is reasonable!
+
+:::
+
+## Summary: Beta-Binomial
+
+:::{style="font-size: .7em"}
+
+**The conjugate pair:**
+
+- **Likelihood:** Binomial (counting successes/failures)
+- **Prior:** Beta($\alpha$, $\beta$)
+- **Posterior:** Beta($\alpha + k$, $\beta + n - k$)
+
+**Key insights:**
+
+- Parameters as "pseudo-data": $\alpha-1$ prior successes, $\beta-1$ prior failures
+- Exponential property makes multiplication → addition
+- Everything computes analytically (no grids!)
+
+**Next time:** More conjugate pairs!
+
+:::
+
+
+## Group Question 1: A/B Testing
+
+:::{style="font-size: .6em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>The Setup:</b> You're testing two website designs (A and B) to see which has a better click-through rate.<br><br>
+
+<b>Pilot study:</b> You ran a small pilot with 10 visitors each:<br>
+• Design A: 5 clicks out of 10 visitors<br>
+• Design B: 3 clicks out of 10 visitors<br>
+<br>
+Based on this pilot, you form prior distributions for the full study.<br><br>
+
+<b>Full study data:</b><br>
+• Design A: 120 clicks out of 1000 visitors<br>
+• Design B: 180 clicks out of 1200 visitors<br>
+<br>
+<b>Your Tasks:</b><br>
+1. What prior distributions should you use based on the pilot data?<br>
+2. What are the posterior distributions after the full study?<br>
+3. What are the MAP and MMSE (posterior mean) estimates for each design?<br>
+4. Which design appears better?<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 1: Solution
+
+:::{style="font-size: .7em"}
+
+**1. Prior distributions from pilot study:**
+
+
+Starting with Beta(1, 1) before pilot, update with pilot data:
+
+- Design A: Beta(1 + 5, 1 + 5) = **Beta(6, 6)**
+- Design B: Beta(1 + 3, 1 + 7) = **Beta(4, 8)**
+
+**2. Posterior distributions after full study:**
+
+
+Update priors with full study data:
+
+- Design A: Beta(6 + 120, 6 + 880) = **Beta(126, 886)**
+- Design B: Beta(4 + 180, 8 + 1020) = **Beta(184, 1028)**
+
+:::
+
+## Group Question 1: Solution
+
+:::{style="font-size: .7em"}
+
+**3. MAP and MMSE estimates:**
+
+Design A - Beta(126, 886):
+
+- **MMSE (mean):** $\frac{126}{126+886} = \frac{126}{1012} = 0.1245$ (12.45%)
+- **MAP (mode):** $\frac{126-1}{1012-2} = \frac{125}{1010} = 0.1238$ (12.38%)
+
+Design B - Beta(184, 1028):
+
+- **MMSE (mean):** $\frac{184}{184+1028} = \frac{184}{1212} = 0.1518$ (15.18%)
+- **MAP (mode):** $\frac{184-1}{1212-2} = \frac{183}{1210} = 0.1512$ (15.12%)
+
+**4. Which is better?** Design B has a higher click-through rate!
+
+:::
+
+## Group Question 1: Visualization
+
+:::{style="font-size: .7em"}
+
+```{python}
+theta_vals = np.linspace(0.08, 0.20, 200)
+
+fig, ax = plt.subplots(1, 2, figsize=(13, 5))
+
+# Design A
+prior_a = beta.pdf(theta_vals, 6, 6)
+posterior_a = beta.pdf(theta_vals, 126, 886)
+ax[0].plot(theta_vals, prior_a, '--', linewidth=2, label='Prior: Beta(6, 6)', alpha=0.7)
+ax[0].plot(theta_vals, posterior_a, linewidth=3, label='Posterior: Beta(126, 886)')
+ax[0].axvline(126/1012, color='red', linestyle=':', label=f'Mean: {126/1012:.3f}', alpha=0.7)
+ax[0].set_xlabel('Click-through Rate θ', fontsize=12)
+ax[0].set_ylabel('Density', fontsize=12)
+ax[0].set_title('Design A', fontsize=14)
+ax[0].legend(fontsize=10)
+ax[0].grid(alpha=0.3)
+
+# Design B
+prior_b = beta.pdf(theta_vals, 4, 8)
+posterior_b = beta.pdf(theta_vals, 184, 1028)
+ax[1].plot(theta_vals, prior_b, '--', linewidth=2, label='Prior: Beta(4, 8)', alpha=0.7)
+ax[1].plot(theta_vals, posterior_b, linewidth=3, label='Posterior: Beta(184, 1028)')
+ax[1].axvline(184/1212, color='red', linestyle=':', label=f'Mean: {184/1212:.3f}', alpha=0.7)
+ax[1].set_xlabel('Click-through Rate θ', fontsize=12)
+ax[1].set_ylabel('Density', fontsize=12)
+ax[1].set_title('Design B', fontsize=14)
+ax[1].legend(fontsize=10)
+ax[1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
+
+## Group Question 2: Normal Conjugacy
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+<b>Scenario:</b> You're a forest conservationist estimating the mean age \(\mu\) of trees in an old-growth forest. From studies of similar forests, you know individual tree ages vary with standard deviation \(\sigma = 30\) years around the forest mean.<br><br>
+
+<b>Prior:</b> Based on previous forests in this region, you believe \(\mu \sim \text{Normal}(120, 400)\).
+<br>
+
+<b>Data:</b> You core the first tree and find it's \(x = 150\) years old. 
+<br> <br>
+
+<b>Your Tasks:</b><br>
+1. Find the formula for the prior distribution of \(\mu\) for this forest. <br>
+2. Find the formula for the likelihood of this first tree measurement. <br>
+3. Find the formula for the (unnormalized) posterior. <br>
+4. Playing with the posterior, what form does this have? <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2: Solution
+
+:::{style="font-size: .7em"}
+
+**Step 1: Multiply prior and likelihood**
+
+$$p(\mu \mid x) \propto p(\mu) \times p(x \mid \mu)$$
+$$p(\mu \mid x) \propto e^{-\frac{(\mu-120)^2}{800}} \times e^{-\frac{(150-\mu)^2}{1800}}$$
+
+**Step 2: Combine using exponential property** ($e^a \cdot e^b = e^{a+b}$):
+
+$$p(\mu \mid x) \propto e^{-\left[\frac{(\mu-120)^2}{800} + \frac{(150-\mu)^2}{1800}\right]}$$
+
+
+:::
+
+
+## Group Question 2: Solution
+
+:::{style="font-size: .7em"}
+**Step 3: Simplify the exponent**
+
+Skipping some algebra:
+
+$$\frac{(\mu-120)^2}{800} + \frac{(150-\mu)^2}{1800} = \frac{(\mu - 129.2)^2}{553.8} + \text{constant}$$
+
+
+**Step 4: Identify the form**
+
+$$p(\mu \mid x) \propto c e^{-\frac{(\mu - 129.2)^2}{553.8}}$$
+
+**This is Normal(129.2, 276.9)!** The exponent has the characteristic Normal form.
+
+**Conclusion: Normal-Normal Conjugacy!**
+
+
+:::
+
