@@ -1,0 +1,662 @@
+---
+title: HMMs for Parts-of-Speech Tagging
+author: "CDS DS-722<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Backward pass of the Viterbi algorithm
+- The hidden Markov model behind Parts-Of-Speech (POS) Tagging
+- Calculation of transition probabilities 
+- Calculation of emission probabilities 
+- Application of HMMs for POS-tagging for an 8-word corpus 
+
+:::
+
+## Umbrella Problem
+:::{style="font-size: .8em"}
+
+Let us visualize the model and assign the probabilities.
+
+:::{.center-text}
+<img src="images/hmm/HMM_diagram_no_start.svg" width=900/>
+:::
+
+The diagram shows that, for instance, the probability of the housemate brining an umbrella on a sunny day is 0.2. <br>
+In addition, we assume that the _**intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day**_, respectively.
+
+:::
+
+## Forward Pass
+:::{style="font-size: .75em"}
+The final result of the forward pass consists of fully defined matrices $\small  C$ and $\small  D$. For the umbrella problem, these matrices are
+
+$$\small{C = \begin{bmatrix}0.48 & 0.0672 & 0.009408 & 0.009953 \\ 0.16 & 0.0864 & 0.03110 & 0.007465  \end{bmatrix},D = \begin{bmatrix} 0 & 1 & 1 & 2\\  0 & 1 & 2 & 2\end{bmatrix}.}$$
+
+:::{.center-text}
+<img src="images/hmm/Viterbi_diagram_forward.svg" width=700/>
+:::
+
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+
+The backward pass constructs the Viterbi path, the optimal hidden state sequence for observed data.  
+
+- Step 1: Find the highest probability in the last column of matrix $\small C$, say column $\small T$:  
+  $$\small s = \operatorname{argmax}_{i} C_{iT}$$  
+- Step 2: Use matrix $\small D$ to trace back the path. That is, start from entry $\small D_{sT}$ and move backward. 
+
+In the umbrella problem, $\small s=1$. It corresponds to hidden state $Sunny$. Thus, the fourth state in the hidden state sequence $\small X = (x_0,x_1, x_2, x_3)$ is $Sunny$: $\small x_3 = S.$
+
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+Moreover, $\small D_{14}$ is equal to 2:
+
+$$\small D = \begin{bmatrix} 0 & 1 & 1 & \mathbf{2}\\  0 & 1 & 2 & 2\end{bmatrix}.$$
+
+This value directs us to the second row of matrix $\small D$ that corresponds with hidden state $Rainy$. Hence, $Rainy$ becomes the third state in the hidden state sequence: $\small x_2 = R.$
+
+Since $\small D_{23}$ is also equal to 2: 
+
+$$\small \small{D = \begin{bmatrix} 0 & 1 & 1 & \mathbf{2}\\  0 & 1 & \mathbf{2} & 2\end{bmatrix},}$$
+
+we find that $\small x_1$ is $Rainy$ and so on.
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+
+The complete path through matrix $\small D$ is shown below:
+
+$$\small \small{D = \begin{bmatrix} \mathbf{0} & 1 & 1 & \mathbf{2}\\  0 & \mathbf{1} & \mathbf{2} & 2\end{bmatrix}.}$$
+
+The Viterbi path for the umbrella problem is then $\small (S, R, R, S).$ 
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Given the following matrix \(\small D\):
+
+$$\small{D = \begin{bmatrix} 0 & 1 & 3 & 2 & 3\\
+                      0 & 2 & 4 & 1 & 3\\
+                      0 & 2 & 4 & 1 & 4\\
+                      0 & 4 & 4 & 3 & 1
+      \end{bmatrix}.}$$
+
+Find the Viterbi path, if the maximum entry in the last column of matrix \(\small C\) is located in the first row. <br>
+a. 3 1 3 2 0 <br>
+b. 1 3 1 3 2 <br>
+c. 2 3 1 3 1 <br>
+d. 0 2 3 1 3 <br>
+e. 3 4 2 3 1
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Parts-Of-Speech Tagging
+:::{style="font-size: .8em"}
+In Natural Language Processing (NLP), associating each word in a piece of text with a proper part of speech (POS) is known as _POS tagging_ or _POS annotation_. 
+
+POS tags are also known as word classes, morphological classes, or lexical tags.
+
+:::{.center-text}
+<img src="images/hmm/POS_example.png" width=700/>
+:::
+
+Ambiguous words make POS tagging a nontrivial task.
+
+:::
+
+## Ambiguous Words
+:::{style="font-size: .8em"}
+In each of the following sentences the word well belongs to a different part of speech.
+
+- He did not feel very well. (adjective)
+- She took it well, all things considered. (adverb)
+- Well, this homework took me forever to complete. (interjection)
+- The well is dry. (noun)
+- Tears were beginning to well in their eyes. (verb)
+
+
+:::
+
+## Parts-Of-Speech Tagging
+:::{style="font-size: .8em"}
+Back in the days, the POS annotation was done manually. Assigning POS tags manually within modern multibillion-word corpora is unrealistic and automatic tagging is used instead.
+
+:::{.center-text}
+<img src="images/hmm/POS_1.png" width=700/>
+:::
+:::
+
+## Parts-Of-Speech Tagging
+:::{style="font-size: .8em"}
+Nowadays, manual annotation is typically used on a small portion of a text to create training data. After that, different techniques, such as transformation based tagging, deep learing models, and probabilistic tagging, can be used to develop an automated POS tagger. 
+
+- Transformation based approaches combine handcrafted rules  and automatically induced rules that are generated during the training. 
+- Deep learning tools assign POS tags to words based on the discovered patterns during the training. 
+- Probabilistic tagging include simple frequency-based methods and more complex models like Hidden Markov Models.
+:::
+
+
+## 8-Word Corpus
+:::{style="font-size: .8em"}
+
+Provided corpus:
+
+- _Mary Jane can see Will._
+- _Today Spot will see Mary._
+- _Will Jane spot Mary?_
+- _Mary will pat Spot._
+
+Considered parts of speech:<br>
+noun, modal verb, verb, and other POS tags.
+<br>
+<br>
+
+__Question__: Use the provided corpus to annotate _Will can spot Mary._
+
+:::
+
+##  Hidden and Observable States
+:::{style="font-size: .8em"}
+When we use HMMs for POS tagging, the _**tags serve as the hidden states**_ and the _**words represent the observable states**_. If we distinquish only between<br> _**nouns**_ ($NN$), _**verbs**_
+($VB$), and _**other**_ ($O$) tags, then $NN$, $VB$, and $O$ represent the hidden states. The observable states can be _**going, to, walk**_, etc.
+
+:::{.center-text}
+<img src="images/hmm/POS_diagram.svg" width=600/>
+:::
+
+:::
+
+## Calculating Probabilities 
+:::{style="font-size: .8em"}
+How do we define the transition and emission probabilities for POS tagging? <br>
+We will introduce the computation of the probabilities based on the following toy corpus.
+
+:::{.center-text}
+<img src="images/hmm/toy_corpus_plain.svg" width=500/>
+:::
+
+For simplicity we will distinquish only between _**nouns**_ ($NN$), _**verbs**_ ($VB$), and _**other**_ ($O$)  tags.
+
+:::
+
+## Transition Probabilities 
+:::{style="font-size: .8em"}
+We assign blue background color to verbs, pink to nouns, and green to other parts of speech:
+
+:::{.center-text}
+<img src="images/hmm/toy_corpus_color.svg" width=350/>
+:::
+
+The number of times that a green tag is followed by a blue tag is 2. At the same time, the number of all tag pairs starting with a green tag is 3. Therefore, the transition probability from a green tag to a blue one is $\frac{2}{3}$.
+In other words, $P(VB|O) = \frac{2}{3}$ for this example.
+:::
+
+## Transition Probabilities 
+:::{style="font-size: .8em"}
+More formally, the transition probabilities are computed in two steps. <br>
+__Step 1__: Count the occurences of tag pairs
+
+$$\small{L(t_{i-1}, t_i) \quad \forall i \in \{1,\dots, N\}.}$$
+
+Here, $N$ is the total number of POS tags.<br>
+That is, for each pair of tags $(t_{i-1}, t_i)$, we count how many times tag $t_{i-1}$ is followed by tag $t_i$.<br>
+__Step 2__: Calculate the conditional probabilities using the obtained counts
+
+$$\small{P(X_n = t_i|X_{n-1} = t_{i-1}) = \frac{L(t_{i-1}, t_i)}{\sum_{j=1}^{N} L\left(t_{i-1}, t_j\right)}.}$$
+
+That is, we normalize the number of times that tag $t_{i-1}$ is followed by tag $t_i$ by the total number of tag pairs that start with tag $t_{i-1}$.
+:::
+
+## Transition Probabilities 
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Compute \(P(NN|O)\) for the toy corpus. <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::{.center-text}
+<img src="images/hmm/toy_corpus_color.svg" width=350/>
+:::
+
+
+:::
+
+## Emission Probabilities 
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/hmm/toy_corpus_color.svg" width=350/>
+:::
+
+To compute the emission probabilities we need to count the co-occurrences of a part of speech tag with a specific word. For example, the word "We" occurs 2 times in our corpus, tagged with a green tag for $O$ for _other_ (i.e., not a verb nor a noun). In total, the green tag appears three times in this corpus. Thus, the probability that the hidden state $O$ emits the word "We", $P(We|O)$, is $\frac{2}{3}$.
+:::
+
+## Emission Probabilities 
+:::{style="font-size: .8em"}
+The emission probabilities are also computed in two steps.<br>
+__Step 1__:  Count the co-occurences of tags and words
+
+$$\small{L(t_{i}, w_k) \quad \forall i \in \{1,\dots, N\} \text{ and} \: \: \forall k \in \{1,\dots, K\}.}$$
+
+Here, $K$ is the total number of words. <br>
+That is, for each tag-word pair $(t_{i}, w_k)$, we count how many times the word $w_k$ is associated with the tag $t_i$. <br>
+__Step 2__:  Calculate the conditional probabilities using the obtained counts
+
+$$\small{P(O_n = w_k|X_n = t_{i}) = \frac{L(t_{i}, w_k)}{\sum_{j=1}^{K} L\left(t_{i}, w_j\right)}.}$$
+
+That is, to find the conditional probabilities we divide $L(t_{i}, w_k)$ by the total number of words associated with the same tag.
+:::
+
+## Emission Probabilities 
+:::{style="font-size: .8em"}
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Find \(P(The|O)\) and \(P(algorithm|NN)\) for the toy corpus. <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::{.center-text}
+<img src="images/hmm/toy_corpus_color.svg" width=350/>
+:::
+
+
+:::
+
+## 8-Word Corpus: Pre-Processing
+:::{style="font-size: .8em"}
+
+Before we can construct the HMM, we need to identify the beginning of each sentence by adding the start of sentence tag ```<s>```. In addition, we replace capital letters by lower case letters. The punctuation stays intact. 
+
+- ```<s>``` mary jane can see will.
+- ```<s>``` today spot will see mary.
+- ```<s>``` will jane spot mary?
+- ```<s>``` mary will pat spot.
+
+:::
+
+## Manual Annotation
+:::{style="font-size: .8em"}
+Since the training set is relatively small, we can assign the tags manually, using color coding. Nouns are shown in red color, modal verbs in black, non-modal verbs in blue, and all other tags in green.
+
+- ```<s>``` <font color='red'>mary jane</font> <font color='black'>can</font> <font color='blue'>see</font> <font color='red'>will</font><font color='green'>.</font>
+- ```<s>``` <font color='green'>today</font> <font color='red'>spot</font> <font color='black'>will</font> <font color='blue'>see</font> <font color='red'>mary</font><font color='green'>.</font>
+- ```<s>``` <font color='black'>will</font> <font color='red'>jane</font> <font color='blue'>spot</font> <font color='red'>mary</font><font color='green'>?</font>
+- ```<s>``` <font color='red'>mary</font> <font color='black'>will</font> <font color='blue'>pat</font> <font color='red'>spot</font><font color='green'>.</font>
+:::
+
+## Transition Probabilities
+:::{style="font-size: .8em"}
+The below table shows the number of occurences of different tag pairs. It includes ```<s>``` tag that is needed to define the initial probabilities.
+
+
+| 2nd tag\1st tag | ```<s>``` | $NN$ |$MD$ |$VB$ |$O$ |
+| ---| --- |  --- |  --- |  --- | --- | 
+|$NN$ | 2 | 1 | 1 | 4 | 1 |
+|$MD$ | 1 | 3 | 0 | 0 | 0 |
+|$VB$ | 0 | 1 | 3 | 0 | 0 |
+|$O$  | 1 | 4 | 0 | 0 | 0 |
+|__Total__| __4__ | __9__ | __4__ | __4__ | __1__ |
+:::
+
+## Transition Probabilities
+:::{style="font-size: .8em"}
+Dividing the number of occurences of each tag pair $(t_{i-1},t_i)$ by the total number of tag pairs that starts with tag $t_{i-1}$ yields the transition matrix and the initial probabilities.
+
+$$ A = \begin{bmatrix}
+1/9 & 1/4 & 1 & 1\\
+1/3 & 0 & 0 & 0 \\
+1/9 & 3/4 & 0 & 0\\
+4/9 & 0 & 0 & 0
+\end{bmatrix} \: \text{ and } \:
+\pi = \begin{bmatrix}
+1/2 \\ 1/4 \\ 0 \\ 1/4
+\end{bmatrix}.
+$$
+
+:::
+
+## Emission Probabilities
+:::{style="font-size: .65em"}
+<!-- The following table shows that in the considered corpus two words, _will_ and _spot_, are used as different parts of speech.  -->
+| word\tag | $NN$ |$MD$ |$VB$ |$O$ |
+| ---| --- |  --- |  --- |  --- | 
+|mary | 4 | 0 | 0 | 0 | 
+|jane | 2 | 0 | 0 | 0 |
+|will | 1 | 3 | 0 | 0 |
+|spot | 2 | 0 | 1 | 0 |
+|can  | 0 | 1 | 0 | 0 |
+|see  | 0 | 0 | 2 | 0 |
+|pat  | 0 | 0 | 1 | 0 |
+|today| 0 | 0 | 0 | 1 |
+|.    | 0 | 0 | 0 | 3 |
+|?    | 0 | 0 | 0 | 1 |
+|__Total__| __9__ | __4__ | __4__ | __5__ |
+:::
+
+## Emission Probabilities
+:::{style="font-size: .8em"}
+Dividing the number of co-occurences of a POS tag with a certain word by the total number of times the tag is used provides us with the emission matrix.
+
+$$\small{B = \begin{bmatrix}
+4/9 & 0 & 0 & 0\\
+2/9 & 0 & 0 & 0\\
+1/9 & 3/4 & 0 & 0\\
+2/9 & 0 & 1/4 & 0\\
+0 & 1/4 & 0 & 0\\
+0 & 0 & 1/2 & 0\\
+0 & 0 & 1/4 & 0\\
+0 & 0 & 0 & 1/5\\
+0 & 0 & 0 & 3/5\\
+0 & 0 & 0 & 1/5\\
+\end{bmatrix}.}$$
+
+Together $A, B$ and $\pi$ define the HMM.
+:::
+
+## 8-Word Corpus
+:::{style="font-size: .8em"}
+We will use a Python implementation of the Viterbi algorithm.
+
+```{python}
+import numpy as np
+```
+
+```{python}
+#| echo: true
+def Viterbi(y, A, B, Pi):
+    N = A.shape[1] # cardinality of the state space
+    T = len(y) # length of the observed sequence
+    # Initialize C & D
+    C = np.empty((N, T), 'd') #'d' stands for type double
+    D = np.empty((N, T), 'B') #'B' stands for type unsigned integer 
+
+    # Initialization stage
+    C[:, 0] = B[y[0], :] * Pi.T
+    D[:, 0] = 0
+
+    # Forward pass
+    for i in range(1, T):
+        C[:, i] = np.max(B[y[i], :, np.newaxis] * A * C[:, i - 1], 1)
+        D[:, i] = np.argmax(B[y[i], :, np.newaxis] * A * C[:, i - 1], 1)
+    D[:,1:] =  D[:,1:] + 1 # hidden states indices start with 1
+
+    # Backward pass
+    x = np.empty(T, 'B')
+    x[-1] = np.argmax(C[:, T - 1]) + 1 # finds the value of s
+    for i in reversed(range(1, T)): 
+        x[i - 1] = D[x[i] - 1, i]
+
+    return x, C, D
+```
+:::
+
+## 8-Word Corpus
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+# HMM: transition matrix, emission matrix, and initial probabilities
+A = np.array([[1/9,1/4,1,1],[1/3,0,0,0],[1/9,3/4,0,0],[4/9,0,0,0]])
+B = np.array([[4/9,0,0,0],[2/9,0,0,0],[1/9,3/4,0,0],[2/9,0,1/4,0],
+              [0,1/4,0,0],[0,0,1/2,0],[0,0,1/4,0],[0,0,0,1/5],
+              [0,0,0,3/5],[0,0,0,1/5]])
+Pi = np.array([[1/2],[1/4],[0],[1/4]])
+
+# Observed sequence: "Will can spot Mary."
+O = np.array([2,4,3,0,8])
+```
+
+Note: The observed sequence is encoded in the same way as the emission matrix. For example, _mary_ corresponds with index 0, _jane_ with 1, etc.
+:::
+
+## 8-Word Corpus
+:::{style="font-size: .8em"}
+```{python}
+#| echo: true
+# Result
+X, C, D = Viterbi(O,A,B,Pi)
+print("Matrix C: \n", C)
+print("Matrix D: \n", D)
+print("Answer: \n", X)
+```
+:::
+
+## 8-Word Corpus
+:::{style="font-size: .8em"}
+From the computation of the transition matrix, we know that
+- 1 represents a noun,
+- 2 represents a modal verb,
+- 3 represents a non-modal verb,
+- 4 represents other POS tags.
+
+This implies that the answer that we obtained, $\begin{bmatrix} 1 & 2 & 3 & 1 & 4 \end{bmatrix}$, corresponds with the following sequesnce of POS tags:<br><br>
+noun, modal verb, non-modal verb, noun, and other tag. <br><br>
+The model assigned all the POS tags correctly, because the observed sequence was _Will can spot Mary._ 
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Consider the following corpus that consists of one sentence (including the punctuation):<br>
+<br>
+<em>Life is like a box of chocolates, you never know.</em>
+<br>
+<br>
+
+Assume that we distinguish only between nouns (\(NN\)), verbs (\(VB\)), and other (\(O\)) tags. <br>
+
+Find the transition probability from the other tag to the noun tag, \(P(NN|O)\) and the emission probability of the word <em>you</em> by the other tag, \(P(you|O).\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .7em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A veterinarian is monitoring a dog’s health state by asking the dog owner about its activity levels over the last 3 days. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+The veterinarian assumes three possible activity levels:<br>
+
+-1: quiet, 0: usual, 1: restless.<br> 
+
+The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
+
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+Let us return to the problem in which a veterinarian must determine whether a dog is sick or healthy, and solve it using the Viterbi algorithm. We assume that on the first day the dog exhibited normal activity levels, followed by two days of unusual quietness.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Perform the initialization stage of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Perform the forward pass of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+:::
+
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   c. Perform the backward pass of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::

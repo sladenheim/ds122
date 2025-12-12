@@ -1,0 +1,767 @@
+---
+title: Hidden Markov Models
+author: "CDS DS-722<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## HMMs in Real Life
+:::{style="font-size: .8em"}
+**Hidden Markov Models** (HMMs) deal with Markov processes in which the states are unobservable or _**hidden**_ but influence an _**observable**_ process.
+
+:::{.center-text}
+<img src="images/hmm/HMM_chain.png" width=900/>
+:::
+
+HMMs are used in various fields that include bioinformatics, finance, robotics, developmental studies, speech recognition, and Natural Language Processing (NLP). 
+:::
+
+## HMMs in Real Life
+:::{style="font-size: .8em"}
+
+
+- A concrete example from a developmental study is modelling of infant-free-play regimes. While it is not possible to directly observe if an infant is focused or exploring, a prediction can be made based on the number of toys they were interacting during a certain period of time.
+
+:::{.center-text}
+<img src="images/hmm/baby_focus.png" width=400/>
+:::
+
+:::
+
+## HMMs in Real Life
+:::{style="font-size: .8em"}
+
+- One of the applications of HMMs in computational finance is for modeling stock market states, such as a bull market (it occurs when the stock prices are rising and investors are optimistic) and a bear market (it happends when the prices decline). It is impossible to directly observe the state of the market but put/call ratios, which are indicators of investor sentiment and are associated with short-term stock market returns, can be used to predict them.
+
+:::{.center-text}
+<img src="images/hmm/bear_bull.png" width=400/>
+:::
+
+:::
+
+:::{.notes}
+Hard to identify in real time
+:::
+
+## HMMs in Real Life
+:::{style="font-size: .8em"}
+
+- In NLP, HMMs are often used for Parts-of-Speech (POS) tagging, a process that assigns a grammatical category, such as noun, verb, and adjective, to each word in a piece of text. While this task seems relatively easy to humans who speak the language from which the text has been taken, it is much harder for a machine. For instance, consider the following sentences:
+
+* I should book my flight to Paris.
+* I am reading an interesting book.
+
+The word book is a verb in the first sentence and is a noun in the second one. There are many ambigous words, like book, for which the POS-tagging is not a trivial task.
+We will look into HMMs for POS tagging in more detail in the next lecture.
+:::
+
+## Learning Objectives
+:::{style="font-size: .75em"}
+
+* The problem set-up:
+    - Hidden and observable states
+    - Assumptions
+    - State-transition diagram
+* Types of questions that HMMs are useful for
+* Brute-force approach
+- The Viterbi algorithm:
+    * Key properties
+    * Connection to the brute-force approach
+    * Main stages
+* Application to the umbrella problem
+
+
+
+:::
+
+
+## Umbrella Problem
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="20%"}
+:::{.center-text}
+<img src="images/hmm/umbrella.png" width=300/>
+:::
+:::
+
+::: {.column width="80%"}
+A student is studying for an exam in a room without any windows. Every day she wants to know whether it is rainy or sunny outside. However, her only access to the outside world is when she sees her housemate leaving the house with or without an umbrella each morning. 
+:::
+:::
+
+__Question__: Given the housemate’s behavior:
+
+- Day 1: no umbrella
+- Day 2: umbrella
+- Day 3: umbrella
+- Day 4: no umbrella
+
+What can the student infer about the weather on each of those days?
+:::
+
+## Umbrella Problem
+:::{style="font-size: .8em"}
+This problem is a little unrealistic but has the components we are interested in.
+
+- The student doesn't have direct access to the outside world, but wants to know whether it is sunny or rainy. Therefore, the set $\left\{\text{Sunny}, \text{Rainy} \right\}$ represents the hidden states.  
+
+- Instead of observing the hidden states directly, the student observes a signal emitted by the hidden states - whether the housemate carries an umbrella or not. Thus, $\left\{\text{No umbrella}, \text{Umbrella}\right\}$ is the set of possible observations.
+
+- The signal that the student observes is noisy. For example, even if it's not raining, the housemate might be bringing an umbrella, because he forgot to check the weather report.
+:::
+
+## Model Assumptions
+:::{style="font-size: .8em"}
+To model the umbrella problem, we need to represent it as a discrete-time process. That is, we need to specify a time step between the events.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    What is a good time step in this case?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+Furthermore, we need the following assumptions to create an HMM.
+
+1. _**Markov property**_: the weather at day $n+1$ depends only on the weather at day $n$. 
+2. _**Stationarity**_: the probability of transitioning from one hidden state to another is the same for every time step.
+3. _**Output independence**_: the observation at day $n+1$ depends only on the hidden state at day $n+1$.
+
+:::
+
+## State-Transition Diagram
+:::{style="font-size: .8em"}
+
+Let us visualize the model and assign the probabilities.
+
+:::{.center-text}
+<img src="images/hmm/HMM_diagram_no_start.svg" width=900/>
+:::
+
+The diagram shows that, for instance, the probability of the housemate brining an umbrella on a sunny day is 0.2. <br>
+In addition, we assume that the _**intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day**_, respectively.
+
+:::
+
+## Decoding
+:::{style="font-size: .8em"}
+In general, there are three types of questions that can be asked about the HMMs.
+
+1. **Evaluation**: What is the probability of an observed sequence?
+2. __Decoding__: What is the most likely series of hidden states to generate an observed sequence?
+3. __Learning__: How can we learn the parameters of HMM given some data?
+
+We will focus on decoding problems.
+In particular, the question we are going to address in this and next lecture is the following:<br>
+Given the model depicted in the state-transition diagram and a sequence of observations $O=\left(o_0,o_1,o_2,o_3\right)=(0,1,1,0)$. Find the sequence of hidden states $X=\left(x_0,x_1,x_2,x_3\right)$ that best describes the observations $O$.
+:::
+
+## Transition Matrix
+:::{style="font-size: .8em"}
+The state-transition diagram provides an accesible manner to present the HMM for the umbrella problem. However, this is only the case for problems with a low number of hidden and observable states. Generally, matrix notation is used to describe the model.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Transition Matrix </span>
+        <p>
+        For \(\small N\) hidden states, \(\small Q=\left\{q_1, q_2, \dots, q_{N}\right\}\), the transition matrix \(\small A\) is an \(\small N\times N\) matrix with transition probabilities equal to
+
+        $$\small A_{ij} = P\left(\text{state } q_i \text{ at time } n+1 \:| \text{ state } q_j \text{ at time } n \right).$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+__Remark__: A transition matrix is column stochastic: each of its columns sums up to 1.
+:::
+
+## Transition Probabilities
+:::{style="font-size: .8em"}
+__Example__: The transition matrix for the umbrella problem is equal to
+
+$$\small A = 
+\begin{bmatrix}
+0.7 & 0.4 \\
+0.3 & 0.6
+\end{bmatrix}.$$
+<br>
+
+
+The __initial transition probabilities__ are typically stored in vector $\pi.$
+
+__Example__: For the umbrella problem, the initial probabilities are given by 
+
+$$ \small \pi = \begin{bmatrix} 0.6 \\ 0.4 \end{bmatrix}.$$
+:::
+
+## Emission Matrix
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Emission Matrix </span>
+        <p>
+        For a general set of possible observations \(\small V = \left\{v_1, v_2, \dots, v_{M} \right\},\) the emission matrix \(\small B\) is an \(\small M\times N\) matrix with observation probabilities equal to
+
+        $$\small B_{ij} = P\left( \text{observation } v_i \text{ at time } n \: | \text{ state } q_j \text{ at time } n \right).$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: $\small B$ is column stochastic.<br>
+__Remark__: Together $\small A, B,$ and $\small \pi$ fully define an HMM.
+
+__Example__: For the umbrella example $\small B$ becomes
+
+$$\small B = 
+\begin{bmatrix}
+0.8 & 0.4\\
+0.2 & 0.6
+\end{bmatrix}.$$
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="50%"}
+:::{.center-text}
+<img src="images/hmm/diagramHMM.png" width=700/>
+:::
+:::
+
+::: {.column width="50%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    The provided diagram represents a hidden Markov model with hidden states \(A, B,\) and \(C,\) and observable states 0 and 1.
+
+    Hidden states are ordered alphabetically, and observable states are listed as 0 followed by 1 when defining \(\pi, A, B,\) and \(O.\)<br>
+
+a. What are the dimensions of the corresponding transition matrix?
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="50%"}
+:::{.center-text}
+<img src="images/hmm/diagramHMM.png" width=700/>
+:::
+:::
+
+::: {.column width="50%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    b. What are the dimensions of the initial state vector?
+    <br>
+    <br>    
+    <br>
+    c. What is the second column of the emission matrix?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+:::
+
+
+## Group Question 2
+:::{style="font-size: .7em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A veterinarian is monitoring a dog’s health state by asking the dog owner about its activity levels over the last 3 days. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+The veterinarian assumes three possible activity levels:<br>
+
+-1: quiet, 0: usual, 1: restless.<br> 
+
+The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
+
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Draw the corresponding state-transition diagram.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Define \(\pi, A,\) and \(B\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Brute-Force Approach
+:::{style="font-size: .75em"}
+Recall that we want to decode the following sequence of observations $\small{O=(0,1,1,0).}$<br> 
+It is possible to answer this question by directly computing the joint probability of $\small O$ with each sequence of hidden states of length 4. This strategy is called the _brute-force_ approach. <br>
+Let's find an expression for the joint probability for a general sequence of observations of length 4, $\small{O=(o_0,o_1,o_2,o_3)}$, and a corresponding sequence of hidden states, $\small{X = (x_0, x_1, x_2, x_3).}$ 
+
+$$\small{P(O,X) = P(o_0, o_1, o_2, o_3, x_0, x_1, x_2, x_3)}$$ 
+$$\small{= P(o_3|o_0, o_1, o_2, x_0, x_1, x_2, x_3)P(o_0, o_1, o_2, x_0, x_1, x_2, x_3)}$$
+
+$$\small{ = P(o_3 | x_3)P(o_0, o_1, o_2, x_0, x_1, x_2, x_3)}$$ 
+$$\small{= P(o_3 | x_3)P(o_2 | o_0, o_1, x_0, x_1, x_2, x_3)P(o_0, o_1, x_0, x_1, x_2, x_3)}$$
+:::
+
+## Brute-Force Approach
+:::{style="font-size: .8em"}
+$$ \small{= P(o_3 | x_3)P(o_2 | x_2)P(o_0, o_1, x_0, x_1, x_2, x_3) = \dots }$$ 
+$$ \small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_0, x_1, x_2, x_3)}$$
+$$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_0, x_1, x_2) P(x_0, x_1, x_2)}$$
+$$\small{= P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_0, x_1, x_2)= \dots}$$
+$$ \small  = P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_2 | x_1) P(x_1 | x_0)P(x_0).$$ 
+
+This can be written as 
+
+$$\small{P(O,X) = \prod_{n=0}^3 P(o_n | x_n) \prod_{n=1}^3 P(x_n | x_{n-1})P(x_0).}$$ 
+
+<!-- All we did to obtain this expression was using conditional probability, the output-independence assumption, and the Markov-property assumption. -->
+:::
+
+## Brute-Force Approach
+:::{style="font-size: .8em"}
+Similarly, for $\small O$ and $\small X$ of length $\small T$, the expression becomes
+
+$$\small{P(O,X) = \prod_{n=0}^{T-1} P(o_n | x_n) \prod_{n=1}^{T-1} P(x_n | x_{n-1})P(x_0).}$$
+
+__Example__: Let us look at the joint probability of observation sequence $\small{(0,1,1,0)}$ and hidden-state sequence $\small{(S,R,S,S)}$:
+
+$$\small{P(0,1,1,0,S,R,S,S) = P(0|S)P(1|S)P(1|R)P(0|S)P(S|S)P(S|R)P(R|S)P(S)}$$
+$$\small{ = B_{11}B_{21}B_{22}B_{11}A_{11}A_{12}A_{21}\pi_1}$$
+$$\small{ =0.8\cdot0.2\cdot0.6\cdot0.8\cdot0.7\cdot0.4\cdot0.3\cdot0.6\approx0.00387.}$$
+:::
+
+## Brute-Force Approach
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    What is the total number of joint probabilities needed to compute for the umbrella problem using the brute-force approach?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+Imagine a problem with $\small N=10$ hidden states and an observation sequence of length $\small T=100$. We would have to compute $\small 10^{100}$ joint probabilities! <br>
+<br>
+
+In general, the brute-force approach is infeasible. <br>
+<br>
+
+_**Solution? The Viterbi algorithm - our next topic!**_
+
+:::
+
+
+
+<!-- ## Umbrella Problem
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="20%"}
+:::{.center-text}
+<img src="images/hmm/umbrella.png" width=300/>
+:::
+:::
+
+::: {.column width="80%"}
+A student is studying for an exam in a room without any windows. Every day she wants to know whether it is rainy or sunny outside. However, her only access to the outside world is when she sees her housemate leaving the house with or without an umbrella each morning. 
+:::
+:::
+
+__Question__: Given the housemate’s behavior:
+
+- Day 1: no umbrella
+- Day 2: umbrella
+- Day 3: umbrella
+- Day 4: no umbrella
+
+What can the student infer about the weather on each of those days?
+:::
+
+## Umbrella Problem
+:::{style="font-size: .8em"}
+
+Model assumptions: Markov property, stationarity, output independence.
+
+
+:::{.center-text}
+<img src="images/hmm/HMM_diagram_no_start.svg" width=900/>
+:::
+
+The intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day, respectively.
+
+Given sequence of observations $\small O=\left(o_0, o_1,o_2,o_3\right)=(0,1,1,0),$ find the sequence of hidden states $\small X=\left(x_0, x_1,x_2,x_3\right)$ that best describes the observations $\small O$.
+
+:::
+
+## Viterbi Algorithm: Properties
+:::{style="font-size: .8em"}
+- Efficient alternative to brute-force decoding  
+- Time complexity: $\small \mathcal{O}(N^2T)$  
+- Step-wise approach: operates step-by-step over observations $\small o_i$ in <br> sequence $\small O$  
+- At each step:
+  - Maximizes joint probability across hidden states  
+  - Stores the state leading to the best score  
+- Recursion: each step builds on the previous one  
+- Viterbi path: the optimal hidden state path   
+
+::: -->
+
+## Viterbi Algorithm: Main Stages
+:::{style="font-size: .8em"}
+The Vitebri algorithm can be split into three main stages:
+
+1. __Initialization__,
+2. __Forward pass__,
+3. __Backward pass__.
+
+Before we proceed with the discussion of the stages of the Viterbi algorithm, we need to introduce its __auxiliary matrices__, $\small C$ and $\small  D$:
+
+- $\small  C$ is used to store the intermediate probabilities
+- $\small  D$ contains the previously visited hidden states 
+- $\small  C$ and $\small  D$ are $\small N \times T$ matrices, where $\small N$ is the number of possible hidden states and $\small T$ is the length of the observed sequence.
+:::
+
+## Initialization
+:::{style="font-size: .8em"}
+The initialization stage populates the first column of matrix $\small C$, $\small C_{i1}$, and the first column of matrix $\small D$, $\small D_{i1}$. 
+
+To find the first column of $C$, we use the following expression:
+
+$$\small C_{i1} = P(o_0 | x_0 = q_i) P(x_0 = q_i) = B_{cindex(o_0)i}\pi_i. $$
+
+where $\small cindex(o_0)$ is the index of the first observation in the emission matrix.
+
+In the umbrella problem, on day 0, the housemate had no umbrella: $\small o_0 = 0.$ Hence, $\small B_{cindex(o_0)i}$ becomes $\small B_{1i}$ and we obtain
+
+$$\small C_{11} = P(0|S)P(S) = B_{11}\pi_1 = 0.8 \cdot 0.6 = 0.48,$$
+
+$$\small C_{21} = P(0|R)P(R) = B_{12}\pi_2 = 0.4 \cdot 0.4 = 0.16.$$
+:::
+
+## Initialization
+:::{style="font-size: .8em"}
+The first column of $\small D$ contains only zeros for any problem, because there are no hidden states preciding the initial state:
+
+$$\small  D_{i1} = 0.$$
+
+:::{.center-text}
+<img src="images/hmm/Viterbi_diagram_initialization.svg" width=600/>
+:::
+
+:::
+
+## Initialization
+:::{style="font-size: .8em"}
+At the end of this stage, matrices $\small C$ and $\small D$ for the umbrella problem can be written as
+
+$$\small C = \begin{bmatrix}0.48 & \ast & \ast & \ast \\ 0.16 & \ast & \ast & \ast \\  \end{bmatrix} \text{ and } D = \begin{bmatrix}0 & \ast & \ast & \ast \\ 0 & \ast & \ast & \ast \\  \end{bmatrix},$$
+
+where $\small  \ast$ denotes the components that haven't been computed yet. 
+
+The matrices are completed in the forward pass.
+:::
+
+## Forward Pass
+:::{style="font-size: .8em"}
+:::{.center-text}
+<span style="color:gray;">This page is intentionally left blank.</span>
+:::
+
+:::
+
+## Forward Pass
+:::{style="font-size: .8em"}
+The final result of the forward pass consists of fully defined matrices $\small  C$ and $\small  D$:
+
+$$\small{C = \begin{bmatrix}0.48 & 0.0672 & 0.009408 & 0.009953 \\ 0.16 & 0.0864 & 0.03110 & 0.007465  \end{bmatrix},D = \begin{bmatrix} 0 & 1 & 1 & 2\\  0 & 1 & 2 & 2\end{bmatrix}.}$$
+
+:::{.center-text}
+<img src="images/hmm/Viterbi_diagram_forward.svg" width=700/>
+:::
+
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+
+The backward pass constructs the Viterbi path, the optimal hidden state sequence for observed data.  
+
+- Step 1: Find the highest probability in the last column of matrix $\small C$, say column $\small T$:  
+  $$\small s = \operatorname{argmax}_{i} C_{iT}$$  
+- Step 2: Use matrix $\small D$ to trace back the path. That is, start from entry $\small D_{sT}$ and move backward. 
+
+In the umbrella problem, $\small s=1$. It corresponds to hidden state $Sunny$. Thus, the fourth state in the hidden state sequence $\small X = (x_0,x_1, x_2, x_3)$ is $Sunny$: $\small x_3 = S.$
+
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+Moreover, $\small D_{14}$ is equal to 2:
+
+$$\small D = \begin{bmatrix} 0 & 1 & 1 & \mathbf{2}\\  0 & 1 & 2 & 2\end{bmatrix}.$$
+
+This value directs us to the second row of matrix $\small D$ that corresponds with hidden state $Rainy$. Hence, $Rainy$ becomes the third state in the hidden state sequence: $\small x_2 = R.$
+
+Since $\small D_{23}$ is also equal to 2: 
+
+$$\small \small{D = \begin{bmatrix} 0 & 1 & 1 & \mathbf{2}\\  0 & 1 & \mathbf{2} & 2\end{bmatrix},}$$
+
+we find that $\small x_1$ is $Rainy$ and so on.
+:::
+
+## Backward Pass
+:::{style="font-size: .8em"}
+
+The complete path through matrix $\small D$ is shown below:
+
+$$\small \small{D = \begin{bmatrix} \mathbf{0} & 1 & 1 & \mathbf{2}\\  0 & \mathbf{1} & \mathbf{2} & 2\end{bmatrix}.}$$
+
+The Viterbi path for the umbrella problem is then $\small (S, R, R, S).$ 
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+Let us return to the problem in Group Question 2 and solve it using the Viterbi algorithm.
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Perform the initialization stage of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Perform the forward pass of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+
+:::
+
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   c. Perform the backward pass of the Viterbi algorithm.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+
