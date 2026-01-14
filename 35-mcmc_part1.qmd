@@ -97,7 +97,7 @@ $p(x) = 3x^2$ is maximized at $x=1$, so $\max p(x) = 3$
 **2. Finding M:** We need $M \cdot g(x) \geq p(x)$ for all $x$
 
    - Need: $M \cdot 2x \geq 3x^2$ for all $x \in [0,1]$, so  $M \geq (3/2)x$
-   - Maximum at $x=1$: $M \geq 2$, so **M = 2**
+   - Maximum at $x=1$: $M \geq 3/2$, so **M = 2**
 
 **3. Algorithm steps:**
 

@@ -972,6 +972,32 @@ display(HTML(html_content))
 
 :::
 
+## <span style="font-size: 1.0em">Solution: Spam Detection</span>
+
+:::{style="font-size: .5em"}
+
+
+- $P(\text{spam}) = 0.10$, so $P(\text{real}) = 0.90$
+- $P(\text{``job"} \mid \text{spam}) = 0.50$, $P(\text{``job"} \mid \text{real}) = 0.01$
+- $P(\text{``donate"} \mid \text{spam}) = 0.50$, $P(\text{``donate"} \mid \text{real}) = 0.01$
+- $P(\text{``name"} \mid \text{spam}) = 0.01$, $P(\text{``name"} \mid \text{real}) = 0.20$
+
+**Naive Bayes calculation (using only features that appear):**
+
+For **spam**:
+$$P(\text{spam}) \times P(\text{name} \mid \text{spam}) \times P(\text{donate} \mid \text{spam}) = 0.10 \times 0.01 \times 0.50 = 0.0005$$
+
+For **real**:
+$$P(\text{real}) \times P(\text{name} \mid \text{real}) \times P(\text{donate} \mid \text{real}) = 0.90 \times 0.20 \times 0.01 = 0.0018$$
+
+**Normalize:**
+$$P(\text{spam} \mid \text{data}) = \frac{0.0005}{0.0005 + 0.0018} = \frac{0.0005}{0.0023} \approx 0.217 \text{ or } 21.7\%$$
+
+$$P(\text{real} \mid \text{data}) = \frac{0.0018}{0.0023} \approx 0.783 \text{ or } 78.3\%$$
+
+**Conclusion:** The text is most likely **REAL** (78.3% probability).
+
+:::
 
 
 ## <span style="font-size: 1.0em">Group Question: Mystery Penguin!</span>
