@@ -13,6 +13,41 @@ format:
         chalkboard: true 
 ---
 
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p><l start="*">
+        A coin is tossed 3 times and the sequence of heads and tails is recorded.<br>
+        a. List the sample space of this experiment.
+        <br>
+        <br>
+        <br>
+        <br>
+        b. List the elements that make up the following events: <br> (1) \(A\) = at least two heads, (2) \(B\) = the last toss is a tail, (3) \(A, B = A\cap B.\)<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. {HHH, HHT, HTH, THH, TTH, THT, HTT, TTT}
+b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHT}
+:::
+
 
 ## Slime Mold's Decisions
 :::{.center-text}
@@ -55,7 +90,7 @@ This illustrates how:
 
 - A seemingly irrelevant third option can shift preferences (violating independence of irrelevant alternatives)
 - The same logic applies to elections—and even dating strategy:
-Bring a friend who’s just slightly less appealing than you. 
+Bring a friend who’s just slightly less appealing than you. Works IN THE LONG RUN!
 :::
 
 <!-- ## Why Probability?
@@ -87,7 +122,7 @@ _"Given a data generating process, what are the properties of its outcomes?"_ <b
     + Law of total probability
     + Bayes' rule -->
 * Answering questions relevant to the tree nursery risk analysis using Python
-* Continuing to develop a structured approach to solving probability and statistics problems (general course objective)
+<!-- * Continuing to develop a structured approach to solving probability and statistics problems (general course objective) -->
 
 <!-- * 3 axioms of probability
 * 4 fundamental properties in probability theory
@@ -112,13 +147,13 @@ print(data.head(11))
 ```
 :::
 :::{.columns}
-::: {.column width="25%"}
+::: {.column width="15%"}
 :::{.center-text}
-<img src="images/axioms of probability/logo.jpeg" width=400/>
+<img src="images/axioms of probability/logo.jpeg" width=200/>
 :::
 :::
 ::: {.column width="70%"}
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 Assumptions: 
 
 * None of the calamities can occur in the same year.
@@ -508,6 +543,10 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+C
+:::
+
 ## Working in Groups of 2–4
 :::{style="font-size: .78em"}
 
@@ -587,7 +626,7 @@ display(HTML(html_content))
 ```
 :::
 
-
+<!-- 
 ## Holly Example
 :::{style="font-size: .8em"}
 - __Given__: 
@@ -767,4 +806,4 @@ Since $ P(A \cup B) \leq 1,$ we obtain
 $$P(A,B) = P(A) + P(B) - P(A \cup B) \geq \frac{3}{4} + \frac{1}{3} - 1 = \frac{1}{12}.$$
 On the other hand, $A \cap B \subseteq A$ and $A \cap B \subseteq B.$ Thus, $P(A,B) \leq \min (P(A),P(B)) = \min\left( \frac{3}{4},  \frac{1}{3} \right) = \frac{1}{3}.$
 This proves that $\frac{1}{12} \leq P(A,B) \leq \frac{1}{3}.$ 
-:::
+::: -->

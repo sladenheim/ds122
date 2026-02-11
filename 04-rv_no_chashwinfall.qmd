@@ -55,61 +55,36 @@ In the remaining part of the course, we will rarely mention sample spaces and wo
 * Probability mass function 
 * Cumulative distribution function of a discrete random variable
 * Expected value of a discrete random  variable
-* Variance of a discrete random  variable
-* Applying the above concepts to Cash WinFall
+* Variance of a random  variable
+* Applying the above concepts to describe the social group of Holly the monkey
 :::
 
-## Cash WinFall Game
+## Holly Problem
+:::{style="font-size: .8em"}
+Red howler monkeys live in relatively large social groups, typically consisting of 5–15 individuals. Let $X$ represent the size of Holly’s group. The graph below shows the probability of each possible group size from 5 to 15.
+:::
+:::{.center-text}
+<img src="images/random_variables/PMF_Holly_group.png" width=650/>
+:::
+
+## Holly Problem
 :::{.columns}
 ::: {.column width="35%"}
 :::{.center-text}
-<img src="images/random_variables/MA_lottery_logo.png" width=400/>
+<img src="images/random_variables/Holly_group.png" width=400/>
 :::
 :::
 ::: {.column width="60%"}
 :::{style="font-size: .8em"}
-Main Rules of the Massachusetts State Lottery in 2005: 
+**Questions:**
 
-* Players chose 6 numbers from 1 to 46.
-* Ticket cost was \$2.
-* The jackpot was capped at \$2 million.
+* Use the graph to find the probability that Holly’s group contains at most 10 individuals.
+* Find the expected group size for Holly’s group.
+* Find the variance of the group size for Holly's group.
 :::
 :::
 :::
 
-:::{style="font-size: .8em"}
-The roll down: 
-
-* If no one won the jackpot when it reached $2 million, the prize money was “rolled down” to lower-tier winners.
-* This meant that players who matched 5, 4, or even 3 numbers received much larger payouts than usual.
-:::
-
-## Cash WinFall Game
-:::{style="font-size: .8em"}
-
-Prize distribution on a normal day:
-
-| Match Type            | Probability            | Prize         |
-|-----------------------|------------------------|---------------|
-| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
-| Match 5 of 6          | 1 in 39,028            | \$4,000       |
-| Match 4 of 6          | 1 in 801               | \$150         |
-| Match 3 of 6          | 1 in 47                | \$5           |
-| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket)          |
-
-__Questions:__
-
-- How did return rates differ between normal days and roll-down days?
-- How did MIT students exploit the opportunity in Cash WinFall?
-
-
-:::
-
-:::{.notes}
-jackpot : (6 choose 6)/ (46 choose 6)
-
-2nd : (6 choose 5)(40 choose 1)/(46 choose 6)
-:::
 ## Random Variables 
 :::{style="font-size: .8em"}
 Statistics and data science are concerned with data. How do we link sample spaces, and events to data? <br>
@@ -150,14 +125,14 @@ __Example__: When tossing dice, we are usually interested in the sum of the two 
 __Example__: When flipping a coin, we may be interested in the total number of heads that occur, for example 2, and not care about the actual head–tail sequence that results such as HTHT or HHTT.<br>
 <br>
 
-In the remaining part of the course, we will rarely mention sample spaces and work directly with random variables. However, you should keep in mind that the sample space is still there, lurking in the background.
+**_In the remaining part of the course, we will rarely mention sample spaces and work directly with random variables. However, you should keep in mind that the sample space is still there, lurking in the background._**
 
 :::
 
 :::{.notes}
 Draw the sample-space potato
 
-Sample space - BIHEND the scenes
+Sample space - BEHIND the scenes
 :::
 
 ## Categorical Random Variables 
@@ -196,13 +171,9 @@ __Example__: The lifetime of a light bulb can range from 0 to possibly thousands
 ## Random Variables 
 :::{style="font-size: .8em"}
 
-| Match Type            | Probability            | Prize         |
-|-----------------------|------------------------|---------------|
-| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
-| Match 5 of 6          | 1 in 39,028            | \$4,000       |
-| Match 4 of 6          | 1 in 801               | \$150         |
-| Match 3 of 6          | 1 in 47                | \$5           |
-| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) 
+:::{.center-text}
+<img src="images/random_variables/PMF_Holly_group.png" width=650/>
+:::
 
 ```{python}
 from IPython.core.display import HTML
@@ -211,7 +182,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-        Let us define \(X\) as a random variable associated with the returns of a Cash WinFall game. What type of random variable is \(X\)?
+         Here, \(X\) is a random variable that represents the size of Holly's social group. What type of random variable is \(X\)?
         <br>
         <br>
         </p>
@@ -260,7 +231,7 @@ display(HTML(html_content))
 :::{.notes}
 discrete
 
-can be categorical if you consider the returns to be: loss, breaking even, small win, big win, jackpot
+Do you know the name of the function in the graph?
 :::
 
 
@@ -274,7 +245,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Probability Mass Function</span>
         <p>
-       For a discrete random variable \(\small{X}\), we define the probability mass function (PMF) \(\small{p(a)}\) of \(\small{X}\) by \(\small{p(a) = P(X=a).}\)
+       For a <b>discrete</b> random variable \(\small{X}\), we define the probability mass function (PMF) \(\small{p(a)}\) of \(\small{X}\) by \(\small{p(a) = P(X=a).}\)
         </p>
     </div>
     """
@@ -317,39 +288,6 @@ plt.show()
 ```
 :::
 
-## Random Variables 
-:::{style="font-size: .8em"}
-
-| Match Type            | Probability            | Prize         |
-|-----------------------|------------------------|---------------|
-| Match 6 of 6          | 1 in 9,366,819        | Jackpot       |
-| Match 5 of 6          | 1 in 39,028            | \$4,000       |
-| Match 4 of 6          | 1 in 801               | \$150         |
-| Match 3 of 6          | 1 in 47                | \$5           |
-| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) 
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-        Assume that the jackpot in Cash WinFall is \$1 million.
-        If \(X\) is a random variable associated with the returns of a Cash WinFall game. <br>
-        Find the PMF of \(X\).
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
 
 
 <!-- ## Probability Mass Function 
@@ -415,13 +353,16 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Cumulative Distribution Function Function</span>
         <p>
-       The cumulative distribution function (CDF) \(\small{F}\) can be expressed in terms of \(\small{p(a)}\) by \(\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}\)
+       The cumulative distribution function (CDF) \(\small{F}\) of a <b>discrete</b> random variable can be expressed in terms of \(\small{p(a)}\) by \(\small{F(a)  = P(X \leq a).}\)
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
+
+<!-- **Remark:** For a discrete random variable $X$, the CDF can be expressed as
+$$\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}$$ -->
 
 If $\small{X}$ is a discrete random variable whose possible values are $\small{x_1 , x_2 , x_3 ,...}$, where $\small{x_1 < x_2 < x_3 <...}$, then the distribution function $\small{F}$ of $\small{X}$ is a _**step function**_. That is, the value of $\small{F}$ is constant in the intervals $\small{[x_i−1,x_i)}$ and then takes a step (or jump) of size $\small{p(x_i)}$ at $\small{x_i}$. 
 :::
@@ -453,6 +394,33 @@ plt.tight_layout()
 plt.show()
 
 
+```
+:::
+
+## Cumulative Distribution Function
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/random_variables/PMF_Holly_group.png" width=550/>
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+         Based on the provided PMF function, how can we find the probability that Holly’s group contains at most 10 individuals?
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
 ```
 :::
 
@@ -514,7 +482,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Expected Value (Expectation)</span>
         <p>
-       If \(\small X\) is a discrete random variable with PMF \( \small p(x)\), then the expected value of \( \small X\) is given by 
+       If \(\small X\) is a <b>discrete</b> random variable with PMF \( \small p(x)\), then the expected value of \( \small X\) is given by 
 \( \small E[X] = \sum_{x=-\infty}^{+\infty} x \cdot  P(X=x) = \sum_{x=-\infty}^{+\infty} x \cdot p(x). \)
         </p>
     </div>
@@ -570,61 +538,33 @@ $$ \small \mbox{Var} (X) = \sum_{x=1}^{6} (x-3.5)^2\; P(X=x)= 1/6\sum_{x=1}^{6} 
 
 :::
 
-## Cash WinFall Game
-:::{.columns}
-::: {.column width="35%"}
+## Expected Value and Variance
+:::{style="font-size: .8em"}
+
 :::{.center-text}
-<img src="images/random_variables/MA_lottery_logo.png" width=400/>
-:::
-:::
-::: {.column width="60%"}
-:::{style="font-size: .8em"}
-Question 1: _**How did return rates differ between normal days and roll-down days?**_
-<!-- - How did MIT students exploit the opportunity in Cash WinFall? -->
-:::
-:::
+<img src="images/random_variables/PMF_Holly_group.png" width=650/>
 :::
 
-:::{style="font-size: .8em"}
-- Expected value of returns in \$ on a normal day with a jackpot of \$1 million:
+```{python}
+from IPython.core.display import HTML
 
-\begin{align*}  
-    \small{E[X]} &= \small{(10^6 - 2) \cdot 1/9366819 + 3998 \cdot 1/39028 +}\\
-    &\small{+ 148 \cdot 1/801 + 3 \cdot 1/47 +0 \cdot 1/6.8 - 2 \cdot 0.83 = -1.2}
-\end{align*} 
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+         Based on the provided PMF function, how can we find the expected value and the variance of the group size of Holly's group?
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 :::
 
-## Cash WinFall Game
-:::{style="font-size: .8em"}
-Prize distribution on February 7, 2005, a roll-down day:
-
-| Match Type            | Probability            | Prize         |
-|-----------------------|------------------------|---------------|
-| Match 5 of 6          | 1 in 39,028            | \$50,000          |
-| Match 4 of 6          | 1 in 801               | \$2,385           |
-| Match 3 of 6          | 1 in 47                | \$60              |
-| Match 2 of 6          | 1 in 6.8               | \$2 (free ticket) |
-
-- Expected value of returns in \$ on February 7, 2005:
-
-$$ \small E[X] = (5 \cdot 10^4 - 2) \cdot 1/39028 + 2383 \cdot 1/801 + 58 \cdot 1/47 - 2 \cdot 0.83 = 3.8$$
-:::
-
-:::{.notes}
-Before: 5/6 - 4 000<br>
-4/6 - 150<br>
-3/6 - 5
-
-:::
-
-## Cash WinFall Game
-:::{style="font-size: .8em"}
-Question 2: _**How did MIT students exploit the opportunity in Cash WinFall?**_
-
-As we said earlier, the expected value tells us what to expect from the average of many observations of the random variable, not what to expect from a single observation. 
-
-Keeping this in mind, MIT students, purchased thousands of Cash WinFall tickets for the game on February 7, 2005.
-:::
 
 ## Group Question 1
 

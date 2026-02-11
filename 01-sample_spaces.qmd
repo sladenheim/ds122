@@ -28,9 +28,14 @@ _You know, the most amazing thing happened to me tonight. I was coming here, on 
 :::{.notes}
 Richard Feynman (Fine-man) was a Nobel Prize-winning physicist known for his work in quantum electrodynamics.
 
+Lecturer at: 	
+Cornell University,<br>
+California Institute of Technology
+
 Quote: ironically points out that despite having very low probability ($1/(17 \cdot 10^6)$) of happining the situation does not feel special to us.
 
-Seeing a blue lobster
+
+Paradox: The same probability as seeing a blue lobster, but since we are not expecting to see this specific plate, we are not surprised!
 :::
 
 
@@ -136,7 +141,7 @@ __Examples__:
 - $B = \{1, 2\}$ is a set that contains two elements, 1 and 2.
 - $\{a, e, i, o, u\}$ and $\{u, o, i, e, a\}$ define the same set.
 - $\{1,1,1\}$ and $\{1\}$ are the same set. 
-- $\mathbb{N}$ is the infinite set of all natural numbers
+- $\mathbb{N}$ is the infinite set of all natural numbers.
 - $\mathbb{R}$ is the infinite set of all real numbers.
 
 ```{python}
@@ -472,7 +477,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 __Notation__: We will mainly use $A,B$ (i.e., $A$ - comma - $B$) but $A\cap  B$ is also a viable option. <br>
-__Example__: If $A = \{sss,scs,ssc,scc\}$ and $B=\{sss,scs,ccs,css\}$, then $A \cap B$ is the  event that the commuter stops at the first light and the third light. It consists of those outcomes that are common for both $A$ _and_ $B$: 
+__Example__: If $A = \{sss,scs,ssc,scc\}$ and $B=\{sss,scs,ccs,css\}$, then $A \cap B$ is the  event that the commuter stops at the first light and the third light. It consists of those outcomes that are common for both $A$ _**and**_ $B$: 
 $$A \cap B = \{sss,scs\}.$$
 
 :::
@@ -715,7 +720,7 @@ Any subset : For example, no calamities
     - Identify potential _**tools/methods**_.
 2. __While solving:__
     - Discuss openly.
-    - Ask Prof. Wheelock and me questions as we circulate.
+    - Ask me questions as I circulate.
 3. __After solving:__ 
     - Check if your result makes sense (sign, magnitude, units, etc.).
     - Confirm that you’ve fully addressed the question or proved the statement.
@@ -747,6 +752,10 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+:::
+
+:::{.notes}
+2x3x4 = 24
 :::
 
 <!-- 2x3x4 = 24 -->
@@ -781,6 +790,12 @@ display(HTML(html_content))
 ```
 :::
 
+:::{.notes}
+b. 2 x 3 = 6
+
+c. 3 x 4 = 12
+:::
+
 ## Group Question 1 
 :::{style="font-size: .78em"}
 
@@ -805,6 +820,10 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+:::
+
+:::{.notes}
+d. {(chicken, pasta, ice cream), (chicken, rice, ice cream),(chicken, potatoes, ice cream)}
 :::
 <!-- b. 2 x 3 = 6
 c. 3 x 4 = 12
@@ -871,8 +890,8 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-a. {HHH, HHT, HTH, THH, TTH, THT, HHT, TTT}
-b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHH, HHT, HTH, THH, THT, HHT, TTT}
+a. {HHH, HHT, HTH, THH, TTH, THT, HTT, TTT}
+b. A = {HHH, HHT, HTH, THH}, B = {HHT, THT, HHT, TTT}, A,B = {HHT}
 :::
 
 

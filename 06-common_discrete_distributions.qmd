@@ -20,8 +20,15 @@ Common discrete distributions help us answer questions like:
 - Will a customer click on an ad? 
 - How many users will open an email? 
 - How long until a system fails? 
-- How many events will occur in a time window? 
+- How many phone calls will a company receive in one day? 
 - What’s the chance of each outcome in a fair game? 
+:::
+
+:::{.notes}
+A __discrete random variable__ is a random variable that can take on
+only a finite or at most a countably infinite number of values.
+
+I would replace this by a historical note on Bernoulli's 
 :::
 
 
@@ -42,6 +49,12 @@ Common discrete distributions help us answer questions like:
 
 :::
 
+:::{.notes}
+No need to memorize the details, such as the PMF, the expected value, etc. They will be on the formula sheet.
+
+However, you need to be able to recognize when to use which distribution!
+:::
+
 ## Horse-Kick Fatalities 
 :::{style="font-size: .8em"}
 
@@ -56,7 +69,7 @@ In 1898, Ladislaus Bortkiewicz analyzed deaths caused by horse kicks in the Prus
 | 4          | 1        |
 | 5+         | 0        |
 
-__Question__: Do the observed fatalities follow a random pattern?
+__Question__: Can the observed fatalities follow be described by a common discrete distribution? If so, which one?
 :::
 
 
@@ -89,6 +102,10 @@ Each distribution has at least one parameter that defines its behavior. The Bern
 $p$, representing _**the probability that the random variable equals 1**_.
 :::
 
+:::{.notes}
+In probability, the terms success and failure are purely mathematical labels with no social, moral, or economic meaning.
+:::
+
 ## Bernoulli Distribution
 :::{style="font-size: .8em"}
 ```{python}
@@ -109,7 +126,8 @@ display(HTML(html_content))
 ```
 
 __Remark__: The mean of a $\small X$ is $\small p$ and its variance is $\small p(1-p)$. <br>
-__Example__: A canonical example is flipping a weighted coin. The coin comes up "heads" (aka "success", aka "1") with probability $p.$ If the coin is fair, $\small p=\frac{1}{2}.$ 
+__Example__: A canonical example is flipping a weighted coin. The coin comes up "heads" (aka "success", aka "1") with probability $p.$ If the coin is fair, $\small p=\frac{1}{2}.$ <br>
+<span style="color:rgb(1, 180, 180);">Can you name another example of a Bernoulli random variable?</span>
 
 ```{python}
 from IPython.core.display import HTML
@@ -127,6 +145,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+
 :::
 
 ## Binomial Distribution
@@ -179,7 +198,7 @@ print(f"The probability of getting exactly 6 heads is {probability:.4f}")
 :::
 
 
-## Binomial Distribution
+<!-- ## Binomial Distribution
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -216,7 +235,7 @@ plt.xticks(fontsize=16)
 plt.xlabel(r'$k$', size=18)
 plt.ylabel(r'$P[X = k]$', size=18);
 ```
-:::
+::: -->
 
 ## Geometric Distribution
 :::{style="font-size: .8em"}
@@ -406,7 +425,7 @@ from scipy.stats import poisson
 mu = 5
 x = np.arange(poisson.ppf(0.01, mu), poisson.ppf(0.9995, mu))
 # plt.ylim([0,1])
-plt.figure(figsize=(10, 2.8))
+plt.figure(figsize=(10, 2.3))
 plt.xlim([0.5, 12.5])
 plt.ylim(ymax = 0.2)
 plt.plot(x, poisson.pmf(x, mu), 'bo', ms=8, label='poisson pmf')
@@ -421,7 +440,7 @@ plt.ylabel(r'$P[X = k]$', size=18);
 
 ## Uniform Distribution
 :::{style="font-size: .8em"}
-The uniform distribution models the case in which all outcomes are equally probable. This distribution _**can be a discrete or continuous**_. We will introduce the continuous version of the uniform distribution in the next lecture.
+The uniform distribution models the case in which all outcomes are equally probable. This distribution _**can be discrete or continuous**_. We will introduce the continuous version of the uniform distribution in the next lecture.
 
 We have already seen the discrete uniform distribution in the case of rolls of a fair die:
 :::
@@ -540,7 +559,7 @@ plt.legend(prop={'size': 18})
 cliff-hanger Maximum Likelihood Estimation
 :::
 
-## Group Question 1
+<!-- ## Group Question 1
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -566,9 +585,9 @@ The probability of triplets in human births is approximately 0.001. We are consi
 html_content = generate_html()
 display(HTML(html_content))
 ```
-:::
+::: -->
 
-## Group Question 2
+## Group Question 1
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -597,5 +616,10 @@ display(HTML(html_content))
 
 :::{.notes}
 Spring 25 HW 2
+
+a. Probability of no odd person corresponds to the probability of getting HHH or TTT = 1/4. Let $X$ be the number of rounds. 
+Then $X$ will follow geometric distribution with $p = 3/4$. The probability that exactly 3 rounds are made is equal to
+$$P(X = 3) = (1/4)^2(3/4) = 3/64.$$\\
+b. $$E[X] = \frac{1}{p} = 4/3.$$
 :::
 

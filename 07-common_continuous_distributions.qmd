@@ -13,7 +13,7 @@ format:
         chalkboard: true 
 ---
 
-## Group Question 2
+## Group Question 1
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -40,8 +40,32 @@ display(HTML(html_content))
 ```
 :::
 
+:::{.notes}
+Spring 25 HW 2
 
-## Why Common Continuous Distributions?
+a. Geometric: concerns Bernoulli trials and answers the question “What is the probability it
+takes k=3 trials to obtain the first success?”"
+
+b. Probability of no odd person corresponds to the probability of getting HHH or TTT = 1/4. Let $X$ be the number of rounds. 
+Then $X$ will follow geometric distribution with $p = 3/4$. The probability that exactly 3 rounds are made is equal to
+$$P(X = 3) = (1/4)^2(3/4) = 3/64.$$\\
+b. $$E[X] = \frac{1}{p} = 4/3.$$
+:::
+
+## The History of the Normal Distribution
+:::{style="font-size: .8em"}
+- Introduced by <b>Abraham DeMoivre</b> in 1733. DeMoivre was a French refugee who computed gambling probabilities for customers at Slaughter’s Coffee House in London.
+- Its usefulness became clear in 1809, when <b>Karl Friedrich Gauss</b> used it to predict the location of astronomical entities. 
+
+:::{.center-text}
+<img src="images/common distributions/Gauss-on-Deutschemark.png" width=550/>
+
+:::
+
+:::
+
+
+<!-- ## Why Common Continuous Distributions?
 :::{style="font-size: .8em"}
 Common continuous distributions help us answer questions like:
 
@@ -54,7 +78,7 @@ Common continuous distributions help us answer questions like:
 
 :::
 
-:::
+::: -->
 
 
 ## Learning Objectives
@@ -95,7 +119,7 @@ The college admin decides to give the top performer fellowship to the student wh
 <!-- 
 The admin knows that the SAT scores are normally distributed with mean 1000 and standard deviation 200, while the ACT scores are normally distributed with mean 20 and standard deviation 5. The highest score received from applicants who appeared for SAT is 1355 and the highest score received from applicants who appeared for ACT is 30. -->
 
-__Question__: Help the college to choose the best candidate for the fellowship.
+__Question__: Help the college choose the best candidate for the fellowship.
 :::
 
 ## Uniform Distribution
@@ -125,7 +149,7 @@ display(HTML(html_content))
 __Remark__: The expected value and the variance are, respectively $\frac{a+b}{2} \text{ and } \frac{(b-a)^2}{12}.$
 :::
 
-## Uniform Distribution
+<!-- ## Uniform Distribution
 :::{style="font-size: .7em"}
 __Example__: Let $\small X$ be a continuous random variable that is uniformly distributed over $\small [0,10]$. <br>
 a. Find the CDF of $\small X.$ <br>
@@ -150,7 +174,7 @@ $$
 
 ## Uniform Distribution
 :::{style="font-size: .8em"}
-__Example (continues)__: <br>
+__Example (continued)__: <br>
 b. We can find $\small E[X]$ directly using the formula for the mean of the continuous uniform distribution:
 $$\small E[X]= \frac{0+10}{2} = 5.$$
 Alternatively, we can integrate $\small x \cdot f(x)$ from 0 to 10.
@@ -158,20 +182,22 @@ Alternatively, we can integrate $\small x \cdot f(x)$ from 0 to 10.
 \small E[X] & \small= \int_{-\infty}^{\infty} x f(x) \:dx = \int_0^{10} x \cdot \frac{1}{10-0} dx = \frac{1}{10} \int_0^{10} x \:dx \\
 & \small =\frac{1}{10}\cdot \frac{1}{2} \left[x^2\right]_{x=0}^{x=10} = \frac{1}{20} \cdot 100 = 5.
 \end{align*}
-:::
+::: -->
 
 ## Uniform Distribution
 :::{style="font-size: .8em"}
 __Example__: Buses arrive at a specified stop at 15-minute intervals starting at 7 am. That is, they arrive at 7, 7:15, 7:30, 7:45, and so on. If a passenger arrives at the stop at a time that is uniformly distributed between 7 and 7:30, find the probability that he waits less than 5 minutes for a bus.
 
-
-Let $X$ be the number of minutes past 7 that the passenger arrives at the stop. Then $X$ is a uniform random variable over the interval $(0, 30)$. The passenger will have to wait less than 5 minutes if he arrives between 7:10 and 7:15 or between 7:25 and 7:30. Hence, the desired probability is 
+- Let $X$ be the number of minutes past 7 that the passenger arrives at the stop. Then $X$ is a uniform random variable over the interval $(0, 30)$.
+- The passenger waits less than 5 min if he arrives between 7:10 and 7:15 or between 7:25 and 7:30. 
 
 \begin{align*}
-\small P(10 < X < 15) + P(25 < X < 30) & \small= \int_{10}^{15} \frac{1}{30} dx + \int_{25}^{30} \frac{1}{30} dx\\
-& \small = \frac{1}{30} (5+5) = \frac{1}{3}.
+\small P(10 < X < 15) + P(25 < X < 30) & \small= \int_{10}^{15} \frac{1}{30} dx + \int_{25}^{30} \frac{1}{30} dx \small = \frac{1}{30} (5+5) = \frac{1}{3}.
 \end{align*}
+
+<span style="color:rgb(1, 180, 180);">Is it possible to solve this problem without computing any integrals?</span>
 :::
+
 
 ## Uniform Distribution
 :::{.center-text}
@@ -227,6 +253,10 @@ display(HTML(html_content))
 :::
 :::
 
+:::{style="font-size: .8em"}
+<span style="color:rgb(1, 180, 180);">What is the most famous application of the Gaussian distribution in probability and statistics?</span>
+:::
+
 ## Gaussian Distribution
 :::{style="font-size: .8em"}
 __Remark__: The __standard Gaussian__ distribution has mean zero and a variance (and standard deviation)
@@ -264,7 +294,7 @@ plt.ylabel(r'$P[X\leq x]$', size=16);
 
 ## Gaussian Distribution
 :::{style="font-size: .8em"}
-__Example__: Suppose the time it takes for a person to commute to work is normally distributed with mean 30 minutes and standard deviation 5 minutes. What’s the probability the commute takes more than 40 minutes?
+__Example__: Suppose the time it takes for a person to commute to work is normally distributed with mean 30 minutes and standard deviation 5 minutes. What’s the probability the commute takes more than 40 minutes? <br><br>
 
 ```{python}
 #| echo: true
@@ -285,7 +315,7 @@ print(f"The desired probability is {prob_more_than_40:.4f}")
 
 ## Exponential Distribution
 :::{style="font-size: .8em"}
-The exponential distribution concerns a Poisson process and has one parameter, $\small \lambda$, the rate of success.
+The exponential distribution concerns a Poisson process and has one parameter, the rate of success $\small \lambda$.
 ```{python}
 from IPython.core.display import HTML
 
@@ -306,7 +336,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean of the exponential distribution is $\small 1/\lambda$, and the variance is $\small 1/\lambda^2$. Its CDF, $\small F(a)$, is given by
+__Remark__: The mean of the exponential distribution is $\small 1/\lambda$, and the variance is $\small 1/\lambda^2$. Its CDF $\small F(a)$ is given by
 $$ \small{F(a) = P(X \leq x) = 1 - e^{-\lambda x} \mbox{ for } x \geq 0.}$$ 
 :::
 
@@ -352,7 +382,7 @@ plt.show()
 
 ## Exponential Distribution
 :::{style="font-size: .8em"}
-__Example__: Suppose a small business receives phone calls at a steady average rate of 6 calls per hour. What’s the probability that the next call comes within 5 minutes?
+__Example__: Suppose a small business receives phone calls at a steady average rate of 6 calls per hour. What’s the probability that the next call comes within 5 minutes? <br><br>
 :::
 :::{.center-text}
 ```{python}
@@ -484,7 +514,13 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Question 2
+:::{.notes}
+Make a drawing!
+
+$$5 \cdot (1/30) \cdot 2 = 1/3.$$
+:::
+
+<!-- ## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -515,7 +551,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-:::
+::: -->
 
 <!-- ## Group Question 2
 :::{style="font-size: .8em"}

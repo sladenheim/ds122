@@ -17,27 +17,24 @@ format:
 ## Logistics
 :::{style="font-size: .8em"}
 
-_Lectures_: 595 Commonwealth Ave HAR 105, MWF 1:25 PM -- 2:15 PM
+_Lectures_: 2 Silber Way WED 130, MWF 1:25 PM -- 2:15 PM
 
-_Discussions_: 665 Comm Ave CDS 164
+_Discussions_: 
 
- - A2: M 9:05 AM -- 9:55 AM
- - A3: M 10:10 AM -- 11:10 AM
- - A4: M 11:15 AM -- 12:05 PM
- - A5: M 12:20 AM -- 1:10 PM
+ - A3: 808 Commonwealth Ave FLR 123, W 9:05 AM -- 9:55 AM
+ - A4: 808 Commonwealth Ave FLR 123, W 10:10 AM -- 11:00 AM
+ - A5: 871 Commonwealth Ave CGS 315, W 11:15 AM -- 12:05 PM
 
 _Teaching Staff_
 
- - Instructors: Prof. Lisa Wobbes and Prof. Lauren Wheelock <br>
- - TFs: Freddy Reiber and Taishan Chen <br>
+ - Instructor: Prof. Lisa Wobbes <br>
+ - TF: Yuke Zhang <br>
  - CAs: Carol Kong, Jabir Ahmed, and Karl Boma
 
 :::
 
 :::{.notes}
 Good Afternoon! Welcome
-
-One of the instructors
 :::
 
 :::{.notes}
@@ -51,10 +48,10 @@ Yilan!
 
 _Platforms_
 
-- __Piazza__: https://piazza.com/bu/fall2025/ds122 <br>
+- __Piazza__: https://piazza.com/bu/spring2026/ds122 <br>
 Check it weekly!
 - __Gradescope__: https://www.gradescope.com<br>
-Entry code: NGNY6P
+Entry code: E6E64W
 
 _Resources_
 
@@ -69,6 +66,8 @@ _Programming environment_
 
 :::{.notes}
 Has everyone been enrolled?
+
+No new classroom recordings
 :::
 
 ## Course Grade
@@ -77,28 +76,35 @@ _Computation_
 
 - 10% Participation
 - 15% Homework assignments
-- 25% Midterm 1
-- 15% Midterm 2 
+- 20% Midterm 1
+- 20% Midterm 2 
 - 35% Final exam
 
 _Participation_
 
-- Discussion Labs (5%): attend at least 11 out of 14
-- In-class participation (4%): participate at least  every three weeks 
-- Homework 0 (1%)
+- Discussion Labs (5%): attend at least 9 out of 12
+- In-class participation (4%): participate at least every 9-10 lectures 
+- Homework 0 (1%): available after this lecture
 :::
 
 :::{.notes}
-Has everyone received a digital ID card with a QR code?
+Please come pick up an index card. Put your name and BUID on it.
 
-Question box: write your full name and BU ID
+Question box: write your full name, BU ID, and BU email adress
+
+Ways to participate in lecture:
+1. Answer one of my questions
+
+2. Ask a content-relevant question
+
+3. Submit your question in a written form using the question box
 :::
 
 ## Course Grade
 :::{style="font-size: .8em"}
 _Homework_
 
-- 8 homework assignments
+- 9 homework assignments
 - Pen-and-paper mathematical questions and coding questions
 - Due at 11:59 pm on a Wednesday
 - Submissions via Gradescope
@@ -116,11 +122,11 @@ _Exams_
 
 All exams are cumulative. Content may include lectures, discussion labs, homework, and required readings.
 
-- Midterm 1: __October 15, 1:25 PM, HAR 105__ <br>
+- Midterm 1: __February 25, 1:25 PM, WED 130__ <br>
 In-calss exam
-- Midterm 2: __November 19, 1:25 PM, HAR 105__ <br>
-Take-home exam. You must submit a hard copy. Late or digital submissions will not be accepted!
-- Final exam: __December 15-19__ <br>
+- Midterm 2: __April 1, 1:25 PM, WED 130__ <br>
+In-calss exam
+- Final exam: __May 8, 2:00 PM, WED 130__ <br>
 In-person exam
 :::
 
@@ -138,7 +144,6 @@ _Regrade requests_
 _Collaboration Policy_
 
 - No copying (or allowing to copy)
-- No searching for answers
 - Disclose collaboration and sources
 
 _Learning Environment_
@@ -166,7 +171,7 @@ _Accommodations_
 :::
 
 :::{.notes}
-My OH: CDS 1401 at 2:30 pm
+My OH: CDS 1401 at F at 9 am
 :::
 
 ## General Information
@@ -175,7 +180,7 @@ My OH: CDS 1401 at 2:30 pm
 __More details, including the weekly schedule, can be found in the syllabus.__
 
 :::{.center-text}
-<img src="images/intro/Syllabus.png" width=900/>
+<img src="images/intro/Syllabus122Sp26.png" width=900/>
 :::
 :::
 
@@ -204,10 +209,12 @@ Advice from former students:
 
 - _Go to the lectures and ask questions._
 - _This class moves fast and this class builds on every little thing from the previous lecture. It is CRUCIAL that you understand the very basics like distributions, random variables, and probability._
-- _I would tell them to go to lecture and set time aside to review the lectures._
+- _Study the lecture slides carefully and set aside time outside of class to fully understand them, THEN do the homework. This way,
+the content will feel more relevant to you, and you'll depend less on AI to find the solution. Attempt the group question even if you
+don't know what's going on._
 - _Take the time to practice the problems and learn the content. There's a lot of content and it's hard to learn all of it at once._
-- _practice! probability is hard…. and recognizing questions and what they are asking needs practice_
-- _Pay attention during the discussions._
+<!-- - _I would tell them to go to lecture and set time aside to review the lectures._ -->
+<!-- - _Pay attention during the discussions._ -->
 
 :::
 
@@ -217,6 +224,8 @@ high-paced course
 concepts build on one another
 
 Advice: come to lectures, participate, go to discussions, think deeply about the homework questions
+
+Group questions: on the last slides. Practice in class or after!
 :::
 
 ## Probability
@@ -306,6 +315,8 @@ Frequentist: more objective and interpretive
 Bayesian: more intuitive and allows to use prior knowledge BUT can be contaversial!
 
 NBA Finals 2025 Okhlahoma City Thunder vs Indiana Pacers
+
+Oklahoma City Thunder (the Western Conference champion) defeated Indiana Pacers (the Eastern Conference champion)
 :::
 
 ## Probability
@@ -361,9 +372,9 @@ Samuel S. Wilks (1906 - 1964)
 :::
 <br>
 
-Imagine you receive a letter from a stockbroker predicting that a certain stock will go up next week. It does. 
+Imagine you receive an email from a stockbroker predicting that a certain stock will go up next week. It does. 
 
-The next week, you get another letter from the same broker. Another correct prediction. This continues for several weeks. Each prediction spot-on. 
+The next week, you get another email from the same broker. Another correct prediction. This continues for several weeks. Each prediction spot-on. 
 
 ```{python}
 from IPython.core.display import HTML
@@ -384,6 +395,8 @@ display(HTML(html_content))
 
 :::{.notes}
 10 weeks: (1/2)^{10} = 1/1024
+
+10000 -> 5000 -> 2500 -> after 10 weeks -> 10
 
 a company launches a mutual fund, maintain it in-house before opening to public -> incubator
 

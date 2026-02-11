@@ -24,7 +24,7 @@ Jordan Ellenberg, a mathematics professor at the University of Wisconsin–Madis
 :::{.columns}
 ::: {.column width="25%"}
 :::{.center-text}
-<img src="images/random variables/FB_logo.png" width=120/>
+<img src="images/random_variables/FB_logo.png" width=120/>
 :::
 :::
 
@@ -45,7 +45,7 @@ _This leads to two important questions:_
 1. _**What is the chance that a person is on Facebook’s list, given that they are not a terrorist?**_
 2. _**What is the probability that a person is not a terrorist, given that they are on Facebook’s list?**_
 
-These questions sound similar, but they are not. One way to see the difference is by comparing their answers. You will do just that at the end of this lecture.
+These questions sound similar, but they are not. One way to see the difference is by comparing their answers. You will do just that in your Homework 2.
 :::
 
 <!-- ##  Big Data, Small Probabilities
@@ -58,6 +58,15 @@ There are two questions we can ask about this:
 These questions sound kind of the same, but they are not. One way to see that is by looking at their answers.
 ::: -->
 
+:::{.notes}
+Question 1 tells you how often innocent people get flagged.
+This matters for understanding false positives, but it does not directly tell you how reliable the list is.
+
+
+Question 2 tells you how likely it is that a person flagged by Facebook is actually innocent.
+This is exactly the quantity that reflects whether the list is trustworthy. If this probability is high, then most people on the list are innocent, which strongly indicates that Facebook should not report the users on that list.
+:::
+
 
 ## Learning Objectives
 
@@ -69,7 +78,7 @@ These questions sound kind of the same, but they are not. One way to see that is
     + Independence of events
     + Law of total probability
     + Bayes' rule
-* Answering questions relevant to the tree nursery risk analysis using Python (final lecture)
+* Answering questions relevant to the tree nursery risk analysis using Python 
 
 :::
 
@@ -96,13 +105,13 @@ print(df[['Calamity', 'Event probability', 'Damage probability']].head(11))
 ```
 :::
 :::{.columns}
-::: {.column width="25%"}
+::: {.column width="15%"}
 :::{.center-text}
-<img src="images/axioms of probability/logo.jpeg" width=400/>
+<img src="images/axioms of probability/logo.jpeg" width=200/>
 :::
 :::
 ::: {.column width="70%"}
-:::{style="font-size: .8em"}
+:::{style="font-size: .7em"}
 Assumptions: 
 
 * None of the calamities can occur in the same year.
@@ -211,6 +220,8 @@ display(HTML(html_content))
 
 :::{.notes}
 $P(D|+) = \frac{P(+,D)}{P(+)} = \frac{0.009}{0.009+0.099} \approx 0.08.$
+
+WHY SO LOW?
 :::
 
 ## Chain Rule
@@ -242,7 +253,7 @@ Definition of conditional probability
 :::
 
 
-## Independence of Events
+## Independen\end{remark}ce of Events
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
@@ -268,6 +279,30 @@ If there are 365 days in a year, then $\small{365/70 \approx 5}$ of them will be
 knowing the day of the week does not change our estimate of whether it will be raining or sunny.
 
 $$P(\text{day is rainy}\,|\,\text{day is Monday}) = P(\text{day is rainy}).$$  -->
+:::
+
+## Independence of Events
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Consider the situation that a fair coin is flipped once. Denote the event that heads come up by \(H\) and the event that tails come up by \(T\).<br> Are \(H\) and \(T\) independent? Are they disjoint?
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 :::
 
 :::{.notes}
@@ -318,6 +353,21 @@ def generate_html():
      <span class="label">Bayes' Rule</span>
         <p>
         For any events \(\small{A}\) and \(\small{B}\) such that \(\small{P(B)>0,}\)  \(\small{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<br>
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Can you prove the Baye's rule using the chain rule?
         </p>
     </div>
     """
@@ -449,7 +499,7 @@ display(HTML(html_content))
 
 :::
 
-## Group Question 2
+<!-- ## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -483,4 +533,4 @@ display(HTML(html_content))
 a. The chance that an innocent person is flagged as a potential terrorist is $\frac{100 000 - 10}{199 990 000} = \frac{99 990}{199 990 000} = 0.05\%.$
 
 b. The probability that a person is not a terrorist, given that they are on Facebook’s list is $\frac{99 990}{100 000}=99.99\%.$
-:::
+::: -->
