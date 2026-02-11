@@ -149,6 +149,7 @@ display(HTML(html_content))
 __Remark__: The expected value and the variance are, respectively $\frac{a+b}{2} \text{ and } \frac{(b-a)^2}{12}.$
 :::
 
+<!-- Uncomment this if you need more material -->
 <!-- ## Uniform Distribution
 :::{style="font-size: .7em"}
 __Example__: Let $\small X$ be a continuous random variable that is uniformly distributed over $\small [0,10]$. <br>
