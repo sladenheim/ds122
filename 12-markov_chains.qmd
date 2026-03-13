@@ -13,69 +13,10 @@ format:
         chalkboard: true 
 ---
 
-## Group Question 2
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-    Let \(\small X_1, X_2, \ldots, X_{10}\) be independent continuous random variables, each uniformly distributed over \(\small  [0,1].\) <br>
-
-    a. Use the CLT to approximate the distribution of \(\small  S_{10} = \sum_{i=1}^{10} X_i.\) <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    
-    b. Calculate an approximation to \(\small  P(S_{10} > 6).\)
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-     </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
-## Group Question 3
-:::{style="font-size: .8em"}
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-    Suppose that, on average, one third of the graduating seniors at a certain college have two parents attend the graduation ceremony, another third of these seniors have one parent attend the ceremony, and the remaining third of these seniors have no parents attend. If there are 600 graduating seniors in a particular class, what is the approximate probability that between 550 and 650 parents will attend the graduation ceremony? 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-     </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
 ## Google's PageRank
-:::{style="font-size: .78em"}
+:::{style="font-size: .8em"}
 
-- Imagine someone randomly clicking links on the internet, hopping from one page to another without a specific plan.
+ Imagine someone randomly clicking links on the internet.
 
 - Pages with more incoming links get visited more often. Each link acts like a vote for the page’s importance.
 
@@ -91,9 +32,9 @@ display(HTML(html_content))
 :::
 ::: {.column width="70%"}
 
-- Behind the scenes, this is represented by a massive matrix of probabilities that includes the chances of moving from one page to another for billions of web pages.
+- The algorithm works a massive matrix of probabilities that includes the chances of moving from one page to another.
 
-- The result? Pages that are more likely to be visited in this random walk are ranked higher.
+- The result? Pages that are more likely to be visited are ranked higher.
 
 :::
 
@@ -174,11 +115,20 @@ __Example__: In the weather model, the possible states are _Sunny_ and _Rainy_, 
 
 The basic idea of a Markov chain is that it moves from state to state _**probabilistically.**_  In any state, there are certain probabilities of moving to each of the other states. 
 
-__Notation__: We will denote the state that the Markov chain is in at time $n$ as $X_n$.  Since the Markov chain evolves probabilistically, $X_n$ is a random variable.
+__Notation__: The state that the Markov chain is in at time $n$ is denoted as $X_n$.  Since the Markov chain evolves probabilistically, $X_n$ is a random variable.
 
 <!-- :::{.center-text}
 <img src="images/markov/mc_sequence.png" width=500/>
 ::: -->
+:::
+
+:::{.notes}
+States
+
+Probabilisticly
+
+Random variable
+
 :::
 
 ## Markov Property

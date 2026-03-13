@@ -13,6 +13,65 @@ format:
         chalkboard: true 
 ---
 
+## Group Question 1
+
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/sums of random variables/covariance_table.png" width=700/> <br>
+:::
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+
+\(\small X\) and \(\small Y\) are discrete random variables. Both \(\small X\) and \(\small Y\) can assume values 0, 1, and 2. The incomplete table above is meant to depict the joint distribution of \(\small X\) and \(\small Y\), and the marginal distributions of \(\small X\) and \(\small Y.\)<br>
+
+b. Find the expected value of \(\small X\) and the expected value of \(\small Y\).<br>
+    <br>
+    <br>
+    <br>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1 
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+c. Find the covariance of \(\small X\) and \(\small Y\). <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+d. Are \(\small X\) and \(\small Y\) independent? Explain your answer.
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+This is quesion 8 from the practice exam for Fall 24.
+:::
+
 ## Brain Cancer
 :::{style="font-size: .8em"}
 
@@ -142,7 +201,7 @@ $$\small{\begin{align*}
 E[X+b] &= \sum_x (x + b) p(x) & \text{(LOTUS)} \\
 &= \sum_x x p(x) + \sum_x b p(x) & \text{(break $(x + b) p(x)$ into $xp(x) + bp(x)$)} \\
 &= \sum_x x p(x) + b\sum_x p(x) & \text{(factor constant outside the sum)} \\
-&= E[X] + b & \text{(definitions of expected value, p.m.f.)}
+&= E[X] + b & \text{(definitions of expected value, PMF)}
 \end{align*}}$$
 
 ```{python}
@@ -161,6 +220,10 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+:::
+
+:::{.notes}
+The expected value of X times a.
 :::
 
 ## Linearity of Expectation
@@ -188,7 +251,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Proof__: Suppose that the joint distribution of $\small{X}$ and $\small{Y}$ is $\small{p(x, y)}$. Then 
+__Proof__ (discrete case): Suppose that the joint distribution of $\small{X}$ and $\small{Y}$ is $\small{p(x, y)}$. Then 
 $$\small{
 \begin{align*}
 E[X + Y] &= \sum_x \sum_y (x + y) p(x, y) \: \quad \qquad \qquad \qquad \text{(LOTUS)} \\
@@ -218,7 +281,7 @@ __Example__: Suppose two people are playing Roulette. Note that in Roulette, 18 
 Note that the number of times player 2 wins is not independent from the number of times player 1 wins, because every time player 1 wins, player 2 also wins.
 
 :::{.center-text}
-<img src="images/sums of random variables/roulette.png" width=300/>
+<img src="images/sums of random variables/roulette.png" width=200/>
 :::
 
 :::
@@ -235,7 +298,7 @@ $$\small{E[Y−X]=E[Y]+E[−1⋅X]=E[Y]+(−1)E[X]=E[Y]−E[X].}$$
 
 $X$ is Binomial with $N=3$ and $p=18/38.$ Similarly, $Y$ is Binomial with $N=5$ and $p=18/38.$
 
-We saw in an earlier lecture that the expect value of a Binomail is $Np$ so putting it all together: 
+We saw in an earlier lecture that the expected value of a Binomail is $Np$ so putting it all together: 
 
 $$\small{E[Y−X]=E[Y]−E[X]=5*18/38−3*18/38=2*18/38 = 18/19.}$$
 
@@ -306,7 +369,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: We will prove the last property as a group exercise.
+__Remark__: We will prove the last two properties in HW 4.
 :::
 
 ## Weak Law of Large Numbers
@@ -403,6 +466,10 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+normally distributed with mean $n\mu$ and variance $n\sigma^2$
+:::
+
 
 ## Classifying Songs
 :::{style="font-size: .8em"}
@@ -460,10 +527,24 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-Q5 HW 3 Fall 25
+Q5 HW 3 Spring 25 
+
+a. Let $X$ represent the outcome of a 4 sided dice. Let $Y$ represent the outcome of a 6 sided dice.
+$$E[X]=\frac{1}{4}\sum_{i=1}^{4}i=2.5.$$
+$$E[Y]=\frac{1}{6}\sum_{i=1}^{6}i=3.5.$$
+$$E[X+Y]=E[X]+E[Y] = 2.5+3.5= 6. $$
+b. Note: $X$ and $Y$ are independent, because the outcome of one does not affect the outcome of the other. Since $X$ and $Y$ are independent, they are also uncorrelated.\\
+
+To compute the variance we can use the following expression, because $X$ and $Y$ are uncorrelated and their covariance is equal to zero:
+$$\operatorname{Var}(X+Y)= Var(X) + Var(Y) = E[X^2]-(E[X])^2+E[Y^2]-(E[Y])^2.$$
+The expected values of $X$ and $Y$ were found in part a. So it remains to compute $E[X^2]$ and $E[Y^2]$.
+$$E[X^2]=\frac{1}{4} \sum_{i=1}^{4} i^2 =\frac{1}{4} (1+4+9+16)=7.5.$$
+$$E[Y^2]=\frac{1}{6} \sum_{i=1}^{6} i^2=\frac{1}{6}(1+4+9+16+25+36)=\frac{91}{6}=15.167.$$
+Hence,
+$$\operatorname{Var}(X+Y)=E[X^2]-(E[X])^2+E[Y^2]-(E[Y])^2=7.5-2.5^2+15.167-3.5^2= 4.167.$$
 :::
 
-## Group Question 2
+<!-- ## Group Question 2
 :::{style="font-size: .8em"}
 ```{python}
 from IPython.core.display import HTML
@@ -489,5 +570,5 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-:::
+::: -->
 

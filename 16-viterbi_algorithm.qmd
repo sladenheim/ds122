@@ -15,6 +15,112 @@ filters:
     - pyodide
 ---
 
+## Group Question 2
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A veterinarian is monitoring a dog’s health state by asking the dog owner about its activity levels over the last 3 days. 
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+The veterinarian assumes three possible activity levels:<br>
+
+-1: quiet, 0: usual, 1: restless.<br> 
+
+The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
+
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+:::{.columns}
+::: {.column width="35%"}
+:::{.center-text}
+<img src="images/hmm/table_HMM_dog.png" width=300/>
+:::
+:::
+
+::: {.column width="65%"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Draw the corresponding state-transition diagram.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Define \(\boldsymbol{\pi}, A,\) and \(B\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
@@ -25,7 +131,6 @@ filters:
         1. Initialization
         2. Forward pass
         3. Backward pass
-    * Implementation in Python
     * Application to the umbrella problem
 
 :::
@@ -68,6 +173,17 @@ The intial probabilities are 0.6 and 0.4 for a sunny day and a rainy day, respec
 
 Given sequence of observations $\small O=\left(o_0, o_1,o_2,o_3\right)=(0,1,1,0),$ find the sequence of hidden states $\small X=\left(x_0, x_1,x_2,x_3\right)$ that best describes the observations $\small O$.
 
+:::
+
+## Brute-Force Approach
+:::{style="font-size: .8em"}
+
+Recall that with the brute-force approach we found the following manner to compute the joint probabilities:
+
+$$\small{P(O,X) = \prod_{n=0}^3 P(o_n | x_n) \prod_{n=1}^3 P(x_n | x_{n-1})P(x_0)}$$ 
+$$ \small  = P(o_3 | x_3)P(o_2 | x_2)P(o_1 | x_1)P(o_0 | x_0)P(x_3 | x_2) P(x_2 | x_1) P(x_1 | x_0)P(x_0).$$ 
+
+ All we did to obtain this expression was using conditional probability, the output-independence assumption, and the Markov-property assumption. 
 :::
 
 ## Viterbi Algorithm: Properties
@@ -229,7 +345,7 @@ display(HTML(html_content))
 
 :::
 
-## Group Question 2
+<!-- ## Group Question 2
 :::{style="font-size: .7em"}
 
 ```{python}
@@ -309,6 +425,5 @@ print("Matrix D: \n", D)
 print("Answer: \n", X)
 ```
 
-:::
+::: -->
 
-<!-- No group questions, because the next lecture is when we actually practice. -->

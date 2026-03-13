@@ -13,22 +13,28 @@ format:
         chalkboard: true 
 ---
 
-## CLT: Recap
+## Group Question 1
 :::{style="font-size: .8em"}
-The Central Limit Theorem (CLT) is a foundational result in probability theory. While there are many versions, varying in degrees of abstraction and generality, this is the one we introduced in the last lecture.
 ```{python}
 from IPython.core.display import HTML
 
 def generate_html():
     return r"""
-    <div class="purple-box">
-     <span class="label"> The Central Limit Theorem (CLT) </span>
+    <div class="blue-box">
         <p>
-        Let \(\small X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\small \mu\) and variance \(\small \sigma^2.\) Let \(\small S_n = \sum_{i=1}^n X_i.\) Then 
-
-    $$\small \frac{S_n - n\mu}{\sigma\sqrt{n}}$$
-
-    tends to the standard normal distribution as \(\small n \to \infty.\)
+    You roll a 4-sided die and a 6-sided die.  <br>
+    a. What is the expected value of the sum of two die rolls?
+    <br>
+    <br>
+    <br>
+    <br> 
+    b. What is the variance of the sum of the two die rolls?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
         </p>
     </div>
     """
@@ -37,9 +43,29 @@ display(HTML(html_content))
 ```
 :::
 
+:::{.notes}
+Q5 HW 3 Spring 25 
+
+a. Let $X$ represent the outcome of a 4 sided dice. Let $Y$ represent the outcome of a 6 sided dice.
+$$E[X]=\frac{1}{4}\sum_{i=1}^{4}i=2.5.$$
+$$E[Y]=\frac{1}{6}\sum_{i=1}^{6}i=3.5.$$
+$$E[X+Y]=E[X]+E[Y] = 2.5+3.5= 6. $$
+b. Note: $X$ and $Y$ are independent, because the outcome of one does not affect the outcome of the other. Since $X$ and $Y$ are independent, they are also uncorrelated.\\
+
+To compute the variance we can use the following expression, because $X$ and $Y$ are uncorrelated and their covariance is equal to zero:
+$$\operatorname{Var}(X+Y)= Var(X) + Var(Y) = E[X^2]-(E[X])^2+E[Y^2]-(E[Y])^2.$$
+The expected values of $X$ and $Y$ were found in part a. So it remains to compute $E[X^2]$ and $E[Y^2]$.
+$$E[X^2]=\frac{1}{4} \sum_{i=1}^{4} i^2 =\frac{1}{4} (1+4+9+16)=7.5.$$
+$$E[Y^2]=\frac{1}{6} \sum_{i=1}^{6} i^2=\frac{1}{6}(1+4+9+16+25+36)=\frac{91}{6}=15.167.$$
+Hence,
+$$\operatorname{Var}(X+Y)=E[X^2]-(E[X])^2+E[Y^2]-(E[Y])^2=7.5-2.5^2+15.167-3.5^2= 4.167.$$
+:::
+
+
 ## Learning Objectives
 :::{style="font-size: .8em"}
-* Discuss less formal versions of the CLT
+* The weak law of large numbers
+* The Central Limit Theorem (CLT)
 * Learn how to use the CLT
 * Practice solving CLT questions 
 * Application of the CLT to song classification
@@ -62,11 +88,108 @@ A data science student Anush is building a machine learning model to classify mu
 :::
 :::
 
-<!-- __Question__: What distribution can be used to describe the amount of time that Anush needs to process the first 45 songs? -->
-Anush has 140 minutes available before class starts. 
+__Question 1__: What distribution can be used to describe the amount of time that Anush needs to process the first 45 songs?
 
-__Question__: Approximate the probability that Anush will be able to process at least 45 songs before class.
+__Question 2__: Anush has 140 minutes available before class starts. Approximate the probability that Anush will be able to process at least 45 songs before class.
 
+:::
+
+## Weak Law of Large Numbers
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Weak Law of Large Numbers </span>
+        <p>
+        Let \(\small{X_1,X_2,...,X_i, ...}\) be a sequence of independent random variables with \(\small{E[X_i] = \mu}\) and \(\operatorname{Var}(X_i) = \sigma^2.\) Let \(\overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i.\) Then, for any \(\varepsilon >0,\)
+
+    $$\small{P(|\overline{X}_n - \mu| \geq \varepsilon) \to 0 \quad \text{ as } n \to \infty.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+<!-- __Example__: It is commonly believed that if a fair coin is tossed many times and the proportion of heads is calculated, that proportion will be close to $\frac{1}{2}$.   -->
+
+__Example__: It is commonly believed that if a fair coin is tossed many times and the proportion of heads is calculated, that proportion will be close to 50%. 
+
+ Imagine we are repeatedly flipping a certain number of coins at time and keep track of the number of head counts. The results can look as follows.
+:::
+
+:::{.notes}
+The Weak Law of Large Numbers says that for any small non-negative number 
+$\varepsilon,$ the probability that the average $X_n$
+differs from the true mean $\mu$
+by more than $\varepsilon$ goes to zero as $n$ becomes very large.
+
+Mathematician John Kerrich tested this belief empirically while detained as a prisoner during World War II. He tossed a coin 10,000 times and observed heads 5067 times
+:::
+
+## Weak Law of Large Numbers
+:::{style="font-size: .8em"}
+
+__Example (continued)__:
+
+- **10 coins** per trial:  
+  `4, 4, 5, 6, 5, 4, 3, 3, 4, 5, 5, 9, 3, 5, 7, 4, 5, 7, 7, 9`  
+  → Wide variability (30%–90% heads)
+
+- **100 coins** per trial:  
+  `46, 54, 48, 45, 52, 49, 47, 60, 40, 57, 46, 45, 51, 52...`  
+  → Narrower range (40%–60%)
+
+- **1000 coins** per trial:  
+  `486, 501, 489, 472, 537, 474, 508, 510, 478, 508, 493,...`  
+  → Tight clustering near 500 heads (47.2%–53.7%)
+
+
+As the number of coins per trial increases, the proportion of heads converges toward 50%.  
+
+
+:::
+
+:::{.notes}
+Connect to brain cancer!
+:::
+
+## Central Limit Theorem
+:::{style="font-size: .8em"}
+
+
+The Weak Law of Large Numbers tells us that the average of many random values tends to get close to the true mean.
+
+The Central Limit Theorem (CLT) goes further: it describes how the average fluctuates around the mean.
+
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Central Limit Theorem (CLT) </span>
+        <p>
+        Let \(\small X_1, X_2, ...\) be a sequence of independent and identically distributed random variables, each having mean \(\small \mu\) and variance \( \small \sigma^2.\) Let \( \small S_n = \sum_{i=1}^n X_i.\) Then 
+
+    $$\small \frac{S_n - n\mu}{\sigma\sqrt{n}}$$
+
+    tends to the standard normal distribution as \(\small n \to \infty.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+:::{.notes}
+normally distributed with mean $n\mu$ and variance $n\sigma^2$
 :::
 
 ## Reformulated CLT 
@@ -195,23 +318,43 @@ $$\begin{align*}
 ## Classifying Songs
 :::{style="font-size: .8em"}
 :::{.columns}
+::: {.column width="70%"}
+Let $X_i$ be the time that it takes to process song $i$, then 
+
+$$\small{S_{45} = \sum_{i=1}^{45} X_i}$$
+
+is the time it takes to classify the first 45 exams. 
+:::
+
 ::: {.column width="30%"}
 :::{.center-text}
 <img src="images/sums of random variables/Anush.jpeg" width=300/>
 :::
 :::
+:::
 
-::: {.column width="70%"}
-
-In the last lecture we saw that $S_{45}$ is approximately normally distributed with 
+From CLT it follows that $S_{45}$ is approximately normally distributed with 
 $$\small{E[S_{45}] = E\left[\sum_{i=1}^{45} X_i \right] = 45\cdot 3 = 135,}$$
 
 $$\small{\text{Var}[S_{45}] = \text{Var}\left(\sum_{i=1}^{45} X_i \right) = 45\cdot 0.5^2 = 11.25.}$$
 
 :::
-:::
- Then the probability that Anush will be able to process at least 45 songs before class is equal to
 
+## Classifying Songs
+:::{style="font-size: .8em"}
+:::{.columns}
+::: {.column width="28%"}
+:::{.center-text}
+<img src="images/sums of random variables/Anush.jpeg" width=300/>
+:::
+:::
+
+::: {.column width="53%"}
+
+Since $S_{45} \sim N(135, 11.25)$, the probability that Anush will be able to process at least 45 songs before class is equal to
+
+:::
+:::
 $$\small{P(S_{45} \leq 140) = P\left(Z \leq \frac{140 - 135}{\sqrt{11.25}} \right) = P(Z \leq 1.49) \approx 0.9320.} $$
 :::
 

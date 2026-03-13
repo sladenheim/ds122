@@ -28,7 +28,7 @@ HMMs are used in various fields that include bioinformatics, finance, robotics, 
 :::{style="font-size: .8em"}
 
 
-- A concrete example from a developmental study is modelling of infant-free-play regimes. While it is not possible to directly observe if an infant is focused or exploring, a prediction can be made based on the number of toys they were interacting during a certain period of time.
+- A concrete example from a developmental study is modelling of infant-free-play regimes. While it is not possible to directly observe if an infant is focused or exploring, a prediction can be made based on the number of toys they were interacting with during a certain period of time.
 
 :::{.center-text}
 <img src="images/hmm/baby_focus.png" width=400/>
@@ -204,11 +204,11 @@ $$\small A =
 <br>
 
 
-The __initial transition probabilities__ are typically stored in vector $\pi.$
+The __initial transition probabilities__ are typically stored in vector $\boldsymbol{\pi}.$
 
 __Example__: For the umbrella problem, the initial probabilities are given by 
 
-$$ \small \pi = \begin{bmatrix} 0.6 \\ 0.4 \end{bmatrix}.$$
+$$ \small \boldsymbol{\pi} = \begin{bmatrix} 0.6 \\ 0.4 \end{bmatrix}.$$
 :::
 
 ## Emission Matrix
@@ -232,7 +232,7 @@ display(HTML(html_content))
 ```
 
 __Remark__: $\small B$ is column stochastic.<br>
-__Remark__: Together $\small A, B,$ and $\small \pi$ fully define an HMM.
+__Remark__: Together $\small A, B,$ and $\small \boldsymbol{\pi}$ fully define an HMM.
 
 __Example__: For the umbrella example $\small B$ becomes
 
@@ -332,7 +332,7 @@ def generate_html():
         <p>
     The provided diagram represents a hidden Markov model with hidden states \(A, B,\) and \(C,\) and observable states 0 and 1.
 
-    Hidden states are ordered alphabetically, and observable states are listed as 0 followed by 1 when defining \(\pi, A, B,\) and \(O.\)<br>
+    Hidden states are ordered alphabetically, and observable states are listed as 0 followed by 1 when defining \(\boldsymbol{\pi}, A, B,\) and \(O.\)<br>
 
 a. What are the dimensions of the corresponding transition matrix?
     <br>
@@ -427,9 +427,7 @@ def generate_html():
         <p>
 The veterinarian assumes three possible activity levels:<br>
 
--1: quiet,<br>
-0: usual,<br>
-1: restless.<br> 
+-1: quiet, 0: usual, 1: restless.<br> 
 
 The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
 
@@ -486,7 +484,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-b. Define \(\pi, A,\) and \(B\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
+b. Define \(\boldsymbol{\pi}, A,\) and \(B\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
 <br>
 <br>
 <br>
