@@ -13,7 +13,146 @@ format:
         chalkboard: true 
 ---
 
-## The Monty Hall Problem
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose \(\small X_1\) and \(\small X_2\) are independent random variables. \(\small X_1\) follows an exponential distribution with parameter \(\small \frac{1}{\theta}\). \( \small X_2\) is uniformly distributed on interval \(\small [0,\theta].\) \(\small \theta\) is unknown. Consider the following estimator for \(\small \theta:\)
+    $$\small \hat{\theta} = \frac{1}{4}x_1 + \frac{3}{2}x_2.$$
+    Here, \(x_1\) and \(x_2\) are realizations of \(X_1\) and \(X_2\), respectively.<br>
+a. Compute the bias of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+b. Is \(\small \hat{\theta}\) unbiased? Explain your answer.
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+c. Compute the variance of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+d. Find the mean squared error of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Finding the Ship of Gold
+:::{style="font-size: .8em"}
+
+
+:::{.columns}
+::: {.column width="50%"}
+:::{.center-text}
+<img src="images/bayesian_intro/ship_gold.png" width=500/>
+:::
+:::
+::: {.column width="50%"}
+
+- **Official name:** SS Central America
+- **Type:** 280‑foot (85 m) steamer
+- **Service:** Operated between Central America and the U.S. East Coast during the 1850s
+:::
+:::
+- **Fate:** Sank on September 12, 1857, with the loss of 425 lives and over 13 tons of gold. The precise location of the wreck was unknown to anyone until 1988.
+
+:::
+
+:::{.notes}
+To motivate our discussion, I want to tell you a true story involving 
+
+- a steamer on a stormy sea, 
+- missing gold, 
+- a group of scientists, 
+- some truly awesome statistics, and even 
+- imprisonment.
+
+It never clicked how “wild” the Wild West was until I learned that the easiest way to travel from California to NYC and other major East Coast cities in 1850s America was 
+
+- by ship down to Panama, 
+- a short train ride, and 
+- a steamer back up.
+
+This is precisely why the SS Central America was sailing North in early September 1857.
+
+Unfortunately, it encountered a powerful storm and sank on September 12.
+
+The exact location of the wreck was not known to anybody until 1988. What was known were the weather reports and statements/testimonies from varios eyewitnesses of the event. 
+:::
+
+## Finding the Ship of Gold
+:::{style="font-size: .8em"}
+The ship was located by a group led by Thomas Gregory Thompson using Bayesian statistics.  
+
+:::{.center-text}
+<img src="images/bayesian_intro/Bayesian_search.png" width=600/>
+:::
+
+:::
+
+:::{.notes}
+That was enough for engineer Thomas Thompson to believe he could find the wreck. He assembled a diverse and talented team with expertise in robotics, sonar, and statistics.
+
+They generated different scenarios for the location of the wreck, combined them, and then UPDATED them based on their findings at the location. 
+
+Surprisingly, they found the wreck and the gold in a cell with low probability. Having low probability (not probable) /= impossible! 
+:::
+
+## Finding the Ship of Gold
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/bayesian_intro/Thomson.png" width=450/>
+:::
+
+- **2000**: Thompson sold some of the recovered gold for $52 million.
+
+- **2018**: He claimed he no longer had access to an additional 500 gold coins.
+
+- **2015–2026**: Thompson was imprisoned from December 2015 to March 2026.
+:::
+
+:::{.notes}
+Thompson’s team found and initially recovered substantial treasure from the SS Central America, but he and his organization became embroiled in multi-million dollar legal battles involving insurers, investors, and crew. His refusal to comply with court orders over the missing 500 coins led to arrests, convictions, and long-term jail time. 
+
+With great power of Bayesian statistics, comes great responsibility!
+:::
+
+
+<!-- ## The Monty Hall Problem
 :::{style="font-size: .8em"}
 Let's consider a famously unintuitive problem in probability, the Monty Hall Problem. Many of you may have heard of this one.
 
@@ -32,7 +171,7 @@ Most people will say there's now a 50/50 chance the remaining doors have the pri
 But it turns out that's wrong! You actually have a 2/3 chance of finding the prize if you switch doors. 
 
 Let's see why using a Bayes table.
-::: 
+:::  -->
 
 ## Learning Objectives
 :::{style="font-size: .8em"}
@@ -43,19 +182,23 @@ Let's see why using a Bayes table.
     - Posterior
     - Normalizing constant
 - Bayesian update
-- Bayes tables
+- Bayes table
     - Python implementation
 - Application to the cookie problem
 
 :::
 
+:::{.notes}
+Bayesian - 2 types of pronounciation
+:::
+
 ## The Cookie Problem
 :::{style="font-size: .8em"}
 
-Suppose there are two bowls of cookies:
+Suppose there are two bowls of cookies.
 
-- The first bowl contains 30 vanilla cookies and 10 chocolate cookies.
-- The second contains 20 vanilla cookies and 20 chocolate cookies.
+- The first bowl: 30 vanilla cookies and 10 chocolate cookies.
+- The second bowl: 20 vanilla cookies and 20 chocolate cookies.
 
 :::{.center-text}
 <img src="images/bayesian_intro/cookie_problem.png" width=300/>
@@ -75,48 +218,66 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Bayes' Rule</span>
         <p>
-        For any events \(\small{A}\) and \(\small{B}\) such that \(\small{P(B)>0,}\)  \(\small{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}.\)
+        For any events \(\small{A}\) and \(\small{B}\) such that \(\small{P(B)>0,}\)  
+        $$\small{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}.$$
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: From the law of total probability it follows that, if we let $\small{P(B)>0}$ and let $\small{A_1, \dots, A_n}$ be events where $\small{A_i}$'s are disjoint and form the entire sample space, then 
+__Remark__: From the law of total probability it follows that, if we let $\small{A_1, \dots, A_n}$ be events where $\small{A_i}$'s are disjoint and form the entire sample space, then 
 $$\small{P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.}$$ 
 :::
 
 ## The Cookie Problem
 :::{style="font-size: .8em"}
-Intuitively, we know that the first bowl had more vanilla cookies, so we should expect it to be more than a 50% chance.
+Since the first bowl contains more vanilla cookies, we anticipate that the cookie is more likely to come from the first bowl than the second one.
 
-Let's solve this using Bayes' Rule. What we want to solve for is:
+Let's define the following events:
 
-$$ P(\text{1st bowl} \vert \text{vanilla cookie}). $$
+- $\small{B_i}$ representing that bowl $i$ was selected
+- $\small{V}$ representing that the cookie is vanilla
 
-Using Bayes':
+Then the probability we are looking for is $\small P(B_1 \vert V).$
 
-$$P(\text{1st bowl} \vert \text{vanilla cookie})\ = \frac{P(\text{vanilla cookie} \vert \text{1st bowl})\;P(\text{1st bowl})}{P(\text{vanilla cookie})}.$$
+Using Bayes' rule we obtain:
+
+$$\small P(B_1 \vert V) = \frac{P(V \vert B_1)\;P(B_1)}{P(V)}.$$
 :::
 
 ## The Cookie Problem
 :::{style="font-size: .8em"}
 
-We now have three probabilities we need to determine:
+From the problem description we know that
 
-- $\small P(\text{1st bowl})$ which is one bowl out of two, so 1/2.
-- $\small P(\text{vanilla cookie} \vert \text{1st bowl})$ which is 30 out of 40 cookies, so 3/4.
-- $\small P(\text{vanilla cookie})$ which is a little tougher, since it's the combined probability of vanilla cookies from either bowl. So let's use the law of total probability:
+- $\small P(B_1) = \frac{1}{2}$ because one of the two bowls was selected randomly 
+- $\small P(V \vert B_1) = \frac{30}{40} = \frac{3}{4}$ because bowl 1 contains 40 cookies 30 of which are vanilla.
+
+We use the law of total probability to find $\small P(V):$
 
 $$\small \begin{align*}
- & P(\text{vanilla cookie})  = \\
- & = P(\text{vanilla cookie} \vert \text{1st bowl})\;P(\text{1st bowl}) +  P(\text{vanilla cookie} \vert \text{2nd bowl})P(\text{2nd bowl}) \\
-& = (3/4)(1/2)+(1/2)(1/2) =5/8 
+ P(V)  & = P(V \vert B_1)\;P(B_1) +  P(V \vert B_2)\;P(B_2) 
+= \frac{3}{4}\cdot \frac{1}{2}+\frac{1}{2}\cdot \frac{1}{2} = \frac{5}{8}.
 \end{align*}$$
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Is there a different way to find \(\small P(V)?\)
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 
 :::
 
-## The Cookie Problem
+<!-- ## The Cookie Problem
 :::{style="font-size: .8em"}
 Let's put it all together now:
 
@@ -128,16 +289,32 @@ P(\text{first bowl} \vert \text{vanilla cookie})\ & = \frac{P(\text{vanilla cook
 <br><br>
 
 Just like we suspected, because the first bowl had more vanilla cookies, it was more likely that our cookie came from the first bowl.
+::: -->
+
+## The Cookie Problem
+:::{style="font-size: .8em"}
+
+We conclude that
+
+$$\small P(B_1 \vert V) = \frac{P(V \vert B_1)\;P(B_1)}{P(V)} = \frac{(3/4)(1/2)}{(5/8)} =\frac{3}{5}.$$
+
+Hence, the probability that the cookie came from bowl 2 is 
+$$\small 1- \frac{3}{5} = \frac{2}{5},$$ 
+which is indeed lower than $\frac{3}{5}.$
+
+
+In Bayesian statistics, we refer to $\small B_1$ as a **hypothesis** and to $\small V$ as the **data**.
+
+__Notation__: Typically, we denote a hypothesis by $\small H$, and the data by $\small D$. 
+
+We can use this to rewrite the Bayes’ rule as follows. 
+
+
+
 :::
 
 ## Basic Bayesian Concepts
 :::{style="font-size: .8em"}
-
-The main way Bayes' Rule is used in Bayesian statistics is as a way to update the probability of a hypothesis $H$, given some data $D$.
-
-<br>
-
-As a general framework, we re-write Bayes' Rule as follows.
 
 ```{python}
 from IPython.core.display import HTML
@@ -146,7 +323,7 @@ def generate_html():
     return r"""
     <div class="purple-box">
      <span class="label">Bayes' Rule</span>
-        <p> For \(\small P(D)>0\),
+        <p> For a hypothesis \(\small{H}\) and some data \(\small{D}\) such that \(\small P(D)>0\),
 
         $$\small P(H \,\vert\, D)\; =  \frac{P(H)P(D\,\vert\,H) \; }{P(D)}. $$
         </p>
@@ -155,19 +332,17 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ``` 
+- **Prior**: the probability of the hypothesis before observing the data, $\small P(H)$
+- **Posterior**: the probability of the hypothesis after observing the data, $\small P(H \vert D)$
+- **Likelihood**: the probability of the data given the hypothesis, $\small  P(D \vert H)$
+- **Total probability of the data** (or **normalizing constant**): the overall probability of the data under all possible hypotheses, $\small P(D)$
 
-
-:::
-
-## Basic Bayesian Concepts
-:::{style="font-size: .8em"}
-
-
+<!-- 
 
 - $P(H)$ is the probability of the hypothesis before we see the data, called the **prior** probability.
 - $P(H \vert D)$ is the probability of the hypothesis after we see the data, called the **posterior** probability.
 - $P(D \vert H)$ is the probability of the data under the hypothesis, called the **likelihood**.
-- $P(D)$ is the **total probability of the data** under any hypothesis (it is also known as the **normalizing constant**).
+- $P(D)$ is the **total probability of the data** under any hypothesis (it is also known as the **normalizing constant**). -->
 
 
 :::
@@ -175,17 +350,13 @@ display(HTML(html_content))
 ## Prior and Likelihood
 :::{style="font-size: .8em"}
 
-The _**prior**_ is often the trickiest portion of the Bayes' Rule to pin down. 
+_**Prior**_:<br>
+Often the most subjective part of Bayes’ rule. In some cases it can be computed directly (e.g., equal likelihood of choosing each bowl), while in others it depends on modeling assumptions (e.g., selection proportional to bowl size or relevant background information).<br><br>
+_**Likelihood**_:<br>
+Usually well defined and straightforward to compute. When the data‑generating process is known (as in the cookie bowl problem), probabilities under each hypothesis can be calculated directly.
 
-Sometimes it can be computed exactly as in the cookie bowl problem, where we were equally likely to pick each bowl. 
-
-But what if we chose bowls proportionally to their size? We would need to include that into our analysis. 
-
-Other times, people might disagree about which background information is relevant to the problem at hand. 
-
-<br><br>
-
-The _**likelihood**_ is usually well defined and can be computed directly. In the cookie problem we know the numbers of different cookies in each bowl, so we can compute the probabilities under each hypothesis.
+<!-- The _**prior**_ is often the most challenging component of Bayes’ rule to specify. In some cases, it can be determined exactly—for example, in the cookie bowl problem, where each bowl is selected with equal probability. In other situations, additional assumptions must be incorporated, such as selecting bowls in proportion to their size. More generally, the choice of prior may depend on which background information is deemed relevant, and reasonable individuals may disagree on this point.<br><br>
+The _**likelihood**_, by contrast, is typically well defined and can be computed directly. In the cookie problem, the composition of each bowl is known, allowing us to calculate the probability of the observed data under each hypothesis. -->
 
 :::
 
@@ -193,13 +364,19 @@ The _**likelihood**_ is usually well defined and can be computed directly. In th
 :::{style="font-size: .8em"}
 
 
-Finally, determining the **total probability** of the data is often a lot more difficult than you might expect because we often don't know what every possible hypothesis is. 
+_**Total probability of the data**_:<br>
+Determining the total probability of the data can be more difficult than it first appears, since we may not know or be able to enumerate all possible hypotheses. <br>
+In practice, we typically restrict attention to a set of **disjoint** (or **mutually exclusive**) and **collectively exhaustive** hypotheses, meaning that exactly one hypothesis is true and all possibilities are accounted for.
 
-However, usually the goal is to pin down a set of **mutually exclusive** and **collectively exhaustive** hypotheses, meaning a set of hypotheses where only one of them can be true, and one of them must be true.
+Then, just as before, we can use the law of total probability
 
-Then, over a set of *i* hypotheses, we say:
+$$\small P(D) = \sum_j{P(H_j)P(D \vert H_j)}. $$
 
-$$\small P(D) = \sum_i{P(H_i)P(D \vert H_i)}. $$
+
+:::
+
+## Bayes Table
+:::{style="font-size: .8em"}
 
 ```{python}
 from IPython.core.display import HTML
@@ -217,10 +394,8 @@ html_content = generate_html()
 display(HTML(html_content))
 ``` 
 
-:::
-
-## Bayes Table
-:::{style="font-size: .8em"}
+<br>
+A Bayes table is a structured approach to keep track of these updates. 
 
 ```{python}
 from IPython.core.display import HTML
@@ -230,62 +405,98 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Bayes Table</span>
         <p> 
-         A Bayes table is table that keeps track of the probabilities of all hypotheses as we update them using our data.
+         A Bayes table is a table that keeps track of the probabilities of all hypotheses as we update them using our data.
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ``` 
+:::
 
-Let's go step by step to create a Bayes table for the cookie problem. First, we need a table that contains all possible hypotheses, one row for each hypothesis:
+## Bayes Table
+:::{style="font-size: .8em"}
+To build a Bayes table for the cookie problem, we start by listing all possible hypotheses, one per row. <br><br>
 
 ```{python}
 #| echo: true
 import pandas as pd
 
-table = pd.DataFrame(index=['first bowl', 'second bowl'])
-table
+table = pd.DataFrame()
+table['hypothesis'] = ['first bowl', 'second bowl']
 ```
+
+```{python}
+#| echo: false
+table.style.hide(axis="index")
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   What values should we enter in the prior column?
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
 :::
 
 ## Bayes Table
 :::{style="font-size: .8em"}
-Next, we add the prior probabilities of each hypothesis. Our prior is that it was equally likely to get a vanilla cookie from either bowl.
+
+The likelihood of each hypothesis is the fraction of cookies in each bowl that is vanilla.  
 
 ```{python}
 #| echo: true
 table['prior'] = 1/2, 1/2
-table
+table['likelihood'] = 30/40, 20/40
 ```
 
-The likelihood of each hypothesis is the fraction of cookies in each bowl that is vanilla.   For example, 
+```{python}
+#| echo: false
+table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}"}).hide(axis="index")
+```
 
-$$\small P(D\,\vert\,\text{1st bowl}) = \frac{30}{40} = 0.75.$$
+It remains to perform the Bayesian update. We do this in three steps:
 
-
+1. Compute the **unnormalized posterior**
+2. Compute the total probability of the data
+3. Compute the posterior
 :::
 
 ## Bayes Table
 :::{style="font-size: .8em"}
 
-```{python}
-#| echo: true
-table['likelihood'] = 30/40, 20/40
-table
-```
-
-Next, let's compute the **unnormalized posteriors**. This is just the prior multiplied by the likelihood.
+The unnormalized posterior is computed by multiplying the prior and likelihood columns entrywise.
 
 ```{python}
 #| echo: true
-table['unnormalized'] = table['prior'] * table['likelihood']
-table
+table['unnorm. post.'] = table['prior'] * table['likelihood']
 ```
+```{python}
+# | echo: false 
+table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}"}).hide(axis="index")
+```
+
+We obtain the total probability of the data by summing the unnormalized posteriors.
+<!-- The final step is normalization: divide by the total probability of the data, which we obtain by summing the unnormalized posteriors. -->
+```{python}
+#| echo: true
+prob_data = table['unnorm. post.'].sum()
+prob_data
+```
+
+This gives us 5/8, just like we calculated before. 
 
 :::
 
-## Bayes Table
+<!-- ## Bayes Table
 :::{style="font-size: .8em"}
 The final missing piece is to divide by the total probability of the data. 
 
@@ -295,52 +506,62 @@ To find the total probability of the data we directly sum over the unnormalized 
 
 ```{python}
 #| echo: true
-prob_data = table['unnormalized'].sum()
+prob_data = table['unnorm. post.'].sum()
 prob_data
 ```
 
 This gives us 5/8, just like we calculated before. 
-:::
+::: -->
 
 ## Bayes Table
 :::{style="font-size: .8em"}
 
-Finally, we can use the total probability of the data to get the posterior probability of each hypothesis.
+The final step is normalization: divide the entries in the unnormalized posterior column by the total probability of the data.
+
+<!-- Finally, we can use the total probability of the data to get the posterior probability of each hypothesis. -->
 
 ```{python}
 #| echo: true
-table['posterior'] = table['unnormalized'] / prob_data
-table
+table['posterior'] = table['unnorm. post.'] / prob_data
 ```
 
-The posterior probability of the first bowl, given that we observed a vanilla cookie, is 0.6, the same as when we used Bayes' theorem directly before. 
+```{python}
+# | echo: false 
+table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}", "posterior": "{:.2f}"}).hide(axis="index")
+```
 
-Notice that the posteriors add up to 1 (as we should expect given mutually exclusive and collectively exhaustive hypotheses).
+The posterior probability of the first bowl given a vanilla cookie is $0.6 = \frac{3}{5}$, consistent with the earlier Bayes’ theorem calculation. 
+
+Note that both the prior and the posterior are _**distributions**_! The entries of each of these columns are probabilities and sum to 1. 
+<!-- As expected for mutually exclusive and exhaustive hypotheses, the posteriors sum to 1. -->
 
 :::
 
 ## Bayes Table
 :::{style="font-size: .8em"}
-We can simplify things going forward by introducing an update function.
+We introduce an update function to simplify subsequent computations.
 
 ```{python}
 #| echo: true
 def update(table):
-    table['unnormalized'] = table['prior'] * table['likelihood']
-    prob_data = table['unnormalized'].sum()
-    table['posterior'] = table['unnormalized'] / prob_data
+    table['unnorm. post.'] = table['prior'] * table['likelihood']
+    prob_data = table['unnorm. post.'].sum()
+    table['posterior'] = table['unnorm. post.'] / prob_data
     return table
 
-table = pd.DataFrame(index=['first bowl', 'second bowl'])
-table['prior'] = 1/5, 1/5,
+table = pd.DataFrame()
+table['hypothesis'] = ['first bowl', 'second bowl']
+table['prior'] = 1/2, 1/2,
 table['likelihood'] = 3/4, 1/2
 
 update(table)
+table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}", "posterior": "{:.2f}"}).hide(axis="index")
 ```
+
 
 :::
 
-## The Monty Hall Problem
+<!-- ## The Monty Hall Problem
 :::{style="font-size: .8em"}
 Now let's return to the Monty Hall Problem. 
 
@@ -405,10 +626,10 @@ update(table)
 ```
 
 Turns out there is a 2/3 probability the prize is behind door 2! We should switch doors.
-:::
+::: -->
 
 
-## Prior and Posterior Distributions
+<!-- ## Prior and Posterior Distributions
 :::{style="font-size: .8em"}
 
 The set of _**prior probabilities**_ are in reality a _**prior distribution**_. Likewise, the set of _**posterior probabilities**_ are in reality a _**posterior distribution**_ across hypotheses. 
@@ -483,9 +704,155 @@ ax.yaxis.label.set_fontsize(16)
 plt.title('Posterior Distribution', size = 16);
 ```
 :::
+::: -->
+
+
+<!-- ## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+Red howler monkeys eat a variety of foods. Holly’s favorite is figs. For her birthday, researchers prepared three food boxes.
+</p>
+
+        <ul>
+           
+            <li><strong>Box 1:</strong> 40% leaves, 25% figs, 10% plums, remainder buds and flowers</li>
+            <li><strong>Box 2:</strong> 10% leaves, 45% figs, 25% plums, remainder buds and flowers</li>
+            <li><strong>Box 3:</strong> 50% leaves, 15% figs, 15% plums, remainder buds and flowers</li>
+
+        </ul>
+
+        <p>
+Holly selects a box at random and then a treat at random. The selected treat is a fig.<br>
+
+a. Define the relevant hypotheses and state their prior probabilities.
+    <br>
+    <br>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+::: -->
+
+## Group Question 1
+:::{.columns}
+::: {.column width="45%"}
+:::{.center-text}
+<img src="images/bayesian_intro/Holly_BD.png" width=500/>
+:::
+:::
+::: {.column width="55%"}
+:::{style="font-size: .7em"}
+
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+<div class="blue-box">
+        <p>
+Red howler monkeys eat a variety of foods. Holly’s favorite is figs. For her birthday, researchers prepared three food boxes.
+</p>
+     <p><l start="*">
+        <ul>
+           
+            <li><strong>Box 1:</strong> 40% leaves, 25% figs, 10% plums, remainder buds and flowers</li>
+            <li><strong>Box 2:</strong> 10% leaves, 45% figs, 25% plums, remainder buds and flowers</li>
+            <li><strong>Box 3:</strong> 50% leaves, 15% figs, 15% plums, remainder buds and flowers</li>
+
+        </ul>
+</p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+:::
+:::
+:::{style="font-size: .7em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+Holly selects a box at random and then a treat at random. The selected treat is a fig.<br>
+
+a. Define the relevant hypotheses and state their prior probabilities.
+    <br>
+</p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 :::
 
 ## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Determine the likelihood of observing a fig under each hypothesis.
+    <br>
+    <br>
+    <br>
+    <br>
+c. Construct a Bayes table and use it to compute the posterior probability that the fig came from each box.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+
+
+<!-- ## Finding the Ship of Gold
+:::{style="font-size: .8em"}
+
+
+:::{.columns}
+::: {.column width="50%"}
+:::{.center-text}
+<img src="images/bayesian_intro/ship_gold.png" width=500/>
+:::
+:::
+::: {.column width="50%"}
+
+- **Official name:** SS Central America
+- **Type:** 280‑foot (85 m) steamer
+- **Service:** Operated between Central America and the U.S. East Coast during the 1850s
+:::
+:::
+- **Fate:** Sank on September 12, 1857, with the loss of 425 lives and over 13 tons of gold. The precise location of the wreck was unknown to anyone until 1988.
+
+::: -->
+
+
+<!-- ## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -510,4 +877,4 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-:::
+::: -->

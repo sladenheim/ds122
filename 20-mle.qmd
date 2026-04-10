@@ -37,8 +37,6 @@ __Question__: Estimate how many trains the railroad has using maximum likelihood
 
 ## Model Fitting
 :::{style="font-size: .8em"}
-Assume that you know that data is drawn from a particular _**kind**_ of distribution, but you don't know the value(s) of the distribution's parameter(s). 
-
 The table below lists some common distributions and their parameters.
 
 
@@ -51,22 +49,24 @@ The table below lists some common distributions and their parameters.
 |Exponential | $\lambda$ |
 |Uniform     | $(a,b)$ |
 |Normal      | $(\mu, \sigma)$ |
+
+Assume that you know that data is drawn from a particular _**kind**_ of distribution, but you don't know the value(s) of the distribution's parameter(s). 
 :::
 
 
 ## Model Fitting
 :::{style="font-size: .8em"}
-That is, data is drawn from a distribution
+<!-- That is, data is drawn from a distribution
 $p(x; \theta).$
 
 The way to read this is: the probability of $x$ under a distribution having parameter(s) $\theta$.
 
-We call $p(x; \theta)$ a __family__ of distributions because there is a different distribution for each value of $\theta$. 
+We call $p(x; \theta)$ a __family__ of distributions because there is a different distribution for each value of $\theta$.  -->
 
-<!-- The graph below illustrates the probability density functions of several normal distributions (from the same parametric family). -->
+The graph below illustrates the probability density functions of several normal distributions (from the same parametric family).
 
 :::{.center-text}
-<img src="images/parameter_estimation/normal_family.svg" width=500/>
+<img src="images/parameter_estimation/normal_family.svg" width=700/>
 :::
 :::
 
@@ -91,7 +91,7 @@ display(HTML(html_content))
 ```
 In this setting, it's the parameter(s) $\theta$ that change, not the data $x.$
 
-When treat $p(x; \theta)$ as a function of $\theta$ (instead of $x$, say) we call it a __likelihood__.
+When we treat $p(x; \theta)$ as a function of $\theta$ (instead of $x$) we call it a __likelihood__.
 
 This shift in terminology highlights that we are now focusing on how the probability changes as we vary $\theta.$
 :::
@@ -228,7 +228,7 @@ We will only be interested in the maxima of the likelihood function. Since the l
 :::
 
 ## Log-Likelihood
-:::{style="font-size: .75em"}
+:::{style="font-size: .7em"}
 So we will work with the log-likelihood:
 
 $$\small{\log p(X_s; \theta).}$$
@@ -305,9 +305,45 @@ $$\small{=2\left(\log\frac{2}{3}+ \log \theta \right) + 3\left(\log\frac{1}{3}+ 
 $$\small{= 5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}.}$$
 :::
 
+
 ## Log-Likelihood
 :::{style="font-size: .8em"}
-We can visualise the log-likelihood function by varying $\theta$.
+
+| $x$ | $1$ | $2$ |
+| :---: | :---: | :---: |
+| $p(x;\theta)$ | $\theta$ | $1-\theta$|
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
+
+Three independent oservations are made from this distribution:
+\(x_1 = 1, x_2 = 2, x_3 = 2.\)<br>
+
+    a. Find the likelihood function.<br>
+    <br>
+    <br>
+    b. Find the log-likelihood function.
+    <br>    
+    <br>
+    <br>
+        </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+
+## Log-Likelihood
+:::{style="font-size: .79em"}
+__Example (continued)__: 
+We can visualise the log-likelihood function by varying $\theta.$
 
 ```{python}
 import numpy as np
@@ -378,29 +414,17 @@ display(HTML(html_content))
 c
 :::
 
-## Computation of MLE
-:::{style="font-size: .8em"}
-
-Typically, to find the Maximum Likelihood Estimate $\hat{\theta}$ for distribution parameter $\theta$, we perform the following steps:
-
- 1. Compute the likehood function $p\left(X_s;\theta \right).$<br>
- 2. Compute the corresponding log-likelihood function $\log p\left(X_s;\theta \right).$<br>
- 3. Take the derivative of the log-likelihood function with respect to $\theta$.<br>
- 4. Set the derivative to zero to find the MLE. <br>
- 4. (Optional) Confirm that the obtained extremum is indeed a maximum by taking the second derivative or from the plot of the log-likelihood function. 
-:::
 
 ## Computation of MLE
 :::{style="font-size: .8em"}
-Let us compute the MLE for the example we looked at earlier.
 
-__Example.__ Earlier we obtained the following log-likehood function:
+__Example (continued):__ Earlier we obtained the following log-likehood function:
 
-$$\small{5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}}.$$
+$$\small{\log p(X_s; \theta) = 5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}}.$$
 
 The derivative of this log-likelihood function with respect to $\theta$ is equal to
 
-$$\small{\log p(X_s; \theta) = \frac{\partial}{\partial\theta}\log p(X_s;\theta) = \frac{5}{\theta} - \frac{5}{1-\theta}}.$$
+$$\small{\frac{\partial}{\partial\theta}\log p(X_s;\theta) = \frac{5}{\theta} - \frac{5}{1-\theta}}.$$ 
 
 Setting the derivative to zero leads to
 
@@ -439,6 +463,59 @@ plt.show()
 The figure shows that $\hat{\theta}=\frac{1}{2}$ is a maximum. Therefore, the MLE of $\theta$ is indeed $\frac{1}{2}.$
 :::
 
+## Computation of MLE
+:::{style="font-size: .8em"}
+```{python}
+def qloglik(theta):
+    return np.log(theta)+2*np.log(1-theta)
+
+fig = plt.figure(figsize = (14,3))
+ax = plt.axes()
+
+x = np.linspace(0.01, 0.99, 500)
+ax.plot(x, qloglik(x), lw = 3, color = 'blue')
+ax.set_xlabel(r'$\theta$', size = 16)
+ax.set_ylabel('Log-Likelihood', size = 16);
+ax.set_xticks(np.arange(0, 1, 0.1))
+plt.title(r'$\log p(X_s; \theta) = \log \theta + 2\log (1-\theta)$', size = 18);
+plt.show()
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Consider the log-likelihood function given above. Find the maximum likelihood estimate of \(\theta.\) 
+       <br>
+    <br>
+    <br>
+        <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## Computation of MLE
+:::{style="font-size: .8em"}
+
+Typically, to find the Maximum Likelihood Estimate $\hat{\theta}$ for distribution parameter $\theta$, we perform the following steps:
+
+ 1. Compute the likehood function $p\left(X_s;\theta \right).$<br>
+ 2. Compute the corresponding log-likelihood function $\log p\left(X_s;\theta \right).$<br>
+ 3. Take the derivative of the log-likelihood function with respect to $\theta$.<br>
+ 4. Set the derivative to zero to find the MLE. <br>
+ 4. (Optional) Confirm that the obtained extremum is indeed a maximum by taking the second derivative or from the plot of the log-likelihood function. 
+
+ However, there are exceptions!
+:::
+
 ## Train Problem
 :::{style="font-size: .8em"}
 
@@ -456,63 +533,17 @@ p(X_s; \theta) = \frac{1}{\theta}, \quad \text{for } \theta \geq 60.
 $$
 
 This function decreases as $\theta$ increases.  
-So the maximum likelihood estimate is:
-
-
-$$
-\hat{\theta} = 60.
-$$
+So the maximum likelihood estimate is: $\hat{\theta} = 60.$
 
 
 :::
 
-## Group Quesiton 1
+## Group Question 1
 :::{style="font-size: .8em"}
 
-| $x$ | $1$ | $2$ |
-| :---: | :---: | :---: |
-| $p(x;\theta)$ | $\theta$ | $1-\theta$|
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-   Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
-
-Three independent oservations are made from this distribution:
-\(x_1 = 1, x_2 = 2, x_3 = 2.\)<br>
-
-    a. Find the likelihood function.<br>
-    <br>
-    <br>
-    <br>
-    b. Find the log-likelihood function.
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
-## Group Quesiton 1
-:::{style="font-size: .8em"}
-```{python}
-def qloglik(theta):
-    return np.log(theta)+2*np.log(1-theta)
-
-fig = plt.figure(figsize = (14,3))
-ax = plt.axes()
-
-x = np.linspace(0.01, 0.99, 500)
-ax.plot(x, qloglik(x), lw = 3, color = 'blue')
-ax.set_xlabel(r'$\theta$', size = 16)
-ax.set_ylabel('Log-Likelihood', size = 16);
-ax.set_xticks(np.arange(0, 1, 0.1))
-plt.title(r'$\log \theta + 2\log (1-\theta)$', size = 18);
-plt.show()
-```
+:::{.center-text}
+<img src="images/intro/Netflix.png" width=400/>
+::: 
 
 ```{python}
 from IPython.core.display import HTML
@@ -521,7 +552,9 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-   c. Find the maximum likelihood estimate of \(\theta.\) 
+   A student notices their roommate watching episode 8 of a TV series on Netflix. The show looks interesting, and the student wonders if they will have enough time to watch the entire series over a long weekend. <br>
+   
+   Help the student estimate the total number of episodes in the series using the maximum likelihood estimation.
        <br>
     <br>
     <br>
@@ -532,4 +565,35 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+
 :::
+
+<!-- ## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(X\) follows a geometric distribution with parameter \(\theta = p,\) 
+   $$P(X=x) = \theta(1-\theta)^{x-1}.$$
+   The data sample has size \(n.\)<br>
+   Find the maximum likelihood estimator of \(\theta.\)
+       <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+::: -->
+

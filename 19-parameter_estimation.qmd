@@ -13,23 +13,34 @@ format:
         chalkboard: true 
 ---
 
-## Horse-Kick Fatalities
+## An Impossible Choice?
+
 :::{style="font-size: .8em"}
 
+:::{.columns}
+::: {.column width="70%"}
+Imagine Levels.fyi has two algorithms for predicting junior data‑scientist salaries:
+:::
 
+::: {.column width="30%"}
 :::{.center-text}
-<img src="images/parameter_estimation/horse-kick.png" width=500/>
+<img src="images/parameter_estimation/levels.png" width=250/>
+:::
 :::
 
-Remember Bortkiewicz’s analysis of horse-kick deaths in the Prussian army?<br>
-He used the Poisson distribution to decide whether a high number of deaths in one year was just a coincidence.
-But how did he choose the right parameter for his model?
+- **Algorithm A**: Always predicts annual salary **10k higher** than the true value.
+- **Algorithm B**: On average correct, but can be **7k above or below** the true value.
 
-That question leads us to parameter estimation, the focus of the next three lectures.
-
-
+Which one should they use?
 
 :::
+
+<br>
+
+Today, we will answer this using the ideas of bias, variance, and Mean Squared Error (MSE).
+:::
+
+
 
 
 
@@ -76,7 +87,7 @@ You are analyzing swipe data from a dating app. Each swipe is either:
 
 <!-- Assume the swipes follow a Bernoulli distribution with unknown probability $\theta,$ the chance of a right swipe. -->
 
-You collect a dataset consisting of 100 swipes, each swipe from a different user. You want to estimate the probability of a right swipe of all users, $\theta.$ 
+You collect a dataset consisting of 100 swipes, each swipe from a different user. You want to estimate the probability of a right swipe, $\theta.$ 
 
 <!-- You use two methods:
 
@@ -110,12 +121,20 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+<br>
 
 __Remark__: A population is typically not directly observable.
 
 A population is the universe of possible data for a specified object. It can be people, places, objects, and many other things.
 
 __Example__: People (or IP addresses) who have visited or will visit a website.
+
+:::
+
+
+## Sampling
+
+:::{style="font-size: .8em"}
 
 ```{python}
 from IPython.core.display import HTML
@@ -133,20 +152,14 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 __Example__: People who visited the website on a specific day.
-:::
-
-
-## Sampling
-
-:::{style="font-size: .8em"}
 
 :::{.center-text}
-<img src="images/parameter_estimation/population_sample.png" width=800/>
+<img src="images/parameter_estimation/population_sample.png" width=750/>
 :::
 
 :::
 
-## Sampling
+<!-- ## Sampling
 
 :::{style="font-size: .8em"}
 ```{python}
@@ -163,7 +176,7 @@ def generate_html():
     <br>
 
     2. The sample data is the calcium intake of all high school students and the population data is the calcium intake of 60 students.
-    
+     <br> <br>
         </p>
     </div>
     """
@@ -174,7 +187,7 @@ display(HTML(html_content))
 
 :::{.notes}
 1
-:::
+::: -->
 
 ## Statistics
 
@@ -282,9 +295,15 @@ We want to fit normal distribution $\mathcal{N}(\mu, \sigma^2)$ to this data. Pa
 ## Parameter Estimation
 
 :::{style="font-size: .8em"}
-Parameter estimation is needed when we are given some data and we want to treat it as an _**independent and identically distributed (or i.i.d.)**_ sample from some population distribution.
+In this example, the collected heights can be referred to as:
 
-<br><br>
+- **data**
+- **data points**
+- **data sample**
+- **realizations** (of a normal distribution)
+
+Parameter estimation is needed when we are given some data $\{x^{(1)}, \dots, x^{(m)}\}$ and we want to treat it as an _**independent and identically distributed (or i.i.d.)**_ sample from some population distribution.
+
 We will use $\theta$ (which can be a scalar or a vector) to represent the parameter(s).  
 
 
@@ -357,7 +376,7 @@ We use the _**hat notation**_ ($\hat{\theta}$) to indicate a point estimator of 
 
 __Remark__: The above description does not require that $g$ returns a value that is close to the parameter(s) $\theta$. 
 Any function qualifies as an estimator. However, a good estimator is a function whose output is close to $\theta$.
-<br><br>
+
 
 
 ```{python}
@@ -443,7 +462,7 @@ We use **bias** and **variance** to describe an estimator.
 Bias measures the difference between the expected value of the estimator and the true value of the parameter, while variance measures how much the estimator can vary as a function of the data sample. 
 
 :::{.center-text}
-<img src="images/parameter_estimation/bias_variance_tradeoff.png" width=440/>
+<img src="images/parameter_estimation/bias_variance_tradeoff.png" width=400/>
 :::
 :::
 
@@ -672,7 +691,6 @@ num_simulations = 1000
 # Store estimated thetas
 estimated_thetas = []
 
-
 # Perform simulations
 for _ in range(num_simulations):
     swipes = np.random.binomial(1, true_theta, n)
@@ -706,7 +724,7 @@ plt.show()
 
 ## Group Question 1
 
-:::{style="font-size: .8em"}
+:::{style="font-size: .75em"}
 ```{python}
 from IPython.core.display import HTML
 
@@ -782,16 +800,14 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Consider again data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean \(\theta:\)
-
-    $$ p\left(x^{(i)}; \theta\right) = \theta^{x^{(i)}}\left(1-\theta\right)^{\left(1-x^{(i)}\right)} $$
+    Consider again data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean \(\theta\)
 
     and the estimator 
 
     $$ \hat{\theta}_m = g\left(x^{(1)}, \dots, x^{(m)}\right) = \frac{1}{m}\sum_{i=1}^m x^{(i)}. $$
 
     Find the MSE for this estimator.
-    
+    <br><br><br><br><br>
         </p>
     </div>
     """

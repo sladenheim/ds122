@@ -22,6 +22,7 @@ format:
     2. Forward pass
     3. Backward pass
 - Example: baby-noise problem
+- Python implementation (through a group question)
 
 :::
 
@@ -73,7 +74,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Define \(A, B, \pi, \) and \(O.\)<br>
+    Define \(A, B, \boldsymbol{\pi}, \) and \(O.\)<br>
     <br>
         </p>
     </div>
@@ -250,7 +251,9 @@ The veterinarian assumes three possible activity levels:<br>
 
 The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
 
- We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time. We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet.
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time. We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet. <br>
+
+ We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
         </p>
     </div>
     """
@@ -262,7 +265,7 @@ display(HTML(html_content))
 
 
 
-## Group Question 1
+<!-- ## Group Question 1
 :::{style="font-size: .8em"}
 
 :::{.columns}
@@ -303,7 +306,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-b. Define \(\pi, A,\) \(B\), and \(O\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
+b. Define \(\boldsymbol{\pi}, A,\) \(B\), and \(O\). We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
 <br>
 <br>
 <br>
@@ -314,6 +317,67 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+::: -->
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+a. Perform the initialization stage of the Viterbi algorithm.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+b. Perform the forward pass of the Viterbi algorithm.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
 :::
 
 
@@ -326,7 +390,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-b. Perform the initialization stage of the Viterbi algorithm.
+c. Perform the backward pass of the Viterbi algorithm.
 <br>
 <br>
 <br>
@@ -347,8 +411,13 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Question 1
-:::{style="font-size: .8em"}
+## Group Question 2
+:::{style="font-size: .7em"}
+
+```{python}
+import numpy as np
+```
+
 ```{python}
 from IPython.core.display import HTML
 
@@ -356,54 +425,71 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-c. Perform the forward pass of the Viterbi algorithm.
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+    Given the code below. What is the final answer for the dog's health problem?
         </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
+```{python}
+#| echo: true
+def Viterbi(y, A, B, Pi):
+    N = A.shape[1] # cardinality of the state space
+    T = len(y) # length of the observed sequence
+    # Initialize C & D
+    C = np.empty((N, T), 'd') #'d' stands for type double
+    D = np.empty((N, T), 'B') #'B' stands for type unsigned integer 
+
+    # Initialization stage
+    C[:, 0] = B[y[0], :] * Pi.T
+    D[:, 0] = 0
+
+    # Forward pass
+    for i in range(1, T):
+        C[:, i] = np.max(B[y[i], :, np.newaxis] * A * C[:, i - 1], 1)
+        D[:, i] = np.argmax(B[y[i], :, np.newaxis] * A * C[:, i - 1], 1)
+    D[:,1:] =  D[:,1:] + 1 # hidden states indices start with 1
+
+    # Backward pass
+    x = np.empty(T, 'B')
+    x[-1] = np.argmax(C[:, T - 1]) + 1 # finds the value of s
+    for i in reversed(range(1, T)): 
+        x[i - 1] = D[x[i] - 1, i]
+
+    return x, C, D
+```
+
 :::
 
-
-## Group Question 1
+## Python Implementation 
 :::{style="font-size: .8em"}
 ```{python}
-from IPython.core.display import HTML
+#| echo: true
+# HMM and observed sequence
+A = np.array([[0.9,0.3],[0.1,0.7]])
+B = np.array([[0.2, 0.6],[0.6, 0.3],[0.2, 0.1]])
+Pi = np.array([[0.9],[0.1]])
 
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-d. Perform the backward pass of the Viterbi algorithm.
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-        </p>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
+print("Transition matrix: \n", A)
+print("Emission matrix: \n", B)
+print("Initial state distribution: \n", Pi)
+
+O = np.array([1,0,0])
+print("Observed sequence: \n", O)
 ```
 :::
+
+## Python Implementation 
+:::{style="font-size: .8em"}
+```{python}
+#| echo: true
+# Result
+X, C, D = Viterbi(O,A,B,Pi)
+print("Matrix C: \n", C)
+print("Matrix D: \n", D)
+#print("Answer: \n", X)
+```
+
+:::
+

@@ -1,5 +1,5 @@
 ---
-title: MLE Examples
+title: Parameter Estimation Practice
 author: "CDS DS-122<br>Boston University"
 format: 
     revealjs:
@@ -17,15 +17,232 @@ format:
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
-- Applying MLE to 
-    - the train problem
-    - the horse-kicking example
 - Practice solving MLE questions
+- Practice solving MoM questions
+- Practive evaluating estimators in terms of bias, variance, and MSE
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(X\) follows a geometric distribution with parameter \(\theta = p,\) 
+   $$P(X=x) = \theta(1-\theta)^{x-1}.$$
+   The data sample has size \(n.\)<br>
+   a. Find the maximum likelihood estimator of \(\theta.\)
+       <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Find the method of moments estimator of \(\theta.\)
+       <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+| $x$ | $0$ | $1$ | $2$ | 
+| :---: | :---: | :---: | :---: | 
+| $p(x;\theta)$ | $1-\theta$ | $\frac{\theta}{2}$| $\frac{\theta}{2}$| 
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose that \(\small X\) is a discrete random variable with the probability mass function shown above. Here \(\small 0\leq \theta \leq 1\) is a parameter. Five independent observations are made from this distribution:
+
+    $$\small X_s = \{1,1,0,2,0\}.$$
+    a. Find the likelihood function \(\small p(X_s;\theta).\)
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   b. Find the corresponding log-likelihood function.
+       <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    c. Find the maximum likelihood estimate (MLE) of \(\small \theta\). You do not need to confirm that the critical point is indeed a maximum.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   d. Find the method of moments estimate of \(\theta.\)
+       <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   Suppose \(\small X_1\) and \(\small X_2\) are independent random variables. \(\small X_1\) follows an exponential distribution with parameter \(\small \frac{1}{\theta}\). \( \small X_2\) is uniformly distributed on interval \(\small [0,\theta].\) \(\small \theta\) is unknown. Consider the following estimator for \(\small \theta:\)
+    $$\small \hat{\theta} = \frac{1}{4}x_1 + \frac{3}{2}x_2.$$
+    Here, \(x_1\) and \(x_2\) are realizations of \(X_1\) and \(X_2\), respectively. <br>
+a. Compute the bias of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+b. Is \(\small \hat{\theta}\) unbiased? Explain your answer.
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+c. Compute the variance of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+d. Find the mean squared error of \(\small \hat{\theta}.\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+
+
+
 <!-- - The definition of the $k$th moment
 - The definition of the $k$th sample moment
 - The method of moments (for one variable) -->
 
-:::
+<!-- :::
 
 ## Train Problem
 :::{style="font-size: .8em"}
@@ -370,4 +587,4 @@ display(HTML(html_content))
 :::
 
 
-
+ -->
