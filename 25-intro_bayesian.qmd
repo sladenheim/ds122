@@ -118,9 +118,9 @@ The exact location of the wreck was not known to anybody until 1988. What was kn
 :::{style="font-size: .8em"}
 The ship was located by a group led by Thomas Gregory Thompson using Bayesian statistics.  
 
-:::{.center-text}
+<!-- :::{.center-text}
 <img src="images/bayesian_intro/Bayesian_search.png" width=600/>
-:::
+::: -->
 
 :::
 
@@ -743,9 +743,9 @@ display(HTML(html_content))
 ## Group Question 1
 :::{.columns}
 ::: {.column width="45%"}
-:::{.center-text}
+<!-- :::{.center-text}
 <img src="images/bayesian_intro/Holly_BD.png" width=500/>
-:::
+::: -->
 :::
 ::: {.column width="55%"}
 :::{style="font-size: .7em"}
