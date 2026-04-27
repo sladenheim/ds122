@@ -1,0 +1,145 @@
+---
+title: The Semester in 5 Minutes
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+## What Have We Talked About?
+:::{style="font-size: .75em"}
+
+ - The fundamentals of probability
+ - The difference between frequentist and Bayesian points of view on probability and statistics
+ - Markov chains and hidden Markov models
+ - The use of statistics in the real world
+
+:::{.columns}
+
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/intro/Coin_toss.jpg" width=300/>
+:::
+
+:::
+
+::: {.column width="50%"}
+
+:::{.center-text}
+<img src="images/intro/NBA_Finals_2025.png" width=300/>
+:::
+
+:::
+:::
+
+:::
+
+## Real-Life Applications
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/closing/teaser_problems.png" width=900/>
+:::
+
+:::
+
+## Practice Makes It Click
+:::{style="font-size: .8em"}
+
+
+:::{.columns}
+::: {.column width="40%"}
+
+We strengthened our understanding by solving problems 
+
+- throughout the lecture 
+- as group questions
+- in homework assignments
+- during discussions
+
+:::
+::: {.column width="60%"}
+
+:::{.center-text}
+<img src="images/axioms of probability/Holly_Leaves.png" width=600/>
+:::
+
+:::
+:::
+
+:::
+
+
+## Considered Problems
+:::{style="font-size: .8em"}
+
+
+:::{.columns}
+::: {.column width="30%"}
+
+:::{.center-text}
+<img src="images/intro/World_cup_thropy.png" width=180/>
+:::
+
+:::
+::: {.column width="70%"}
+
+1. How can we determine whether one soccer team is significantly better than another?
+
+:::
+:::
+
+:::{.columns}
+
+:::
+::: {.column width="70%"}
+
+2. How did a group of MIT students crack the Massachusetts State Lottery?
+:::
+
+::: {.column width="30%"}
+
+:::{.center-text}
+<img src="images/intro/MA_lottery_logo.png" width=300/>
+:::
+
+:::
+
+:::
+
+## Considered Problems
+:::{style="font-size: .8em"}
+
+3. How can we accurately assign word classes to a body of text?
+
+:::{.center-text}
+<img src="images/intro/POS_example.png" width=600/>
+::: 
+
+4. How can we estimate the total number of episodes in a show after watching just one?
+
+:::{.center-text}
+<img src="images/intro/Netflix.png" width=400/>
+::: 
+
+:::
+
+## Course Evaluations
+:::{style="font-size: .8em"}
+
+Please submit your course evaluations:
+
+- For Prof. Wobbes, CDS DS 122 A1 - Foundations of Data Science 3
+
+- For Yuke Zhang, CDS DS 122 A3/A4/A5 - Foundations of Data Science 3
+
+<br>
+Your feedback is valuable to us!
+:::

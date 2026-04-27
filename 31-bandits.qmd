@@ -1,0 +1,590 @@
+---
+title: Bayesian Bandits
+author: "CDS DS-122<br>Boston University"
+format: 
+    revealjs:
+        math: true
+        css: 
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true 
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom, randint
+from IPython.core.display import HTML
+from collections import Counter
+
+def update(distribution, likelihood):
+    '''Standard Bayesian update function'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+
+def choose(beliefs):
+    '''Use Thompson sampling to choose a machine'''
+    ps = [np.random.choice(b.index, p=b['probs']) for b in beliefs]
+    return np.argmax(ps)
+
+# Simulate playing a machine
+actual_probs = [0.10, 0.20, 0.30, 0.40]  # Unknown to us!
+counter = Counter()
+
+def play(i):
+    '''Play machine i and return outcome'''
+    counter[i] += 1
+    p = actual_probs[i]
+    if np.random.random() < p:
+        return 'W'
+    else:
+        return 'L'
+
+```
+
+## Restaurant Dilemma
+:::{style="font-size: .8em"}
+:::{.center-text}
+<img src="images/bayesian_testing/table.png" width=400/>
+:::
+
+_**Set-up**_: 3 Restaurants. 365 Days.
+
+_**Goal**_: Maximize total "dining satisfaction."
+
+_**Constraint**_: You only learn the quality of a restaurant by eating there.
+
+_**Dilemma**_: When do you stop "exploring" and start "exploiting" your favorite spot?
+:::
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Bayesian bandits
+    - Explore and exploit
+    - Bayesian approach for 1 slot machine
+    - Thompson sampling
+- Application to the 4-slot-machines problem
+
+:::
+
+## 4 Slot Machines 
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/bayesian_testing/slot_machines.jpeg" width=500/>
+:::
+
+- There are 4 slot machines. 
+- Each machine has a different and unknown probability of winning. 
+- A player plays 500 games in total.
+
+**Question**: What strategy should the player use to maximize their winnings?
+
+:::
+
+## Explore and Exploit
+:::{style="font-size: .8em"}
+
+_**Strategy A (Aggressive Exploit)**_
+
+- Play each machine 125 times.
+
+_**Strategy B (Short Explore then Exploit)**_
+
+- Play each machine 5 times.
+- Select the machine with the highest empirical win rate after those 20 plays.
+- Play the selected machine for the remaining 480 plays.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+   What strategy would you prefer and why? 
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+
+## 1 Machine: Set-Up
+:::{style="font-size: .8em"}
+
+- _**Hypothesis**_: The probability of winning $p$, ranging from 0 to 1, with a step of 0.1.
+- _**Prior**_: Uniform, probability of $1/101$ for each hypothesis.
+- _**Likelihood of winning**_: $p,$ directly corresponds to the hypothesis.
+- _**Likelihood of losing**_: $1-p.$
+- _**Bayesian update**_: Based on the outcome of the game, win/loss.
+- _**Posterior**_: The posterior becomes the prior for the next play.
+
+```{python}
+#| echo: true
+def update_bandit(distribution, outcome):
+    '''Update distribution about a machine based on win/loss outcome'''
+    if outcome == 'W':
+        update(distribution, distribution.index)
+    elif outcome == 'L':
+        update(distribution, 1 - distribution.index)
+```
+
+:::
+
+## 1 Machine: Prior
+:::{style="font-size: .8em"}
+
+Initially, nothing is known about win probabilities. Each probability of winning is equally likely.
+
+```{python}
+#| echo: false
+#| fig-align: center
+p_prior = pd.DataFrame(index=np.arange(101)/100)
+p_prior['probs'] = 1/101
+bandit = p_prior.copy()
+
+bandit.plot(lw=3, legend=False, color='blue', figsize=(10, 4))
+plt.xlabel('Win Probability (p)', size=18)
+plt.ylabel('Probability', size=18)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.show()
+```
+
+:::
+
+## 1 Machine: Posterior After 1 Game
+:::{style="font-size: .8em"}
+
+Suppose we play this machine and win.
+
+```{python}
+#| echo: false
+#| fig-align: center
+bandit = p_prior.copy()
+for outcome in 'W':
+    update_bandit(bandit, outcome)
+
+bandit.plot(lw=3, legend=False, color='blue', figsize=(10, 4))
+plt.xlabel('Win Probability (p)', size=18)
+plt.ylabel('Probability', size=18)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.show()
+```
+
+The posterior shifts toward high win probabilities.
+:::
+
+## 1 Machine: Posterior After 2 Games
+:::{style="font-size: .8em"}
+
+Suppose we play this machine again, but this time we lose.
+
+```{python}
+#| echo: false
+#| fig-align: center
+bandit = p_prior.copy()
+for outcome in 'WL':
+    update_bandit(bandit, outcome)
+
+bandit.plot(lw=3, legend=False, color='blue', figsize=(10, 4))
+plt.xlabel('Win Probability (p)', size=18)
+plt.ylabel('Probability', size=18)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.show()
+```
+
+The posterior emphasizes $p=0.5$ and excludes $p=0$ and $p=1.$
+:::
+
+## 1 Machine: Posterior After 10 Games
+
+:::{style="font-size: .8em"}
+
+Suppose we play the machine 10 times but only the first game results in a win.
+
+```{python}
+#| echo: false
+#| fig-align: center
+bandit = p_prior.copy()
+for outcome in 'WLLLLLLLLL':
+    update_bandit(bandit, outcome)
+
+bandit.plot(lw=3, legend=False, color='blue', figsize=(10, 4))
+plt.xlabel('Win Probability (p)', size=18)
+plt.ylabel('Probability', size=18)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.show()
+```
+
+The posterior shifts toward low win probabilities. This looks like a bad machine!
+
+:::
+
+## Let's Play! 
+
+:::{style="font-size: .8em"}
+
+We will need 4 Bayes tables, one for each machine. 
+
+See jupyter notebook for an interactive demo.
+
+:::
+
+## Thompson Sampling
+:::{style="font-size: .8em"}
+Thompson sampling uses Bayesian statistics to make optimal decisions for the Bayesian bandits that combines exploration with explotation.
+
+:::{.center-text}
+<img src="images/bayesian_testing/thompson_octopus.png" width=500/>
+:::
+:::
+
+## Thompson Sampling
+:::{style="font-size: .8em"}
+
+
+1. _**Set up the prior**_: Use a uniform distribution to represent the initial win probability for each machine.
+
+2. _**Sample**_: Randomly draw one win‑probability value from the prior distribution for each machine.
+
+3. _**Decide**_: Choose the machine whose sampled win probability is the highest.
+
+4. _**Play**_: Play the selected machine.
+
+5. _**Perform the Bayesian update**_: Update the win‑probability distribution of the selected machine based on the observed outcome.
+
+6. _**Sample**_: Draw a new random win‑probability value from the updated distributions.
+
+7. _**Repeat**_: Continue with Steps 3–6.
+
+:::
+
+
+## 4 Slot Machines
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+BLUE = '#1f77b4' 
+p_prior = pd.DataFrame(index=np.arange(101)/100)
+p_prior['probs'] = 1/101
+beliefs = [p_prior.copy() for i in range(4)]
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color=BLUE)
+    axes[i].set_title(f'Machine {i}', size=14)
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+    axes[i].set_ylim(0, 0.011)
+plt.tight_layout();
+plt.suptitle(f'Steps 1: Uniform Priors',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Reset beliefs
+np.random.seed(49)  # For reproducibility
+beliefs_demo = [p_prior.copy() for i in range(4)]
+counter_demo = Counter()
+
+# Draw one sample from each machine's posterior
+samples = [np.random.choice(b.index, p=b['probs']) for b in beliefs_demo]
+chosen_machine = np.argmax(samples)
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color=BLUE, alpha=1)
+    # Mark the sampled value
+    axes[i].axvline(samples[i], color='red' if i == chosen_machine else 'gray',
+                   linestyle='--', lw=2, alpha=0.8)
+    axes[i].scatter([samples[i]], [0], color='red' if i == chosen_machine else 'gray',
+                   s=100, zorder=5, marker='o')
+
+    title = f'Machine {i}'
+    if i == chosen_machine:
+        title += f'\n**CHOSEN** (p̃={samples[i]:.2f})'
+        axes[i].set_title(title, size=14, weight='bold', color='red')
+    else:
+        title += f'\n(p̃={samples[i]:.2f})'
+        axes[i].set_title(title, size=14)
+
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+    axes[i].set_ylim(0, 0.011)
+plt.tight_layout()
+plt.suptitle(f'Steps 2-3: Sample and Select Machine {chosen_machine}',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+:::
+
+## 4 Slot Machines
+:::{style="font-size: .8em"}
+```{python}
+#| echo: false
+#| fig-align: center
+# Play the chosen machine
+outcome_1 = play(chosen_machine)
+update_bandit(beliefs_demo[chosen_machine], outcome_1)
+counter_demo[chosen_machine] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False,
+            color='red' if i == chosen_machine else BLUE,
+            alpha=1 if i == chosen_machine else 1)
+
+    title = f'Machine {i}'
+    if i == chosen_machine:
+        title += f'\n**UPDATED** (1 play)'
+        axes[i].set_title(title, size=14, weight='bold', color='red')
+    else:
+        axes[i].set_title(title, size=14)
+
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+plt.tight_layout()
+plt.suptitle(f'Steps 4-5: Play and Update Machine {chosen_machine}: Result = {outcome_1}',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Draw another sample from each machine's posterior
+samples_2 = [np.random.choice(b.index, p=b['probs']) for b in beliefs_demo]
+chosen_machine_2 = np.argmax(samples_2)
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color=BLUE, alpha=1)
+    # Mark the sampled value
+    axes[i].axvline(samples_2[i], color='red' if i == chosen_machine_2 else 'gray',
+                   linestyle='--', lw=2, alpha=0.8)
+    axes[i].scatter([samples_2[i]], [0], color='red' if i == chosen_machine_2 else 'gray',
+                   s=100, zorder=5, marker='o')
+
+    title = f'Machine {i}'
+    if i == chosen_machine_2:
+        title += f'\n**CHOSEN** (p̃={samples_2[i]:.2f})'
+        axes[i].set_title(title, size=14, weight='bold', color='red')
+    else:
+        title += f'\n(p̃={samples_2[i]:.2f})'
+        axes[i].set_title(title, size=14)
+
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+plt.tight_layout()
+plt.suptitle(f'Steps 6 and 3: Sample and Select Machine {chosen_machine_2}',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+:::
+
+## 4 Slot Machines
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Play the second chosen machine
+outcome_2 = play(chosen_machine_2)
+update_bandit(beliefs_demo[chosen_machine_2], outcome_2)
+counter_demo[chosen_machine_2] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False,
+            color='red' if i == chosen_machine_2 else BLUE,
+            alpha=1 if i == chosen_machine_2 else 1)
+
+    title = f'Machine {i}'
+    plays = counter_demo.get(i, 0)
+    if plays > 0:
+        title += f'\n({plays} play{"s" if plays > 1 else ""})'
+    if i == chosen_machine_2:
+        axes[i].set_title(title, size=14, weight='bold', color='red')
+    else:
+        axes[i].set_title(title, size=14)
+
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+plt.tight_layout()
+plt.suptitle(f'Steps 4-5: Play and Update Machine {chosen_machine_2}: Result = {outcome_2}',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+# Play 8 more times (we already did 2, so 8 more to get to 10)
+for _ in range(8):
+    machine = choose(beliefs_demo)
+    outcome = play(machine)
+    update_bandit(beliefs_demo[machine], outcome)
+    counter_demo[machine] += 1
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs_demo):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color=BLUE)
+    axes[i].set_title(f'Machine {i} \n{counter_demo.get(i, 0)} plays', size=14)
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+plt.tight_layout()
+plt.suptitle('After 10 plays',
+            fontsize=16, weight='bold', y=1.02);
+```
+
+:::
+
+## 4 Slot Machines: After 500 Plays
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+# Reset beliefs and counter
+beliefs = [p_prior.copy() for i in range(4)]
+counter = Counter()
+play_sequence = []
+num_plays = 500
+
+for _ in range(num_plays):
+    machine = choose(beliefs)
+    play_sequence.append(machine)
+    outcome = play(machine)
+    update_bandit(beliefs[machine], outcome)
+```
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, axes = plt.subplots(1, 4, figsize=(14, 2.5))
+for i, pmf in enumerate(beliefs):
+    pmf.plot(ax=axes[i], lw=3, legend=False, color=BLUE)
+    axes[i].set_title(f'Machine {i} (True p={actual_probs[i]:.1f})', size=14)
+    axes[i].set_xlabel('Win Probability (p)', size=12)
+    axes[i].set_ylabel('Probability', size=12)
+    axes[i].tick_params(axis='both', labelsize=11)
+plt.tight_layout();
+```
+
+
+```{python}
+#| echo: false
+index = range(4)
+columns = ['Actual P(win)', 'Times played']
+df = pd.DataFrame(index=index, columns=columns)
+for i in range(4):
+    df.loc[i] = [actual_probs[i], counter.get(i, 0)]
+
+df.index = [f"Machine {i}" for i in df.index]
+df
+```
+
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+#| echo: false
+#| fig-align: center
+
+# Create three machines with different histories
+p_grid = pd.DataFrame(index=np.arange(101)/100)
+p_grid['probs'] = 1/101
+
+# Machine A: 7 plays, 6 wins
+machine_a = p_grid.copy()
+for _ in range(6):
+    update(machine_a, machine_a.index)
+for _ in range(1):
+    update(machine_a, 1 - machine_a.index)
+
+# Machine B: 2 plays, 2 wins
+machine_b = p_grid.copy()
+for _ in range(2):
+    update(machine_b, machine_b.index)
+for _ in range(0):
+    update(machine_b, 1 - machine_b.index)
+
+# Machine C: 30 plays, 21 wins
+machine_c = p_grid.copy()
+for _ in range(21):
+    update(machine_c, machine_c.index)
+for _ in range(9):
+    update(machine_c, 1 - machine_c.index)
+
+# Calculate means for display
+mean_a = np.sum(machine_a.index * machine_a['probs'])
+mean_b = np.sum(machine_b.index * machine_b['probs'])
+mean_c = np.sum(machine_c.index * machine_c['probs'])
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 3))
+machine_a.plot(ax=axes[0], lw=3, legend=False, color='blue')
+axes[0].set_title(f'Machine A: 7 plays, 6 wins\n(mean = {mean_a:.2f})', size=14)
+axes[0].set_xlabel('Win Probability (p)', size=12)
+axes[0].set_ylabel('Probability', size=12)
+axes[0].tick_params(axis='both', labelsize=11)
+
+machine_b.plot(ax=axes[1], lw=3, legend=False, color='orange')
+axes[1].set_title(f'Machine B: 2 plays, 2 wins\n(mean = {mean_b:.2f})', size=14)
+axes[1].set_xlabel('Win Probability (p)', size=12)
+axes[1].set_ylabel('Probability', size=12)
+axes[1].tick_params(axis='both', labelsize=11)
+
+machine_c.plot(ax=axes[2], lw=3, legend=False, color='green')
+axes[2].set_title(f'Machine C: 30 plays, 21 wins\n(mean = {mean_c:.2f})', size=14)
+axes[2].set_xlabel('Win Probability (p)', size=12)
+axes[2].set_ylabel('Probability', size=12)
+axes[2].tick_params(axis='both', labelsize=11)
+
+plt.tight_layout();
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+During Thompson sampling with 3 slot machines, the above posterior distributions are obtained. Based on these distributions, which machine is most likely to produce the highest sampled win probability in the next sampling step?
+        
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+

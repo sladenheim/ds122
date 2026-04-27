@@ -1,0 +1,314 @@
+---
+title: Monte Carlo Methods
+author: "CDS DS-122<br>Boston University"
+format:
+    revealjs:
+        math: true
+        css:
+        - styles.css
+        html-math-method: mathjax
+        highlight-style: github
+        slide-number: true
+        show-slide-number: all
+        chalkboard: true
+---
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm, uniform
+from IPython.core.display import HTML
+
+```
+
+## Learning Objectives
+
+:::{style="font-size: .8em"}
+
+- The core idea behind Monte Carlo simulation
+- Three types of applications
+- Monte Carlo approach for numerical integration
+- Application to estimation of the value of $\pi$
+
+:::
+
+## Why is Simulation Useful?
+
+:::{style="font-size: .8em"}
+**Simulation** is a powerful technique used to understand how complex systems work, even when detailed analysis is not possible.
+
+They help estimate features of models that _can not be computed analytically_.
+
+:::{.center-text}
+<img src="images/monte_carlo/extreme_weather.png" width=500/>
+:::
+
+Simulations that rely on repeated random sampling are often called Monte Carlo simulations (or Monte Carlo analysis), named after the famous European gambling center.
+:::
+
+## Monte Carlo Simulations
+
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/monte_carlo/monte_carlo_casino.png" width=400/>
+:::
+
+Monte Carlo simulation has three main classes of applications:
+
+- optimization,
+- numerical integration, and
+- generating draws from probability distributions.
+
+
+
+:::
+
+## Estimating $\pi$
+
+:::{style="font-size: .8em"}
+
+Consider a circle of radius 1 inscribed in a 2 by 2 square:
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(4,4))
+
+# Draw square
+square = plt.Rectangle((-1, -1), 2, 2, fill=False, edgecolor='black', linewidth=2)
+ax.add_patch(square)
+
+# Draw circle
+circle = plt.Circle((0, 0), 1, fill=False, edgecolor='blue', linewidth=2)
+ax.add_patch(circle)
+
+ax.set_xlim(-1.2, 1.2)
+ax.set_ylim(-1.2, 1.2)
+ax.set_aspect('equal')
+ax.axhline(y=0, color='gray', linestyle='--', alpha=0.3)
+ax.axvline(x=0, color='gray', linestyle='--', alpha=0.3)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('y', size=14)
+ax.set_title('Circle (radius 1) inside Square (side 2)', size=14)
+plt.show()
+```
+
+**Question:** Estimate $\pi$ by "throwing darts".
+:::
+
+## Estimating $\pi$
+
+:::{style="font-size: .7em"}
+
+**Strategy:**
+
+1. Throw random "darts" uniformly in the square
+2. Count how many land inside the circle
+3. Use the ratio to estimate $\pi$
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n_samples = 5000
+
+x = np.random.uniform(-1, 1, n_samples)
+y = np.random.uniform(-1, 1, n_samples)
+
+# Check if inside circle
+inside_circle = (x**2 + y**2) <= 1
+
+# Estimate pi
+pi_estimate = 4 * np.sum(inside_circle) / n_samples
+
+```
+
+:::
+
+## Estimating $\pi$
+
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+fig, ax = plt.subplots(figsize=(4,4))
+
+# Use fewer points for visualization
+n_viz = 1000
+x_viz = np.random.uniform(-1, 1, n_viz)
+y_viz = np.random.uniform(-1, 1, n_viz)
+inside_viz = (x_viz**2 + y_viz**2) <= 1
+
+# Plot points
+ax.scatter(x_viz[inside_viz], y_viz[inside_viz], c='blue', s=5, alpha=0.5, label='Inside circle')
+ax.scatter(x_viz[~inside_viz], y_viz[~inside_viz], c='red', s=5, alpha=0.5, label='Outside circle')
+
+# Draw shapes
+square = plt.Rectangle((-1, -1), 2, 2, fill=False, edgecolor='black', linewidth=2)
+ax.add_patch(square)
+circle = plt.Circle((0, 0), 1, fill=False, edgecolor='blue', linewidth=2)
+ax.add_patch(circle)
+
+ax.set_xlim(-1.2, 1.2)
+ax.set_ylim(-1.2, 1.2)
+ax.set_aspect('equal')
+ax.legend(fontsize=10)
+ax.set_title(f'Monte Carlo Estimation of π\n{n_viz} random points', size=14)
+plt.show()
+
+print(f"Estimate of π with {n_samples} samples: {pi_estimate:.4f}")
+print(f"True value of π: {np.pi:.4f}")
+print(f"Error: {abs(pi_estimate - np.pi):.4f}")
+```
+
+
+:::
+
+## How Good Is Our Estimate?
+
+:::{style="font-size: .8em"}
+
+The more samples we use, the better our estimate:
+
+```{python}
+#| echo: false
+#| fig-align: center
+np.random.seed(42)
+sample_sizes = [10, 20, 50, 100, 500, 1000, 5000, 10000]
+estimates = []
+
+for n in sample_sizes:
+    x = np.random.uniform(-1, 1, n)
+    y = np.random.uniform(-1, 1, n)
+    inside = (x**2 + y**2) <= 1
+    pi_est = 4 * np.sum(inside) / n
+    estimates.append(pi_est)
+
+fig, ax = plt.subplots(figsize=(8, 3.5))
+ax.semilogx(sample_sizes, estimates, 'o-', linewidth=2, markersize=8, label='Monte Carlo estimate')
+ax.axhline(y=np.pi, color='red', linestyle='--', linewidth=2, label='True value of π')
+ax.set_xlabel('Number of samples', size=14)
+ax.set_ylabel('Estimate of π', size=14)
+ax.set_title('Convergence of Monte Carlo Estimate', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+With enough samples, Monte Carlo converges to the true value!
+
+:::
+
+## Monte Carlo Integration
+
+:::{style="font-size: .7em"}
+
+**General principle:** Estimate the area under any curve
+
+$$\text{Area} = \int_a^b f(x) \, dx$$
+
+**Monte Carlo approach:**
+
+1. Draw a bounding box around the region 
+2. Generate random points uniformly in the box
+3. Count what fraction fall under the curve
+4. Multiply the fraction by the area of the box to find the area of the curve
+
+$$\int_a^b f(x) \, dx \approx \text{Box Area} \times \frac{\text{Points under curve}}{\text{Total points}}$$
+
+:::
+
+## A Tricky Integral
+
+:::{style="font-size: .7em"}
+
+Let's estimate $\int_0^2 e^{-x^2} \, dx$ (this has no closed-form solution!)
+
+```{python}
+#| echo: false
+#| fig-align: center
+x_range = np.linspace(0, 2, 400)
+y_range = np.exp(-x_range**2)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(x_range, y_range, linewidth=3, color='blue', label='$f(x) = e^{-x^2}$')
+ax.fill_between(x_range, y_range, alpha=0.3)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('f(x)', size=14)
+ax.set_title('$\int_0^2 e^{-x^2} dx$ = ?', size=16)
+ax.legend(fontsize=12)
+ax.grid(alpha=0.3)
+plt.show()
+```
+
+:::
+
+## A Tricky Integral
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: false
+#| fig-align: center
+from scipy.integrate import quad
+from scipy.stats import expon
+
+np.random.seed(42)
+n_viz = 2000
+x_viz = np.random.uniform(0, 2, n_viz)
+y_viz = np.random.uniform(0, 1, n_viz)
+f_x_viz = np.exp(-x_viz**2)
+under_viz = y_viz <= f_x_viz
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(x_viz[under_viz], y_viz[under_viz], c='blue', s=5, alpha=0.4, label='Under curve')
+ax.scatter(x_viz[~under_viz], y_viz[~under_viz], c='red', s=5, alpha=0.4, label='Above curve')
+
+x_curve = np.linspace(0, 2, 400)
+ax.plot(x_curve, np.exp(-x_curve**2), linewidth=3, color='darkblue', label='$f(x) = e^{-x^2}$')
+
+ax.add_patch(plt.Rectangle((0, 0), 2, 1, fill=False, edgecolor='black', linewidth=2, linestyle='--'))
+ax.set_xlim(-0.1, 2.1)
+ax.set_ylim(-0.05, 1.05)
+ax.set_xlabel('x', size=14)
+ax.set_ylabel('y', size=14)
+ax.legend(fontsize=10)
+ax.set_title('Monte Carlo Integration with Random Points', size=14)
+plt.show()
+```
+
+:::
+
+## A Tricky Integral
+
+:::{style="font-size: .7em"}
+
+```{python}
+#| echo: true
+np.random.seed(42)
+n_samples = 10000
+
+# Bounding box: [0, 2] x [0, 1] (since max of e^(-x^2) on [0,2] is 1)
+x = np.random.uniform(0, 2, n_samples)
+y = np.random.uniform(0, 1, n_samples)
+
+# Function values at random x points
+f_x = np.exp(-x**2)
+
+# Check if points are under the curve
+under_curve = y <= f_x
+
+# Estimate the integral
+box_area = 2 * 1  # width x height
+integral_estimate = box_area * np.sum(under_curve) / n_samples
+print(f"Monte Carlo estimate: {integral_estimate:.4f}")
+
+# Compare with numerical integration
+true_value, _ = quad(lambda x: np.exp(-x**2), 0, 2)
+print(f"Numerical integration: {true_value:.4f}")
+```
+
+:::
