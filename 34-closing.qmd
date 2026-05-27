@@ -14,7 +14,7 @@ format:
 ---
 
 ## What Have We Talked About?
-:::{style="font-size: .75em"}
+:::{style="font-size: .8em"}
 
  - The fundamentals of probability
  - The difference between frequentist and Bayesian points of view on probability and statistics

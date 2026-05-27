@@ -436,7 +436,7 @@ Almost each lecture will be structured around a certain problem.
 :::
 ::: {.column width="70%"}
 
-1. How can we predict the outcome of a soccer game rematch?
+1. How can we determine whether one soccer team is significantly better than another?
 
 :::
 :::

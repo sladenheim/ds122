@@ -122,7 +122,7 @@ display(HTML(html_content))
 ## 1 Machine: Set-Up
 :::{style="font-size: .8em"}
 
-- _**Hypothesis**_: The probability of winning $p$, ranging from 0 to 1, with a step of 0.1.
+- _**Hypothesis**_: The probability of winning $p$, ranging from 0 to 1, with a step of 0.01.
 - _**Prior**_: Uniform, probability of $1/101$ for each hypothesis.
 - _**Likelihood of winning**_: $p,$ directly corresponds to the hypothesis.
 - _**Likelihood of losing**_: $1-p.$
