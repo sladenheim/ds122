@@ -1,35 +1,26 @@
 ---
 title: Introduction
-author: "CDS DS-122<br>Boston University"
-format: 
-    revealjs:
-        math: true
-        css: 
-        - styles.css
-        html-math-method: mathjax
-        highlight-style: github
-        slide-number: true
-        show-slide-number: all
-        chalkboard: true 
 ---
 
 
 ## Logistics
 :::{style="font-size: .8em"}
 
-_Lectures_: 2 Silber Way WED 130, MWF 1:25 PM -- 2:15 PM
+_Lectures_: 871 Commonwealth Ave CGS 511, MWF 1:25 PM -- 2:15 PM
 
 _Discussions_: 
 
- - A3: 808 Commonwealth Ave FLR 123, W 9:05 AM -- 9:55 AM
- - A4: 808 Commonwealth Ave FLR 123, W 10:10 AM -- 11:00 AM
- - A5: 871 Commonwealth Ave CGS 315, W 11:15 AM -- 12:05 PM
+
+ - A2: 665 Commonwealth Ave CDS 164, M 9:05 AM -- 9:55 AM
+ - A3: 665 Commonwealth Ave CDS 164, M 10:10 AM -- 11:00 AM
+ - A4: 665 Commonwealth Ave CDS 164, M 11:15 AM -- 12:05 PM
+- A4: 871 Commonwealth Ave CGS 315, M 12:20 PM -- 1:10 PM
 
 _Teaching Staff_
 
- - Instructor: Prof. Lisa Wobbes <br>
- - TF: Yuke Zhang <br>
- - CAs: Carol Kong, Jabir Ahmed, and Karl Boma
+ - Instructor: Prof. Scott Ladenheim <br>
+ - TF: Selena Hu, Matthew Shumway <br>
+ - CAs: Karl Boma, Charles Carpenter, Sophie Choong, Jacky Lin
 
 :::
 
@@ -39,8 +30,6 @@ Good Afternoon! Welcome
 
 :::{.notes}
 Invite the staff
-
-Yilan!
 :::
 
 ## Getting Set Up
@@ -48,10 +37,10 @@ Yilan!
 
 _Platforms_
 
-- __Piazza__: https://piazza.com/bu/spring2026/ds122 <br>
+- __Piazza__: https://piazza.com/bu/fall2026/ds122 <br>
 Check it weekly!
 - __Gradescope__: https://www.gradescope.com<br>
-Entry code: E6E64W
+Entry code: 2DN8YP
 
 _Resources_
 
@@ -76,13 +65,13 @@ _Computation_
 
 - 10% Participation
 - 15% Homework assignments
-- 20% Midterm 1
-- 20% Midterm 2 
-- 35% Final exam
+- 20% Midterm 1 
+- 20% Midterm 2
+- 35% Final exam 
 
 _Participation_
 
-- Discussion Labs (5%): attend at least 9 out of 12
+- Discussion Labs (5%): attend at least 10 out of 13
 - In-class participation (4%): participate at least every 9-10 lectures 
 - Homework 0 (1%): available after this lecture
 :::
@@ -90,7 +79,7 @@ _Participation_
 :::{.notes}
 Please come pick up an index card. Put your name and BUID on it.
 
-Question box: write your full name, BU ID, and BU email adress
+Question box: write your full name, BU ID, and BU email address
 
 Ways to participate in lecture:
 1. Answer one of my questions
@@ -122,11 +111,11 @@ _Exams_
 
 All exams are cumulative. Content may include lectures, discussion labs, homework, and required readings.
 
-- Midterm 1: __February 25, 1:25 PM, WED 130__ <br>
-In-calss exam
-- Midterm 2: __April 1, 1:25 PM, WED 130__ <br>
-In-calss exam
-- Final exam: __May 8, 2:00 PM, WED 130__ <br>
+- Midterm 1: __October 7, 1:25 PM, CGS 511__ <br>
+In-class exam
+- Midterm 2: __November 11, 1:25 PM, CGS 511__ <br>
+In-class exam
+- Final exam: __December 18, 12:00 PM, CGS 511__ <br>
 In-person exam
 :::
 
@@ -197,7 +186,7 @@ Courses requiring DS-122:
 
 - DS-436 / 596: Foundations of Biological Data Science (Cleary)
 - DS-453 / 653: Crypto for Data Science (Varia)
-- DS-522: Stochastic Methods for Algorithms (Zhang?)
+- DS-522: Stochastic Methods for Algorithms (Zhang)
 - DS-592: Intro to Sequential Decision Making (Pacchiano)
 - DS-574: Algorithmic Mechanism Design (Goldner)
 
@@ -312,9 +301,9 @@ Both perspectives are valid and both have their pros and cons.
 
 Frequentist: more objective and interpretive
 
-Bayesian: more intuitive and allows to use prior knowledge BUT can be contaversial!
+Bayesian: more intuitive and allows to use prior knowledge BUT can be controversial!
 
-NBA Finals 2025 Okhlahoma City Thunder vs Indiana Pacers
+NBA Finals 2025 Oklahoma City Thunder vs Indiana Pacers
 
 Oklahoma City Thunder (the Western Conference champion) defeated Indiana Pacers (the Eastern Conference champion)
 :::
@@ -400,7 +389,7 @@ display(HTML(html_content))
 
 a company launches a mutual fund, maintain it in-house before opening to public -> incubator
 
-In practice: many incubated funds and only successfull ones are released to public. Data: Average returns
+In practice: many incubated funds and only successful ones are released to public. Data: Average returns
 
 :::
 
