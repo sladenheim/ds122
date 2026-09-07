@@ -1,8 +1,66 @@
 project:
-  title: "Foundations of Data Science Linear Algebra"
+  title: "CDS DS-122 — Foundations of Data Science: Probability & Statistics"
   output-dir: _slides
   render:
-    - pca.qmd
+    - 00-intro.qmd
+    # - 001-hmm.qmd                # older draft (DS-722); superseded by 15-hmm.qmd
+    # - 002-hmm_pos.qmd            # older draft (DS-722); superseded by 18-hmm_pos.qmd
+    - 01-sample_spaces.qmd
+    - 02-axioms_of_probability.qmd
+    - 03-conditional_probability.qmd
+    - 04-random_variables.qmd
+    # - 04-rv_no_chashwinfall.qmd  # alternate version of 04-random_variables.qmd
+    - 05-continuous_distributions.qmd
+    - 06-common_discrete_distributions.qmd
+    - 07-common_continuous_distributions.qmd
+    - 08-practice_distributions.qmd
+    - 09-joint_distributions.qmd
+    - 10-sums_of_random_variables.qmd
+    - 11-clt.qmd
+    - 12-markov_chains.qmd
+    - 13-steady_states.qmd
+    - 14-convergence_mc.qmd
+    - 15-hmm.qmd
+    - 16-viterbi_algorithm.qmd
+    - 17-baby_noise_hmm.qmd
+    - 18-hmm_pos.qmd
+    - 19-parameter_estimation.qmd
+    - 20-mle.qmd
+    - 21-mle_horse_kicking.qmd
+    - 22-mom.qmd
+    - 22-practice_parameter_estimation.qmd
+    - 23-confidence_intervals.qmd
+    - 24-hypothesis_testing.qmd
+    - 25-intro_bayesian.qmd
+    - 26-map.qmd
+    - 27-mmse.qmd
+    # - 28-poisson_processes.qmd
+    # - 29-bayesian_testing.qmd
+    # - 30-comparison.qmd          # older lecture (Dec 2025); current: 30-naive_bayes.qmd
+    - 30-naive_bayes.qmd
+    # - 31-classification.qmd      # older lecture (Nov 2025); current: 31-bandits.qmd
+    - 31-bandits.qmd
+    # - 32-conjugate_priors_1.qmd
+    # - 33-conjugate_priors_2.qmd
+    # - 34-monte_carlo.qmd         # older lecture (Dec 2025); current: 34-monte_carlo_simulations.qmd
+    # - 34-monte_carlo_simulations.qmd
+    # - 34-closing.qmd
+    # - 35-mcmc_part1.qmd
+    # - 36-mcmc_part2.qmd
+    # - 37-mcmc_practice.qmd        
+    # - 38-review_part2.qmd
 
+# Shared metadata — applies to every lecture; a lecture's own front matter
+# (title, filters, or any format overrides) still takes precedence.
+author: "CDS DS-122<br>Boston University"
 
-
+format:
+  revealjs:
+    math: true
+    css:
+      - styles.css
+    html-math-method: mathjax
+    highlight-style: github
+    slide-number: true
+    show-slide-number: all
+    chalkboard: true
