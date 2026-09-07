@@ -1,0 +1,37 @@
+# Conda environment for rendering the DS-122 lecture slides.
+#
+# Rebuild from scratch:
+#   conda env remove -n ds122          # remove the old env first
+#   conda env create -f environment.yml
+#   conda activate ds122
+#   quarto render
+#
+# Notes:
+# - python 3.12 pinned deliberately: 3.14 is too new for full wheel
+#   coverage across the scientific stack (source builds fail on install).
+# - arviz pinned <1: arviz 1.x hard-requires arviz_plots, which is
+#   currently broken on matplotlib >= 3.11. arviz 0.23.x has the classic
+#   API the slides use (az.summary / plot_posterior / plot_trace) and is
+#   what pymc needs internally. Only 37-mcmc_practice.qmd uses pymc/arviz.
+name: ds122
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      # Quarto's python engine
+      - jupyter
+      # core stack (used across most decks)
+      - numpy
+      - pandas
+      - matplotlib
+      - scipy
+      - seaborn
+      # deck-specific
+      - matplotlib-venn      # 01, 02
+      - palmerpenguins       # 30-naive_bayes
+      - networkx             # 35-mcmc_part1
+      - statsmodels          # 36-mcmc_part2
+      - pymc                 # 37-mcmc_practice
+      - arviz<1              # 37-mcmc_practice (see note above)
