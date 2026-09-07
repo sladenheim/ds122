@@ -1,16 +1,5 @@
 ---
 title: Conjugate Priors Part 1
-author: "CDS DS-122<br>Boston University"
-format:
-    revealjs:
-        math: true
-        css:
-        - styles.css
-        html-math-method: mathjax
-        highlight-style: github
-        slide-number: true
-        show-slide-number: all
-        chalkboard: true
 ---
 
 ```{python}
@@ -234,7 +223,7 @@ $$p(\theta \mid \text{data}) = 20 \cdot \theta^3(1-\theta)$$
 # Continuous version
 p_continuous = np.linspace(0, 1, 200)
 posterior_continuous = p_continuous**3 * (1 - p_continuous)
-posterior_continuous = posterior_continuous / np.trapz(posterior_continuous, p_continuous)
+posterior_continuous = posterior_continuous / np.trapezoid(posterior_continuous, p_continuous)
 
 # Discrete version (from table)
 p_discrete = [0.3, 0.4, 0.5, 0.6, 0.7]

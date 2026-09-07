@@ -1,17 +1,5 @@
 ---
 title: Sample Spaces
-author: "CDS DS-122<br>Boston University"
-format: 
-    revealjs:
-        math: true
-        css: 
-        - styles.css
-        html-math-method: mathjax
-        highlight-style: github
-        slide-number: true
-        show-slide-number: all
-        chalkboard: true
-
 ---
 
 ## ARW 357
@@ -32,7 +20,7 @@ Lecturer at:
 Cornell University,<br>
 California Institute of Technology
 
-Quote: ironically points out that despite having very low probability ($1/(17 \cdot 10^6)$) of happining the situation does not feel special to us.
+Quote: ironically points out that despite having very low probability ($1/(17 \cdot 10^6)$) of happening the situation does not feel special to us.
 
 
 Paradox: The same probability as seeing a blue lobster, but since we are not expecting to see this specific plate, we are not surprised!
@@ -76,7 +64,7 @@ Verdant Roots composed a dataset for their study. It contains
 :::
 
 ::: {.notes}
-Today forcus on the first column: Calamity. 
+Today focus on the first column: Calamity. 
 
 Next lecture: entire dataset.
 :::
@@ -98,7 +86,7 @@ Assumptions:
 * None of the calamities can occur in the same year.
 * The dataset contains all possible calamity types.
 
-__Question__: Relate the dataset to the basics of probability theory.
+__Topic__: Relate the dataset to the basics of probability theory.
 :::
 
 ::: {.notes}
@@ -241,7 +229,7 @@ display(HTML(html_content))
 ::: {.notes}
 Example that would be a good option in real life: 
 
-1. Regional droght of any degree
+1. Regional drought of any degree
 2. Fire of any degree
 3. Remaining calamities
 4. No calamities

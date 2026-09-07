@@ -1,16 +1,5 @@
 ---
 title: Minimum Mean Squared Error Estimator
-author: "CDS DS-122<br>Boston University"
-format: 
-    revealjs:
-        math: true
-        css: 
-        - styles.css
-        html-math-method: mathjax
-        highlight-style: github
-        slide-number: true
-        show-slide-number: all
-        chalkboard: true 
 ---
 
 ## Learning Objectives
@@ -101,7 +90,7 @@ def likelihood(max_N, data):
     '''Returns the likelihood of seeing a particular train number (data) when the company has max_N trains'''
     lval = pd.DataFrame(index = np.arange(1, max_N + 1))
     lval['likelihoods'] = 1 / np.arange(1, max_N + 1)
-    lval['likelihoods'][lval.index < data] = 0
+    lval.loc[lval.index < data, 'likelihoods'] = 0
     return lval['likelihoods']
 ```
 
