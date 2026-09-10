@@ -233,7 +233,7 @@ display(HTML(html_content))
 
 - Find the **total number of years** in the dataset
 
-- Divide the entry in **year occured** by that **total number of years**
+- Divide the entry in **year occurred** by that **total number of years**
 
 :::
 
@@ -546,7 +546,7 @@ C
     - Identify potential _**tools/methods**_.
 2. __While solving:__
     - Discuss openly.
-    - Ask Prof. Wheelock and me questions as we circulate.
+    - Ask me questions while I circulate.
 3. __After solving:__ 
     - Check if your result makes sense (sign, magnitude, units, etc.).
     - Confirm that you’ve fully addressed the question or proved the statement.
