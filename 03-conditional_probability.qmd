@@ -210,7 +210,13 @@ display(HTML(html_content))
 :::{.notes}
 $P(D|+) = \frac{P(+,D)}{P(+)} = \frac{0.009}{0.009+0.099} \approx 0.08.$
 
+In particular,
+
+$P(+) = P(+,D)+P(+,\overline D) = 0.009 + 0.099 = 0.108.$
+
 WHY SO LOW?
+
+The table hides the base rate of the disease, $P(D) = 0.01.$, so only 1% of the population has the disease. Of the positives, 0.009 are from that 1% and 0.099 come from the 99% who are healthy (roughly 10 times more). A 10% error rate on a large healthy group produces more positives than a 90% hit rate on a tiny sick group. This again illustrates why $P(D|+) \neq P(+|D).$
 :::
 
 ## Chain Rule
@@ -486,6 +492,12 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+:::
+
+::: {.notes}
+Let $A be the event that the first ball is red and $B$ be the event that the second ball is red, then $P(A,B) = P(B|A)P(A) = \frac{2}{3}\frac{3}{4} = \frac{1}{2}.$
+
+$P(A)$ is 3/4 because there are 3 red balls and 1 blue ball. $P(B|A)$ is 2/3 because after the first red ball is drawn, there are 2 red balls and 1 blue ball left.
 :::
 
 <!-- ## Group Question 2
