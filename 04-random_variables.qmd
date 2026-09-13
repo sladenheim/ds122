@@ -145,7 +145,7 @@ In the remaining part of the course, we will rarely mention sample spaces and wo
 :::{.notes}
 Draw the sample-space potato
 
-Sample space - BIHEND the scenes
+Sample space - BEHIND the scenes
 :::
 
 ## Categorical Random Variables 
@@ -665,7 +665,7 @@ def generate_html():
     a. Find the PMF of \(X\). <br>
     <br>
     <br>
-    b. Find the expectated value of \(X\). <br>
+    b. Find the expected value of \(X\). <br>
     <br>
     <br>
     Extra: c. Find the variance of \(X\).   <br>
