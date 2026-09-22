@@ -399,7 +399,7 @@ In the last two lectures we introduced the binomial, geometric, Poisson, and exp
 
 In addition, each of the four distributions answers one of the following questions:
 
-1. Given that a success has just occured, how many trials or how long until the next success?
+1. Given that a success has just occurred, how many trials or how long until the next success?
 2. In a fixed number of trials or amount of time, how many successes occur?
 :::
 
