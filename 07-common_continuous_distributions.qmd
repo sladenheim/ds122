@@ -326,8 +326,8 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: The mean of the exponential distribution is $\small 1/\lambda$, and the variance is $\small 1/\lambda^2$. Its CDF $\small F(a)$ is given by
-$$ \small{F(a) = P(X \leq x) = 1 - e^{-\lambda x} \mbox{ for } x \geq 0.}$$ 
+__Remark__: The mean of the exponential distribution is $\small 1/\lambda$, and the variance is $\small 1/\lambda^2$. Its CDF $\small F(x)$ is given by\
+$$ \small{F(x) = P(X \leq x) = 1 - e^{-\lambda x} \mbox{ for } x \geq 0.}$$ 
 :::
 
 ## Exponential Distribution
