@@ -401,7 +401,7 @@ from IPython.core.display import HTML
 def generate_html():
     return r"""
     <div class="purple-box">
-     <span class="label"> Cumulative Distribution Function Function</span>
+     <span class="label"> Cumulative Distribution Function</span>
         <p>
        The cumulative distribution function (CDF) \(\small{F}\) can be expressed in terms of \(\small{p(a)}\) by \(\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}\)
         </p>
