@@ -1,13 +1,318 @@
 ---
-title: Distributions  
+title: Distributions Review
 ---
 
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
-- Practice general discrete distributions
-- Practice general continuous distributions
-- Practice common discrete distributions
-- Practice common continuous distributions
+- Review of discrete and continuous distributions
+- Practice problems using discrete distributions
+- Practice problems using continuous distributions
+:::
 
+## Random Variables
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Random Variable</span>
+        <p>
+        A random variable is a function \(X: \Omega \to \mathbb{R}\) that assigns a real number \(X(\omega)\) to each outcome \(\omega.\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.incremental}
+- Give an example of a discrete random variable. What is the sample space and what are the possible values of the random variable?
+- Give an example of a continuous random variable. What is the sample space and what are the possible values of the random variable?
+::::
+
+## Distributions
+
+A distribution provides a complete description of the probabilities associated with each possible value of the random variable (r.v.).
+
+It can be represented as:
+
+-  a probability mass function (pmf) for discrete r.v.
+-  a probability density function (PDF) for continuous r.v.
+
+The power of probability distributions is that they allow us to analyze a r.v. directly, without having to examine every possible outcome of the underlying experiment.
+
+## Properties of PMFs
+
+Let $\Omega$ be the sample space of a discrete random variable $X$. 
+The pmf of $X$ is a function $p: \Omega \to [0,1]$ that assigns a probability to each possible value of $X$. 
+
+The pmf, denoted $p(x) = P(X=x)$, must satisfy the following properties:
+
+1. $p(x) \geq 0$ for all $x$ in the sample space.
+2. $\sum_{x \in \Omega} p(x) = 1$.
+
+## Properties of PDFs
+
+Let $\Omega$ be the sample space of a continuous random variable $X$.
+The PDF of $X$ is a function $f: \Omega \to [0,\infty)$ that assigns a probability density to each possible value of $X$. 
+
+The PDF must satisfy the following properties:
+
+1. $f(x) \geq 0$ for all $x$ in the sample space.
+2. $\int_{-\infty}^{\infty} f(x) dx = 1$.
+
+## Cumulative Distribution Function (CDF)
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Cumulative Distribution Function</span>
+        <p>
+       The cumulative distribution function (CDF) \(\small{F}\) of a discrete r.v. can be expressed in terms of \(\small{p(a)}\) by 
+       $$\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}$$
+        </p>
+        <p>
+       The cumulative distribution function (CDF) \(\small{F}\) of a continuous r.v. can be expressed in terms of \(\small{f(x)}\) by 
+       $$\small{F(x) = P(X \leq x) = \int_{-\infty}^{x}f(s)ds.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+## Expectation
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Expected Value (Expectation)</span>
+        <p>
+       If \(\small X\) is a discrete r.v. with pmf \(\small p(x)\), then the expected value of \(\small X\) is given by
+       $$\small{E[X] = \sum_{x=-\infty}^{+\infty} x \cdot P(X=x) = \sum_{x=-\infty}^{+\infty} x \cdot p(x).}$$
+        </p>
+        <p>
+       If \(\small X\) is a continuous r.v. with PDF \(\small f(x)\), then the expected value of \(\small X\) is given by
+       $$\small{E[X] = \int_{-\infty}^{\infty} x f(x) dx.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Notation__: $\small E[X], \mu$ or $\small \overline{X}.$<br>
+__Remark__: The expected value tells us what to expect from the average of many observations of the random variable, _**not**_ what to expect from a single observation.
+:::
+
+## Variance
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Variance</span>
+        <p>
+       The variance of a random variable \(\small X\) is \(\small{\mbox{Var} (X) = E[(X - \overline{X})^2],}\) where \(\small \overline{X}\) denotes \(\small E[X].\)
+        </p>
+        <p>
+       For a discrete r.v. with pmf \(\small p(x)\) and \(\small \overline{X} = \mu\)
+       $$\small{\mbox{Var} (X) = \sum_{x=-\infty}^{+\infty} (x-\mu)^2\; P(X=x) = \sum_{x=-\infty}^{+\infty} (x-\mu)^2\; p(x).}$$
+        </p>
+        <p>
+       For a continuous r.v. with PDF \(\small f(x)\) and \(\small \overline{X} = \mu\)
+       $$\small{\mbox{Var}(X) = \int_{-\infty}^{\infty} (x - \mu)^2 f(x) dx.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Notation__: We frequently use the symbol $\small \sigma^2$ to denote variance, and $\small \sigma = \sqrt{\mbox{Var}(X)}$ is called the standard deviation.
+:::
+
+## Discrete Distributions
+:::{style="font-size: .6em"}
+The following table summarizes the discrete distributions we have seen so far in class:
+
+| Distribution | Parameters | pmf $p(k) = P(X=k)$ | $E[X]$ | $\mbox{Var}(X)$ |
+|---|:--:|:--:|:--:|:--:|
+| Bernoulli | $p$ | $P(X=1) = p, \; P(X=0) = 1-p$ | $p$ | $p(1-p)$ |
+| Binomial, $Bin(N,p)$ | $N, p$ | $\binom{N}{k}\; p^k\; (1-p)^{N-k}, \; k = 0,1,...,N$ | $Np$ | $Np(1-p)$ |
+| Geometric, $Geo(p)$ | $p$ | $p(1-p)^{k-1}, \; k \geq 1$ | $\frac{1}{p}$ | $\frac{1-p}{p^2}$ |
+| Poisson, $Pois(\lambda)$ | $\lambda > 0$ | $\frac{e^{-\lambda}\lambda^k}{k!}, \; k = 0,1,2,...$ | $\lambda$ | $\lambda$ |
+| Uniform on $[a,b]$ | $a, b$ | $\frac{1}{n}$ with $n = b-a+1, \; k = a, a+1, ..., b$ | $\frac{a+b}{2}$ | $\frac{n^2-1}{12}$ |
+:::
+
+## Continuous Distributions
+:::{style="font-size: .6em"}
+The following table summarizes the continuous distributions we have seen so far in class:
+
+| Distribution | Parameters | PDF $f(x)$ | $E[X]$ | $\mbox{Var}(X)$ |
+|---|:--:|:--:|:--:|:--:|
+| Uniform on $[a,b]$ | $a, b$ | $\frac{1}{b-a}$ for $a \leq x \leq b$, and 0 otherwise | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$ |
+| Normal, $N(\mu, \sigma^2)$ | $\mu, \sigma^2$ | $\frac{1}{\sigma \sqrt{2 \pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$ | $\mu$ | $\sigma^2$ |
+| Exponential | $\lambda > 0$ | $\lambda e^{-\lambda x}$ for $x \geq 0$, and 0 otherwise | $\frac{1}{\lambda}$ | $\frac{1}{\lambda^2}$ |
+:::
+
+
+## Group Question 1
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    You wait at BU Central for an inbound B-line trolley. Each trolley that pulls up is too crowded to squeeze into with probability 0.6, independently of every other trolley. Let \(\small X\) be the number of trolleys that arrive up to and including the one you board.
+    <br>
+    a. What is the distribution of \(\small X\)? Give its pmf.
+    <br>
+    <br>
+    b. What is the probability that you board the third trolley you see?
+    <br>
+    <br>
+    c. Find \(\small E[X]\) and \(\small \mbox{Var}(X).\)
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Boarding is a "success", so $p = 1-0.6 = 0.4.$
+
+a. $X \sim Geo(0.4)$: counting trials until the first success, so $p(k) = P(X=k) = 0.4(0.6)^{k-1}$ for $k \geq 1.$
+
+b. $P(X=3) = 0.4(0.6)^2 = 0.4(0.36) = 0.144.$
+
+c. $E[X] = 1/p = 1/0.4 = 2.5$ trolleys, and $\mbox{Var}(X) = (1-p)/p^2 = 0.6/0.16 = 3.75,$ so $\sigma \approx 1.94.$
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Let \(X\) be a continuous random variable with the probability density function (pdf) given by
+ $$ f(x)=\begin{cases}
+    8(x^3-x^7), & \text{ for } 0< x <1.\\
+    0, & \text{otherwise}.
+  \end{cases} $$ 
+a. Show that \(f\) is indeed a pdf.<br>
+b. Find the corresponding cumulative density function.<br>
+c. Find \(P(X < 0.5)\).
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. For $0<x<1$, $x^7 = x^3 \cdot x^4 < x^3$, so $f(x) = 8(x^3-x^7) > 0.$ And
+$$\int_0^1 8(x^3-x^7) dx = 8\left[\frac{x^4}{4} - \frac{x^8}{8}\right]_{x=0}^{x=1} = 8\left(\frac{1}{4}-\frac{1}{8}\right) = 1.$$
+
+b. For $0 \leq x \leq 1$, $F(x) = \int_0^x 8(s^3-s^7) ds = 8\left[\frac{s^4}{4} - \frac{s^8}{8}\right]_{s=0}^{s=x} = 2x^4 - x^8.$ So
+$$F(x) = \begin{cases} 0 & \text{ for } x < 0,\\ 2x^4 - x^8 & \text{ for } 0 \leq x \leq 1,\\ 1 & \text{ for } x > 1.\end{cases}$$
+
+c. $P(X<0.5) = F(0.5) = 2(0.5)^4 - (0.5)^8 = \frac{1}{8} - \frac{1}{256} = \frac{31}{256} \approx 0.121.$
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Suppose that the travel time from Ben's home to his office is normally distributed with a mean of 40 minutes and a standard deviation of 7 minutes. If Ben wants to be 95 percent certain that he will not be late for an office appointment at 1PM, what is the latest time that he should leave home?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+Let $T \sim N(40, 7^2)$ be the travel time. Ben is on time if $T \leq t$, where $t$ is the number of minutes he allows, so we need $P(T \leq t) = 0.95:$
+$$P\left(\frac{T-40}{7} \leq \frac{t-40}{7}\right) = 0.95 \implies \frac{t-40}{7} = z_{0.95} = 1.645.$$
+Hence $t = 40 + 1.645(7) \approx 51.5$ minutes. Leaving 51.5 minutes before 1PM, he should leave no later than about 12:08 PM.
+:::
+
+## Group Question 4
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Given the pdf \(f(x)\) for a continuous random variable \(X\), computed the probability that \(X=a\). What does this imply about the probability of a continuous random variable taking on a specific value?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+$$P(X=a) = P(a \leq X \leq a) = \int_a^a f(x) dx = 0.$$
+Every single value has probability 0 for a continuous r.v.: probability comes from intervals, not points. Consequences: $P(a \leq X \leq b) = P(a < X < b)$, so endpoints never matter, and $f(a)$ is a density, not a probability (it may exceed 1).
 :::
