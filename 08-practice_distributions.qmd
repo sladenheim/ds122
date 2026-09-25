@@ -47,7 +47,7 @@ The power of probability distributions is that they allow us to analyze a r.v. d
 ## Properties of PMFs
 
 Let $\Omega$ be the sample space of a discrete random variable $X$. 
-The pmf of $X$ is a function $p: \Omega \to [0,1]$ that assigns a probability to each possible value of $X$. 
+The pmf of $X$ is a function $p: \mathbb{R} \to [0,1]$ that assigns a probability to each possible value of $X$. 
 
 The pmf, denoted $p(x) = P(X=x)$, must satisfy the following properties:
 
@@ -57,7 +57,7 @@ The pmf, denoted $p(x) = P(X=x)$, must satisfy the following properties:
 ## Properties of PDFs
 
 Let $\Omega$ be the sample space of a continuous random variable $X$.
-The PDF of $X$ is a function $f: \Omega \to [0,\infty)$ that assigns a probability density to each possible value of $X$. 
+The PDF of $X$ is a function $f: \mathbb{R} \to [0,\infty)$ that assigns a probability density to each possible value of $X$. 
 
 The PDF must satisfy the following properties:
 
@@ -74,7 +74,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Cumulative Distribution Function</span>
         <p>
-       The cumulative distribution function (CDF) \(\small{F}\) of a discrete r.v. can be expressed in terms of \(\small{p(a)}\) by 
+       The cumulative distribution function (CDF) \(\small{F}\) of a discrete r.v. can be expressed in terms of \(\small{p(x)}\) by 
        $$\small{F(a) = P(X \leq a) = \sum_{x\leq a} p(x).}$$
         </p>
         <p>
@@ -222,7 +222,7 @@ def generate_html():
     0, & \text{otherwise}.
   \end{cases} $$ 
 a. Show that \(f\) is indeed a pdf.<br>
-b. Find the corresponding cumulative density function.<br>
+b. Find the corresponding cumulative distribution function.<br>
 c. Find \(P(X < 0.5)\).
     <br>
     <br>
@@ -280,7 +280,7 @@ display(HTML(html_content))
 :::{.notes}
 Let $T \sim N(40, 7^2)$ be the travel time. Ben is on time if $T \leq t$, where $t$ is the number of minutes he allows, so we need $P(T \leq t) = 0.95:$
 $$P\left(\frac{T-40}{7} \leq \frac{t-40}{7}\right) = 0.95 \implies \frac{t-40}{7} = z_{0.95} = 1.645.$$
-Hence $t = 40 + 1.645(7) \approx 51.5$ minutes. Leaving 51.5 minutes before 1PM, he should leave no later than about 12:08 PM.
+Hence $t = 40 + 1.645(7) \approx 51.5$ minutes. Leaving 51.5 minutes before 1PM means he should leave no later than about 12:08 PM.
 :::
 
 ## Group Question 4
@@ -292,7 +292,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Given the pdf \(f(x)\) for a continuous random variable \(X\), computed the probability that \(X=a\). What does this imply about the probability of a continuous random variable taking on a specific value?
+    Given the pdf \(f(x)\) for a continuous random variable \(X\), compute the probability that \(X=a\). What does this imply about the probability of a continuous random variable taking on a specific value?
     <br>
     <br>
     <br>
