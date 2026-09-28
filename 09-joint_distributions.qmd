@@ -484,7 +484,7 @@ __Example__: Suppose that $\small X$ and $\small Y$ have the joint probability m
 ## Covariance
 :::{style="font-size: .8em"}
 __Example (continued)__: <br>
-The support $S$ is the set $\{\small (5,8),(6,8),(7,8), (5,9),(6,9),(7,9)\}.$
+The support set $\small S=\{(6,8),(7,8),(5,9),(7,9)\}$ are the points where $\small p(x,y) > 0.$
 
 The marginal probabilities are given by
 
@@ -536,7 +536,6 @@ display(HTML(html_content))
 ```
 
 We typically _**normalize**_ covariance by the standard deviations and obtain the __correlation coefficient__ (or __Pearson's correlation coefficient__ or __Pearson's__ $\rho.$)
-
 :::
 
 :::{.notes}
@@ -546,6 +545,8 @@ We typically _**normalize**_ covariance by the standard deviations and obtain th
 | $\small y = 9$ | 0.3  | 0 | 0.2 | 
 
 $$ \small \operatorname{Cov}(X, Y) = \sum_{(x,y)\in S} (x - \overline{X})(y - \overline{Y}) p(x,y). $$
+
+__Remark__: Here we summed over all pairs $\small (x,y)$, including $\small (5,8)$ and $\small (6,9)$, which are not in $\small S$. This gives the same result because terms with $\small p(x,y) = 0$ contribute nothing to the sum.
 :::
 
 ## Correlation
