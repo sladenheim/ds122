@@ -65,8 +65,6 @@ ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
 ax.set_aspect('equal')
 
-# Save the figure
-plt.savefig("berksons_fallacy_diagram.png")
 plt.show()
 ```
 :::

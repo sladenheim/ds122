@@ -488,9 +488,8 @@ v1.get_label_by_id('11').set_fontsize(16)
 ax1.set_axis_on()
 ax1.text(ax1.get_xlim()[0]+0.1, ax1.get_ylim()[0]+0.1, '$\\Omega$', fontsize=16)
 
-# Adjust layout and save the figure
+# Adjust layout
 plt.tight_layout()
-plt.savefig("venn_diagrams_quarto_slide.png")
 plt.show()
 ```
 :::

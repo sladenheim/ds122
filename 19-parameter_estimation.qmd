@@ -705,7 +705,6 @@ plt.xlabel('Estimated θ')
 plt.ylabel('Frequency')
 plt.legend()
 plt.grid(True)
-plt.savefig("theta_simulation_037.png")
 plt.show()
 ```
 :::
