@@ -1,0 +1,882 @@
+---
+title: Review - Midterm 1
+---
+
+## Setup
+
+1. Wednesday October 7, 1:15-2:15PM, CGS 511
+2. Practice exam: instructions, formula sheet, z-table
+3. 7 questions
+    - 1 question: MCQs (no explanation)
+    - 6 free response questions
+    - No coding question
+4. Calculators allowed but NOT provided (no symbolic math)
+5. **NO PHONES**
+
+## Questions
+
+- Practice Exams
+- HW1, HW2, HW3, HW4 (non CLT)
+- Group questions in lecture notes
+- Discussion questions (Discussions 1-4)
+
+## Topics
+
+1. Basics of Probability: sample spaces, events, axioms of probability, etc.
+2. Conditional probability: chain rule, law of total probability, Bayes' rule, independence
+3. Random variables: discrete, continuous, common distributions, etc.
+4. Joint distributions: marginals, covariance/correlation, independence, etc.
+
+## Sample Spaces and Events
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Sample Space and Events </span>
+        <p>
+        The <b>sample space</b> \(\small \Omega\) of an experiment is the set of all possible outcomes. An <b>event</b> is a subset of \(\small \Omega\).<br><br>
+        For events \(\small A\) and \(\small B\):
+        <ul>
+        <li>Union \(\small A \cup B\): \(\small A\) or \(\small B\) (or both) occurs</li>
+        <li>Intersection \(\small A \cap B\) (also written \(\small A, B\)): both \(\small A\) and \(\small B\) occur</li>
+        <li>Complement \(\small \overline{A}\): \(\small A\) does not occur</li>
+        <li>\(\small A\) and \(\small B\) are <b>disjoint</b> if \(\small A \cap B = \emptyset\)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.incremental}
+- What exactly is being _recorded_ in the experiment? The sample space is the set of possible values of that record.
+::::
+:::
+
+## Axioms of Probability
+
+:::{style="font-size: .75em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Probability (Probability Measure) </span>
+        <p>
+        A probability \(\small P\) assigns a number \(\small P(A)\) to every event \(\small A\) such that:<br>
+        <b>Axiom 1:</b> \(\small 0 \leq P(A) \leq 1\) for every event \(\small A\).<br>
+        <b>Axiom 2:</b> \(\small P(\Omega) = 1\).<br>
+        <b>Axiom 3:</b> If \(\small A_1, A_2, \dots\) are disjoint, then \(\small P(A_1 \cup A_2 \cup \dots) = P(A_1) + P(A_2) + \dots\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Properties A–D </span>
+        <p>
+        <b>A:</b> \(\small P(\overline{A}) = 1 - P(A)\) &nbsp;&nbsp;
+        <b>B:</b> \(\small P(\emptyset) = 0\) &nbsp;&nbsp;
+        <b>C:</b> If \(\small A \subseteq B\), then \(\small P(A) \leq P(B)\)<br>
+        <b>D:</b> \(\small P(A \cup B) = P(A) + P(B) - P(A, B)\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Basics of Probability
+
+**Q:** Given $\Omega$ and the fact that each outcome of $\Omega$ is equally likely, how do we find $P(E)$? Consider an experiment where you flip a fair coin 2 times and you are looking to compute $P(E)$ where $E$ is the event that you get two heads.
+
+::: {.notes}
+$\Omega = \{HH, HT, TH, TT \}$ so $\vert \Omega \vert = 4$.
+$E = \{HH\}$ so $\vert E \vert = 1$.
+$P(E) = \frac{\vert E \vert}{\vert \Omega \vert} = \frac{1}{4}$.
+:::
+
+---
+
+**Q:** Can we follow the same approach if the outcomes are not equally likely? For instance, what if $P(H)=\frac{1}{4}$?
+
+::: {.notes}
+$P(E) = P(HH) = P(H)P(H) = \frac{1}{4} \cdot \frac{1}{4} = \frac{1}{16}$.
+:::
+
+## Conditional Probability
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Conditional Probability and Independence </span>
+        <p>
+        <b>Conditional probability</b> (for \(\small P(B) > 0\)): \(\small P(A \mid B) = \dfrac{P(A, B)}{P(B)}\)<br><br>
+        <b>Chain rule:</b> \(\small P(A, B) = P(A \mid B)\,P(B)\)<br><br>
+        <b>Independent events:</b> \(\small A\) and \(\small B\) are independent if \(\small P(A, B) = P(A)\,P(B)\).<br>
+        Equivalently (when \(\small P(B) > 0\)), \(\small P(A \mid B) = P(A)\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remark__: Conditioning on $\small C$ gives a new probability measure, so every property still holds "given $\small C$." For example, $\small P(\overline{A} \mid C) = 1 - P(A \mid C).$
+
+:::: {.incremental}
+- Disjoint and independent are _**different**_ ideas. Can two disjoint events, each with positive probability, be independent?
+::::
+:::
+
+:::{.notes}
+No. If $A$ and $B$ are disjoint, $P(A,B) = 0$, but $P(A)P(B) > 0$. Disjoint events: if one occurs, the other cannot.
+:::
+
+---
+
+**Q:** For any events $A$ and $B$, can we say that $P(A|B) = P(B|A)$?
+
+::: {.notes}
+Not true in general. Consider probability of having a disease given a positive test result vs. probability of testing positive given that you have the disease. Everyone with measles has spots, but not everyone with spots has measles.
+:::
+
+---
+
+**Q:** For any disjoint events $A$ and $B$, and any event $C$ with $P(C) > 0$, $P(A\cup B|C) = P(A|C) + P(B|C)$. Is this statement true or false?
+
+::: {.notes}
+A: True, by axiom 3 applied to the conditional probability measure $P(\cdot \mid C)$.
+:::
+
+
+## Total Probability and Bayes' Rule
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Law of Total Probability </span>
+        <p>
+        If \(\small B_1, B_2, \dots, B_n\) are disjoint and \(\small B_1 \cup \dots \cup B_n = \Omega\), then
+        $$\small{P(A) = \sum_{i=1}^n P(A \mid B_i)\,P(B_i).}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Bayes' Rule </span>
+        <p>
+        $$\small{P(B_j \mid A) = \frac{P(A \mid B_j)\,P(B_j)}{P(A)} = \frac{P(A \mid B_j)\,P(B_j)}{\sum_{i=1}^n P(A \mid B_i)\,P(B_i)}.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+<!-- 
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A web service routes each incoming request to one of three servers. Server \(\small S_1\) handles 50% of the requests, \(\small S_2\) handles 30%, and \(\small S_3\) handles 20%. A request fails with probability 0.01 on \(\small S_1\), 0.02 on \(\small S_2\), and 0.05 on \(\small S_3\). For one request we record which server handled it and whether it failed.<br>
+    a. Write down the sample space. Express the event \(\small F\) = "the request fails" as a set of outcomes.
+    <br>
+    <br>
+    <br>
+    b. What is the probability that a randomly chosen request fails?
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. $\Omega = \{(S_1, \text{fail}), (S_1, \text{ok}), (S_2, \text{fail}), (S_2, \text{ok}), (S_3, \text{fail}), (S_3, \text{ok})\}$ and $F = \{(S_1, \text{fail}), (S_2, \text{fail}), (S_3, \text{fail})\}.$
+
+b. The events $S_1, S_2, S_3$ are disjoint and cover $\Omega$, so by the law of total probability
+$$P(F) = 0.01(0.5) + 0.02(0.3) + 0.05(0.2) = 0.005 + 0.006 + 0.010 = 0.021.$$
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    c. A request failed. What is the probability that it was handled by \(\small S_3\)?
+    <br>
+    <br>
+    <br>
+    <br>
+    d. Are the events "the request is handled by \(\small S_1\)" and "the request fails" independent? Justify your answer.
+    <br>
+    <br>
+    <br>
+    <br>
+    e. What is \(\small P(\overline{F} \mid S_2)\)? Which property did you use?
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+c. Bayes' rule: $P(S_3 \mid F) = \dfrac{P(F \mid S_3)P(S_3)}{P(F)} = \dfrac{0.010}{0.021} = \dfrac{10}{21} \approx 0.476.$ Although $S_3$ handles only 20% of the traffic, it causes almost half of the failures.
+
+d. Not independent: $P(F \mid S_1) = 0.01 \neq P(F) = 0.021.$ Equivalently, $P(S_1, F) = 0.005 \neq P(S_1)P(F) = 0.5(0.021) = 0.0105.$
+
+e. $P(\overline{F} \mid S_2) = 1 - P(F \mid S_2) = 0.98$, using Property A for the conditional probability measure $P(\cdot \mid S_2).$
+::: -->
+
+## Discrete Random Variables
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> PMF, CDF, Expectation, Variance </span>
+        <p>
+        A random variable is a function \(\small X: \Omega \to \mathbb{R}\). For a discrete r.v. with PMF \(\small p(x) = P(X = x)\):<br>
+        <ul>
+        <li>\(\small p(x) \geq 0\) and \(\small \sum_x p(x) = 1\)</li>
+        <li>CDF: \(\small F(a) = P(X \leq a) = \sum_{x \leq a} p(x)\)</li>
+        <li>\(\small E[X] = \sum_x x\, p(x)\)</li>
+        <li>\(\small \operatorname{Var}(X) = E[(X - E[X])^2] = E[X^2] - E[X]^2\)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.incremental}
+- How do you get the PMF back from the CDF? What does the graph of a discrete CDF look like?
+- What are $\small \lim_{a \to -\infty} F(a)$ and $\small \lim_{a \to \infty} F(a)$?
+- Given the PMF $p(x)$ of $X$, how do we find the CDF $F(x)$?
+::::
+:::
+
+:::{.notes}
+The CDF of a discrete r.v. is a non-decreasing step function. It jumps at each possible value $x$. The height of the jump is $p(x)$. The limits are 0 and 1, respectively.
+:::
+
+## Common Discrete Distributions
+
+:::{style="font-size: .65em"}
+
+| Distribution | Parameters | pmf $p(k) = P(X=k)$ | $E[X]$ | $\operatorname{Var}(X)$ |
+|---|:--:|:--:|:--:|:--:|
+| Bernoulli | $p$ | $p^k(1-p)^{1-k}, \; k = 0, 1$ | $p$ | $p(1-p)$ |
+| Binomial, $Bin(N,p)$ | $N, p$ | $\binom{N}{k} p^k (1-p)^{N-k}, \; k = 0, 1, \dots, N$ | $Np$ | $Np(1-p)$ |
+| Geometric, $Geo(p)$ | $p$ | $p(1-p)^{k-1}, \; k \geq 1$ | $\frac{1}{p}$ | $\frac{1-p}{p^2}$ |
+| Poisson, $Pois(\lambda)$ | $\lambda > 0$ | $\frac{e^{-\lambda}\lambda^k}{k!}, \; k = 0, 1, 2, \dots$ | $\lambda$ | $\lambda$ |
+| Uniform on $\{a, \dots, b\}$ | $a, b$ | $\frac{1}{n}$ with $n = b-a+1$ | $\frac{a+b}{2}$ | $\frac{n^2-1}{12}$ |
+:::
+
+## Choosing a Distribution
+
+:::{style="font-size: .65em"}
+
+__Ask what is being counted__:
+
+| Distribution | What it counts |
+|---|---|
+| Bernoulli$(p)$ | the outcome of one trial: success (1) or failure (0) |
+| Binomial$(N,p)$ | the number of successes in a _fixed_ number $\small N$ of independent trials |
+| Geometric$(p)$ | the number of trials up to and including the _first_ success |
+| Poisson$(\lambda)$ | the number of events in a fixed interval, at average rate $\small \lambda$ |
+
+* Define what counts as a "success" before you plug in $\small p$.
+:::
+<!-- 
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A basketball player makes each free throw with probability 0.7, independently of all other free throws. She keeps shooting until she misses for the first time. Let \(\small X\) be the number of shots she takes, including the miss.<br>
+    a. What is the distribution of \(\small X\)? What counts as a "success" here?
+    <br>
+    <br>
+    <br>
+    b. Find the CDF \(\small F(k) = P(X \leq k)\) for \(\small k = 1, 2, 3, \dots\) Use it to find \(\small P(X \geq 4)\).
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. A "success" is a miss, so $p = 0.3$ and $X \sim Geo(0.3)$ with $p(k) = 0.3(0.7)^{k-1}$ for $k \geq 1.$
+
+b. $F(k) = \sum_{j=1}^{k} 0.3(0.7)^{j-1} = 1 - 0.7^k$ (geometric series, or: $X > k$ means the first $k$ shots were all made). Then $P(X \geq 4) = 1 - F(3) = 0.7^3 = 0.343.$
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    c. Find \(\small E[X]\) and \(\small \operatorname{Var}(X)\).
+    <br>
+    <br>
+    <br>
+    <br>
+    d. In practice she shoots exactly 10 free throws. Let \(\small Y\) be the number she makes. Which distribution does \(\small Y\) follow? Find \(\small P(Y = 8)\), \(\small E[Y]\), and \(\small \operatorname{Var}(Y)\).
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+c. $E[X] = 1/0.3 = 10/3 \approx 3.33$ shots, $\operatorname{Var}(X) = 0.7/0.3^2 \approx 7.78.$
+
+d. $Y \sim Bin(10, 0.7)$: a fixed number of independent trials. $P(Y=8) = \binom{10}{8}(0.7)^8(0.3)^2 = 45(0.0576)(0.09) \approx 0.233.$ $E[Y] = 7$, $\operatorname{Var}(Y) = 10(0.7)(0.3) = 2.1.$
+
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    e. The team's stats page has 500 entries. Each entry independently contains a typo with probability 0.002. Which distribution approximates the number of typos \(\small N\)? Approximate the probability that there are at least two typos.
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+e. Exactly, $N \sim Bin(500, 0.002)$. Many trials with a small success probability, so $N \approx Pois(\lambda)$ with $\lambda = 500(0.002) = 1.$
+$$P(N \geq 2) = 1 - P(N=0) - P(N=1) = 1 - e^{-1} - e^{-1} = 1 - 2e^{-1} \approx 0.264.$$
+The exact binomial answer is also 0.264 (to three decimals).
+:::
+
+## Distributions in Python
+
+:::{style="font-size: .7em"}
+We can check Group Question 2 with `scipy.stats`. Note that `cdf(k)` always computes $\small P(X \leq k)$.
+
+```{python}
+#| echo: true
+import scipy.stats as st
+
+print("P(X >= 4) =", round(1 - st.geom.cdf(3, 0.3), 4))
+print("E[X], Var(X) =", round(st.geom.mean(0.3), 4), round(st.geom.var(0.3), 4))
+print("P(Y = 8)  =", round(st.binom.pmf(8, 10, 0.7), 4))
+print("P(N >= 2) Poisson  =", round(1 - st.poisson.cdf(1, 1), 4))
+print("P(N >= 2) Binomial =", round(1 - st.binom.cdf(1, 500, 0.002), 4))
+```
+
+:::: {.incremental}
+- For continuous distributions, `scipy.stats` uses `loc` and `scale`. For example, `st.uniform(loc=a, scale=w)` is uniform on $\small [a, a+w]$, _**not**_ on $\small [a, w]$.
+::::
+::: -->
+
+## Continuous Random Variables
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> PDF, CDF, Expectation, Variance </span>
+        <p>
+        A continuous r.v. \(\small X\) has a PDF \(\small f(x)\) with \(\small f(x) \geq 0\) and \(\small \int_{-\infty}^{\infty} f(x)\,dx = 1\).
+        <ul>
+        <li>\(\small P(a \leq X \leq b) = \int_a^b f(x)\,dx\)</li>
+        <li>CDF: \(\small F(x) = P(X \leq x) = \int_{-\infty}^{x} f(s)\,ds\), and \(\small F'(x) = f(x)\)</li>
+        <li>\(\small E[X] = \int_{-\infty}^{\infty} x f(x)\,dx\), &nbsp; \(\small E[g(X)] = \int_{-\infty}^{\infty} g(x) f(x)\,dx\) (LOTUS)</li>
+        <li>\(\small \operatorname{Var}(X) = E[X^2] - E[X]^2\)</li>
+        </ul>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Remarks__:
+
+* $\small P(X = a) = 0$, so $\small P(X < b) = P(X \leq b)$: endpoints do not matter.
+* $\small f(x)$ is a density, not a probability. It can be larger than 1.
+* Given the PDF $f(x)$ of $X$, how do we find the CDF $F(x)$?
+:::
+
+## Common Continuous Distributions
+
+:::{style="font-size: .6em"}
+
+| Distribution | PDF $f(x)$ | CDF | $E[X]$ | $\operatorname{Var}(X)$ |
+|---|:--:|:--:|:--:|:--:|
+| Uniform on $[a,b]$ | $\frac{1}{b-a}$ for $a \leq x \leq b$ | $\frac{x-a}{b-a}$ for $a \leq x \leq b$ | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$ |
+| Exponential$(\lambda)$ | $\lambda e^{-\lambda x}$ for $x \geq 0$ | $1 - e^{-\lambda x}$ for $x \geq 0$ | $\frac{1}{\lambda}$ | $\frac{1}{\lambda^2}$ |
+| Normal $N(\mu, \sigma^2)$ | $\frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$ | use $\small Z = \frac{X-\mu}{\sigma}$ and the table | $\mu$ | $\sigma^2$ |
+
+<br>
+
+__Standardizing__: If $\small X \sim N(\mu, \sigma^2)$, then $\small P(X \leq x) = P\left(Z \leq \frac{x-\mu}{\sigma}\right)$, read from the standard normal table.
+:::
+<!-- 
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    The time (in hours) that a battery-powered sensor runs before it needs a recharge is a continuous random variable \(\small X\) with PDF
+    $$\small f(x) = \begin{cases} c\,x(2-x), & \text{for } 0 \leq x \leq 2,\\ 0, & \text{otherwise.} \end{cases}$$
+    a. Find the constant \(\small c\) so that \(\small f\) is a PDF.
+    <br>
+    <br>
+    <br>
+    b. Find the CDF \(\small F(x)\) for all real \(\small x\).
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. $f(x) \geq 0$ on $[0,2]$ requires $c \geq 0$, and
+$$\int_0^2 c(2x - x^2)\,dx = c\left[x^2 - \frac{x^3}{3}\right]_0^2 = c\left(4 - \frac{8}{3}\right) = \frac{4c}{3} = 1 \implies c = \frac{3}{4}.$$
+
+b. For $0 \leq x \leq 2$: $F(x) = \int_0^x \frac{3}{4}(2s - s^2)\,ds = \frac{3}{4}\left(x^2 - \frac{x^3}{3}\right) = \frac{3x^2}{4} - \frac{x^3}{4}.$ So
+$$F(x) = \begin{cases} 0 & x < 0,\\ \frac{3x^2 - x^3}{4} & 0 \leq x \leq 2,\\ 1 & x > 2.\end{cases}$$
+Check: $F(2) = (12 - 8)/4 = 1.$
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    c. What is the probability that the sensor runs for more than 1.5 hours?
+    <br>
+    <br>
+    <br>
+    <br>
+    d. Find \(\small E[X]\) and \(\small \operatorname{Var}(X)\). Can you predict \(\small E[X]\) from a sketch of \(\small f\) before integrating?
+    <br>
+    <br>
+    <br>
+    <br>
+    e. What is \(\small P(X = 1)\)? Is \(\small f(1)\) a probability?
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+c. $P(X > 1.5) = 1 - F(1.5) = 1 - \frac{3(2.25) - 3.375}{4} = 1 - 0.84375 = 0.15625 = \frac{5}{32}.$
+
+d. $f$ is symmetric around $x = 1$, so $E[X] = 1.$ Check: $E[X] = \int_0^2 \frac{3}{4}(2x^2 - x^3)\,dx = \frac{3}{4}\left(\frac{16}{3} - 4\right) = 1.$
+LOTUS: $E[X^2] = \int_0^2 \frac{3}{4}(2x^3 - x^4)\,dx = \frac{3}{4}\left(8 - \frac{32}{5}\right) = \frac{6}{5}$, so $\operatorname{Var}(X) = \frac{6}{5} - 1 = \frac{1}{5}.$
+
+e. $P(X = 1) = \int_1^1 f(x)\,dx = 0.$ $f(1) = 3/4$ is a density value, not a probability.
+::: -->
+
+## Joint Distributions
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Joint and Marginal Distributions, Independence </span>
+        <p>
+        <b>Joint PMF:</b> \(\small p(x, y) = P(X = x, Y = y)\), with \(\small \sum_x \sum_y p(x,y) = 1\).<br><br>
+        <b>Marginal PMFs:</b> \(\small p_X(x) = \sum_y p(x, y)\) and \(\small p_Y(y) = \sum_x p(x, y)\).<br><br>
+        <b>Independent random variables:</b> \(\small X\) and \(\small Y\) are independent if \(\small p(x, y) = p_X(x)\,p_Y(y)\) for <b>all</b> \(\small x\) and \(\small y\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.notes}
+- To show independence you must check _**every**_ cell. To show dependence, _**one**_ cell where $\small p(x,y) \neq p_X(x)\,p_Y(y)$ is enough.
+- A cell with $\small p(x,y) = 0$ while both marginals are positive immediately shows dependence.
+::::
+:::
+
+## Covariance
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Covariance and Correlation </span>
+        <p>
+        $$\small{\operatorname{Cov}(X, Y) = E[(X - E[X])(Y - E[Y])] = E[XY] - E[X]E[Y],}$$
+        $$\small{\rho(X, Y) = \frac{\operatorname{Cov}(X, Y)}{\sigma_X \sigma_Y}, \qquad -1 \leq \rho \leq 1.}$$
+        \(\small X\) and \(\small Y\) are <b>uncorrelated</b> if \(\small \operatorname{Cov}(X, Y) = 0\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Computing $\small E[XY]$ from a table__: By LOTUS, $\small E[XY] = \sum_x \sum_y x\,y\,p(x, y)$. Cells where $\small x = 0$ or $\small y = 0$ contribute nothing.
+
+__Shortcut__: If $\small E[X] = 0$ or $\small E[Y] = 0$, then $\small \operatorname{Cov}(X,Y) = E[XY]$.
+
+:::: {.incremental}
+- Independent $\small \Rightarrow$ uncorrelated. Is the converse true?
+::::
+:::
+
+:::{.notes}
+No. Uncorrelated does not imply independent: the covariance can be 0 while some cell still has $p(x,y) \neq p_X(x)p_Y(y)$.
+:::
+
+## Sums of Random Variables
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> LOTUS, LOE, and Variance of Sums </span>
+        <p>
+        <b>LOTUS:</b> \(\small E[g(X)] = \sum_x g(x)\,p(x)\) &nbsp; and &nbsp; \(\small E[g(X,Y)] = \sum_x \sum_y g(x,y)\,p(x,y)\)<br><br>
+        <b>Linearity of Expectation:</b> \(\small E[aX + bY + c] = aE[X] + bE[Y] + c\), <b>always</b> (no independence needed).<br>
+        For \(\small n\) random variables: \(\small E\left[\sum_{i=1}^n X_i\right] = \sum_{i=1}^n E[X_i]\).<br><br>
+        <b>Variance:</b> \(\small \operatorname{Var}(aX + b) = a^2 \operatorname{Var}(X)\)
+        $$\small{\operatorname{Var}(aX + bY) = a^2\operatorname{Var}(X) + b^2\operatorname{Var}(Y) + 2ab\operatorname{Cov}(X, Y)}$$
+        If \(\small X_1, \dots, X_n\) are independent: \(\small \operatorname{Var}\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \operatorname{Var}(X_i)\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Strategy__: To find the mean of a complicated total, write it as a sum of simple pieces $\small X_1 + \dots + X_n$, find the mean of one piece, and add.
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A fair six-sided die is rolled repeatedly until a number greater than 4 appears. What is the probability that the die is rolled exactly 4 times?
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Let \(\small X\) be a continuous r.v. with the following pdf:
+    $$
+    f(x) = \begin{cases} 11x^{10}, & 0 \leq x \leq 1,\\ 0, & \text{otherwise.} \end{cases}
+    $$
+    a. Find the CDF \(\small F(x)\) of \(\small X\).<br>
+    b. Find the expected value of \(\small X\).<br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A coffee shop records two quantities for each customer: \(\small X = 1\) if the customer orders food (and \(\small X = 0\) otherwise), and \(\small Y\), the number of drinks ordered. The joint distribution is:<br><br>
+    <table style="margin: auto; text-align: center; font-size: 0.9em;">
+      <tr><th></th><th>\(\small Y=1\)</th><th>\(\small Y=2\)</th><th>\(\small Y=3\)</th><th>\(\small p_X\)</th></tr>
+      <tr><th>\(\small X=0\)</th><td>0.10</td><td>0.20</td><td>0.10</td><td></td></tr>
+      <tr><th>\(\small X=1\)</th><td>0.20</td><td>0.10</td><td>0.30</td><td></td></tr>
+      <tr><th>\(\small p_Y\)</th><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <br>
+    a. Complete the marginal distributions. Are \(\small X\) and \(\small Y\) independent?
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. $p_X(0) = 0.4$, $p_X(1) = 0.6$; $p_Y(1) = 0.3$, $p_Y(2) = 0.3$, $p_Y(3) = 0.4.$ Not independent: $P(X=0, Y=1) = 0.10 \neq p_X(0)p_Y(1) = 0.4(0.3) = 0.12.$
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    b. Compute \(\small \operatorname{Cov}(X, Y)\).
+    <br>
+    <br>
+    <br>
+    <br>
+    c. Let \(\small S = X + Y\). Find the PMF of \(\small S\). Use it to find \(\small E[S]\), and check your answer with linearity of expectation.
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+b. $E[X] = 0.6$, $E[Y] = 1(0.3) + 2(0.3) + 3(0.4) = 2.1.$ Only the $X = 1$ row contributes to $E[XY]$: $E[XY] = 1(0.2) + 2(0.1) + 3(0.3) = 1.3.$
+$\operatorname{Cov}(X,Y) = 1.3 - 0.6(2.1) = 0.04.$
+
+c. $P(S=1) = 0.10$, $P(S=2) = 0.20 + 0.20 = 0.40$, $P(S=3) = 0.10 + 0.10 = 0.20$, $P(S=4) = 0.30.$
+$E[S] = 0.1 + 0.8 + 0.6 + 1.2 = 2.7 = E[X] + E[Y] = 0.6 + 2.1.$ ✓
+
+:::
+
+## Group Question 3
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    d. Find \(\small \operatorname{Var}(S)\) in two ways: from the PMF of \(\small S\), and from \(\small \operatorname{Var}(X) + \operatorname{Var}(Y) + 2\operatorname{Cov}(X,Y)\).
+    <br>
+    <br>
+    <br>
+    <br>
+    e. A food order earns $3, and each drink earns $2, minus a fixed $5 cost per customer: \(\small W = 3X + 2Y - 5\). Find \(\small E[W]\) and \(\small \operatorname{Var}(W)\).
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+d. From the PMF: $E[S^2] = 0.1 + 1.6 + 1.8 + 4.8 = 8.3$, so $\operatorname{Var}(S) = 8.3 - 2.7^2 = 1.01.$
+From the formula: $\operatorname{Var}(X) = 0.6(0.4) = 0.24$ (Bernoulli), $E[Y^2] = 0.3 + 1.2 + 3.6 = 5.1$, $\operatorname{Var}(Y) = 5.1 - 2.1^2 = 0.69$, so $\operatorname{Var}(S) = 0.24 + 0.69 + 2(0.04) = 1.01.$ ✓
+
+e. $E[W] = 3(0.6) + 2(2.1) - 5 = 1.0$ dollars.
+$\operatorname{Var}(W) = 9(0.24) + 4(0.69) + 2(3)(2)(0.04) = 2.16 + 2.76 + 0.48 = 5.40.$ The constant $-5$ does not change the variance.
+:::
+
+<!-- ## Group Question 4
+:::{style="font-size: .8em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    f. A quiz has 20 multiple-choice questions with 4 options each. A student guesses every answer at random, independently. Each correct answer earns \(\small +1\) point and each wrong answer costs \(\small \frac{1}{4}\) point. Let \(\small T\) be the total score.<br>
+    Define a random variable \(\small X_i\) for the score on question \(\small i\). Use it to find \(\small E[T]\) and \(\small \operatorname{Var}(T)\).
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+$X_i = 1$ with probability $1/4$ and $X_i = -1/4$ with probability $3/4$, and $T = \sum_{i=1}^{20} X_i.$
+
+$E[X_i] = 1 \cdot \frac{1}{4} - \frac{1}{4}\cdot\frac{3}{4} = \frac{1}{16}$, so by LOE $E[T] = 20 \cdot \frac{1}{16} = 1.25$ points (no independence needed).
+
+$E[X_i^2] = \frac{1}{4} + \frac{1}{16}\cdot\frac{3}{4} = \frac{19}{64}$, so $\operatorname{Var}(X_i) = \frac{19}{64} - \frac{1}{256} = \frac{75}{256}.$ Since the guesses are independent, $\operatorname{Var}(T) = 20 \cdot \frac{75}{256} \approx 5.86.$
+::: -->
