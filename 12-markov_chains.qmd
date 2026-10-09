@@ -21,7 +21,7 @@ title: Markov Chains
 :::
 ::: {.column width="70%"}
 
-- The algorithm works a massive matrix of probabilities that includes the chances of moving from one page to another.
+- The algorithm works with a massive matrix of probabilities that includes the chances of moving from one page to another.
 
 - The result? Pages that are more likely to be visited are ranked higher.
 
@@ -46,7 +46,7 @@ The Markov matrix has more than 3 billion rows and columns. -->
 - Definition of a Markov chain
 - (n-step) transition matrices
 - Distribution vectors
-- Forward Kolomogorov equation
+- Forward Kolmogorov equation
 - Application of Markov chains for vote prediction
 
 
@@ -55,7 +55,7 @@ The Markov matrix has more than 3 billion rows and columns. -->
 ## Vote Prediction
 :::{style="font-size: .75em"}
 Suppose you live in a country with three political parties $P$, $Q$, and $R$.
- We use $P_k, Q_k,$ and $R_k$ to denote the percentage of voters voting for that party in election $k$.
+ We use $P_k, Q_k,$ and $R_k$ to denote the proportion of voters voting for that party in election $k$.
 
 
 :::{.center-text}
@@ -114,7 +114,7 @@ __Notation__: The state that the Markov chain is in at time $n$ is denoted as $X
 :::{.notes}
 States
 
-Probabilisticly
+probabilistically
 
 Random variable
 
@@ -140,7 +140,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Markov Chain </span>
         <p>
-    Given a finite set of states \(\small S \), a process \(\small X_0, X_1, \dots\) is a Markov chain on \(\small S\) if, when the process is in state \(\small j\), the probability that its next  state is \(\small i\) depends only on \(\small j\):
+    Given a finite set of states \(\small S \), a process \(\small X_0, X_1, \dots\) is a Markov chain on \(\small S\) if, when the process is in state \(\small j\), the probability that its next state is \(\small i\) depends only on \(\small j\):
 
     $$\small{P(X_{n+1} = i \,\vert\, X_{n} = j, X_{n-1} = x_{n-1}, \dots, X_0 = x_0) =  P(X_{n+1} = i \,\vert\, X_{n} = j).}$$
         </p>
@@ -275,13 +275,13 @@ The first equality uses the law of total probability, while the second one uses 
 ## N-Step Transition Matrix
 :::{style="font-size: .78em"}
 
-Now let's write the expression above using matrix notation:
+Now let's write the expression above using the entries of $P$:
 
 $$\small{P^{(2)}_{ij} = \sum_k P_{ik}P_{kj}.}$$
 
 This turns out to be the definition of matrix multiplication:
 
-$$\small{P(X_2 = i\,\vert\,X_0 = j) = P^{(2)}_{ij} = P^2_{ij}.}$$
+$$\small{P(X_2 = i\,\vert\,X_0 = j) = P^{(2)}_{ij} = (P^{2})_{ij}.}$$
 
 In other words, the two-step transition probabilities are given by the square of the $P$ matrix. 
 
@@ -299,7 +299,7 @@ __Example__:
 <img src="images/markov/Sunny_Rainy2.png" width=500/>
 :::
 
-If at time $t=0$ the chain is in a "sunny" state, at time $t=2$ it will either be in "sunny" state (with probability 0.72) or a "rainy" state (with probability 0.28).
+If at time $t=0$ the chain is in a "sunny" state, at time $t=2$ it will either be in a "sunny" state (with probability 0.72) or a "rainy" state (with probability 0.28).
 
 We can confirm that by computing $P^2$:
 
@@ -371,9 +371,9 @@ Vector $\mathbf{x}_0$ is known as the __initial (state) distribution__ and $\mat
 :::{style="font-size: .8em"}
 The __Forward Kolmogorov Equation__ tells us that taking one step forward in time corresponds to multiplying $\small P$ times $\small \mathbf{x}_n$. This follows from the law of total probability:
 
-$$\small{\mathbf{x}_{n+1,i} = P(X_{n+1} = i) = \sum_j P(X_{n+1} = i\,\vert\,X_n = j)\,P(X_n = j) = \sum_j P_{ij} \mathbf{x}_{n,j} = P\mathbf{x}_n.}$$
- 
-It is clear then that
+$$\small{\mathbf{x}_{n+1,i} = P(X_{n+1} = i) = \sum_j P(X_{n+1} = i\,\vert\,X_n = j)\,P(X_n = j) = \sum_j P_{ij} \mathbf{x}_{n,j} = (P\mathbf{x}_n)_i.}$$
+
+Hence $\small \mathbf{x}_{n+1} = P\mathbf{x}_n.$ It is clear then that
 $$\small{\mathbf{x}_n = P^n \mathbf{x}_0.}$$
 
 That is, if we know the initial probability distribution at time 0, we can find the distribution at any later time using powers of the matrix $\small P$.
@@ -382,7 +382,7 @@ That is, if we know the initial probability distribution at time 0, we can find 
 
 ## Forward Kolmogorov 
 :::{style="font-size: .8em"}
-__Example__: If we say that an aribtrary day in Boston has an 80% chance of being sunny, we can calculate whether it will be sunny two days later.
+__Example__: If we say that an arbitrary day in Boston has an 80% chance of being sunny, we can calculate the probability that it will be sunny two days later.
 
 We consider an initial probability distribution over states:
     
@@ -403,12 +403,12 @@ $$
 ## Forward Kolmogorov
 :::{style="font-size: .8em"}
 __Example__:
-Continuing our larger more abstract model again, if we consider an initial probability distribution over states:
+Returning to our larger more abstract model, if we consider an initial probability distribution over states:
     
 $$\small{\mathbf{x}_0 = \begin{bmatrix}0.1\\0.3\\0.2\\0.4\end{bmatrix}.}$$
 
 
-Then to compute the distribution two steps later, ie $\mathbf{x}_2,$ we can use $P^2$:
+Then to compute the distribution two steps later, i.e., $\mathbf{x}_2,$ we can use $P^2$:
 
 $$\small{\mathbf{x}_2 = P^2\mathbf{x}_0 = 
 \begin{bmatrix}
@@ -438,14 +438,14 @@ The initial state distribution is $\small{\mathbf{x}_0=\begin{bmatrix} 0.4\\ 0.3
 :::
 :::
 The vote distribution in the next two elections is given by $\mathbf{x}_1$ and $\mathbf{x}_2:$
-$$\small{\mathbf{x}_1 = P\mathbf{x}_0 = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix}\mathbf{x}_0=\begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix} = \begin{bmatrix} 0.3\\ 0.4 \\ 0.3\end{bmatrix}.}$$
+$$\small{\mathbf{x}_1 = P\mathbf{x}_0 = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix}\begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix} = \begin{bmatrix} 0.3\\ 0.4 \\ 0.3\end{bmatrix}.}$$
 
 
 :::
 
 ## Vote Prediction
 :::{style="font-size: .8em"}
-Although it is possible and usually recommended to compute $\mathbf{x}_2$ using $P\mathbf{x}_1.$ We will do so using $P^2\mathbf{x}_0.$
+Although it is possible and usually recommended to compute $\mathbf{x}_2$ using $P\mathbf{x}_1$, we will do so using $P^2\mathbf{x}_0.$
 
 $$\small{P^2 = \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix} \begin{bmatrix} 0.6 & 0 & 0.2\\ 0.4 & 0.6 & 0.2 \\ 0 & 0.4 & 0.6\end{bmatrix} = \begin{bmatrix} 0.36 & 0.08 & 0.24\\ 0.48 & 0.44 & 0.32 \\ 0.16 & 0.48 & 0.44\end{bmatrix}.}$$
 $$\small{\mathbf{x}_2 = P^2\mathbf{x}_0 = \begin{bmatrix} 0.36 & 0.08 & 0.24\\ 0.48 & 0.44 & 0.32 \\ 0.16 & 0.48 & 0.44\end{bmatrix} \begin{bmatrix} 0.4\\ 0.3 \\ 0.3\end{bmatrix}= \begin{bmatrix}0.24 \\ 0.42 \\ 0.34\end{bmatrix}.}$$
