@@ -31,7 +31,7 @@ Suppose that we have a small Internet consisting of just 4 websites referencing 
 <img src="images/markov/pagerank_example.png" width=300/>
 :::
 
-Each page should transfer evenly its importance to the pages that it links to. For example, node 1 has 3 outgoing edges, so it will pass on  its importance to each of the other 3 nodes.
+Each page should transfer evenly its importance to the pages that it links to. For example, node 1 has 3 outgoing edges, so it will pass on $1/3$ of its importance to each of the other 3 nodes.
 
 __Question__: Find the PageRank of each website.
 :::
@@ -49,7 +49,7 @@ We know that the one-step transition matrix for this problem is
 
 $$\small P = \begin{bmatrix}0.8 & 0.4\\0.2 & 0.6\end{bmatrix}$$
 
-We can calculate the probabilty of a sunny day in 2 days or in 10 days by using the powers of $P$. Can we say anything interesting about the weather in 100 or 1,000 days?
+We can calculate the probability of a sunny day in 2 days or in 10 days by using the powers of $P$. Can we say anything interesting about the weather in 100 or 1,000 days?
 
 Let us assume that day 0 is sunny, and let the chain "run" for a while:
 :::
@@ -95,7 +95,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Steady State</span>
         <p>
-        A vector \(\small \mathbf{x}\) for which \(\small P \mathbf{x} = \mathbf{x}\) is called a steady state of the Markov chain corresponding to \(\small P\).
+        A nonzero vector \(\small \mathbf{x}\) for which \(\small P \mathbf{x} = \mathbf{x}\) is called a steady state of the Markov chain corresponding to \(\small P\).
         </p>
     </div>
     """
@@ -118,7 +118,7 @@ __Example__: If the Markov chain below is in state $\small \begin{bmatrix}\frac{
 ## Steady State
 :::{style="font-size: .8em"}
 
-__Example (continued)__: The transition matrix $\small{P=\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and the state $\small{\mathbf{x}=\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$
+__Example (continued)__: The transition matrix is $\small{P=\begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and the state is $\small{\mathbf{x}=\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$
 
 We just need to check if $\small P\mathbf{x}=\mathbf{x}.$
 
@@ -140,9 +140,9 @@ Does every Markov chain have a steady state?<br>
 
 In general, no. However, if the chain has a finite set of states, then it can be represented by a column stochastic matrix $\small P$.
 
-Since each column of $\small P$ sums to 1, $\small P^\top \mathbf{1} = \mathbf{1}.$ Recall from DS-121 that 1 is called an eigenvalue of $\small P^\top$. There is a theorem that says that  $\small P^\top$ and $\small P$ have the same eigenvalues.
+Since each column of $\small P$ sums to 1, $\small P^\top \mathbf{1} = \mathbf{1}.$ Recall from DS121 that 1 is called an eigenvalue of $\small P^\top$. There is a theorem that says that  $\small P^\top$ and $\small P$ have the same eigenvalues.
 
-Hence, 1 is always an eigenvalue of $\small P$. This implies that there exists a vector $\small \mathbf{x}$ such that $\small P\mathbf{x} = \mathbf{x}.$
+Hence, 1 is always an eigenvalue of $\small P$. This implies that there exists a nonzero vector $\small \mathbf{x}$ such that $\small P\mathbf{x} = \mathbf{x}.$
 
 
 ```{python}
@@ -185,7 +185,7 @@ display(HTML(html_content))
 
 __Remark__: The above equations are called the  __detailed balance equations.__
 
-__Remark__: For a Markov chain with $n$ states, there are $n^2$ of the detailed balance equations. However, due to the symmetry of these equations not all of them need to be checked.
+__Remark__: For a Markov chain with $n$ states, there are $n^2$ detailed balance equations. However, due to the symmetry of these equations not all of them need to be checked.
 
 ```{python}
 from IPython.core.display import HTML
@@ -218,7 +218,7 @@ display(HTML(html_content))
 
 ## Detailed Balance
 :::{style="font-size: .8em"}
-__Example__: We have shown that if the following Markov chain is in state $\small{\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}$, it is in a steady state. However, is it in detalied balance?
+__Example__: We have shown that if the following Markov chain is in state $\small{\begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}$, it is in a steady state. However, is it in detailed balance?
 
 :::{.center-text}
 <img src="images/markov/mc-example-4.jpeg" width=400/>
@@ -231,9 +231,9 @@ __Example__: We have shown that if the following Markov chain is in state $\smal
 __Example (continued)__: To check if it is in detailed balance, we need to confirm that $\pi_i P_{ji} = \pi_j P_{ij}$ for all $i$, $j$ for
 $\small{P = \begin{bmatrix}0.8&0.2&0.3\\0.1&0.6&0.3\\0.1&0.2&0.4\end{bmatrix}}$ and $\small{\boldsymbol{\pi} = \begin{bmatrix}\frac{6}{11}\\\frac{3}{11}\\\frac{2}{11}\end{bmatrix}}.$<br>
 
-We do not need to check cases where $i=j.$ For example, for $i=1$ and $j=1,$ the detailed balance equation is $\small{\pi_1 P_{1,1} = \pi_1 P_{1,1}}$ is always true.
+We do not need to check cases where $i=j.$ For example, for $i=1$ and $j=1,$ the detailed balance equation is $\small{\pi_1 P_{1,1} = \pi_1 P_{1,1}}$, which is always true.
 
-- [x] $\small{i=1}$ and $\small{j=2}:$ $\small{\frac{6}{11} \cdot 0.1 \stackrel{}{=} \frac{3}{11} \cdot 0.2}$
+- [x] $\small{i=1}$ and $\small{j=2}:$ $\small{\frac{6}{11} \cdot 0.1 = \frac{3}{11} \cdot 0.2}$
 - [x] $\small{i=1}$ and $\small{j=3}:$ $\small{\frac{6}{11} \cdot 0.1 = \frac{2}{11} \cdot 0.3}$
 - [x] $\small{i=2}$ and $\small{j=3}:$ $\small{\frac{3}{11} \cdot 0.2  =  \frac{2}{11} \cdot 0.3}$
 
@@ -277,7 +277,7 @@ Using the knowledge from DS121, we can show that any vector $\small{\mathbf{x} =
 Since PageRank should reflect only the relative importance of the nodes, we can choose any of them to be our PageRank vector.
 <br>
 <br>
-If we choose $\mathbf{x}$ to be a probability vector, then it is also a steady state vector of our Markov chain.
+We choose $\mathbf{x}$ to be a probability vector so the PageRanks sum to 1.
 
 :::
 
@@ -293,7 +293,7 @@ c \cdot (12+4+9+6) & = 1
 
 It follows that $\small{c = 1/31.}$
 
-Hence, the PageRank of our websites is given by the stationary state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.38 \\ 0.12 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
+Hence, the PageRank of our websites is given by the steady state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.39 \\ 0.13 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
 :::
 <!-- 
 ## Group Question 1
@@ -423,7 +423,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Prove that if a Markov chain satsfies detailed balance with respect to \(\boldsymbol{\pi},\)  then \(\boldsymbol{\pi}\) is one of its steady states.
+    Prove that if a Markov chain satisfies detailed balance with respect to \(\boldsymbol{\pi},\)  then \(\boldsymbol{\pi}\) is one of its steady states.
     <br>
     <br>
     <br>
