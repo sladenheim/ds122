@@ -14,7 +14,7 @@ $$\small{\begin{align*}
 x_1 & = x_3 + (1/2)x_4,\\
 x_2 & = (1/3) x_1,\\
 x_3 & = (1/3)x_1 + (1/2) x_2 + (1/2) x_4,\\
-x_4 & = (1/3) x_1 + (1/2).
+x_4 & = (1/3) x_1 + (1/2)x_2.
 \end{align*}}$$
 
 :::
@@ -40,7 +40,7 @@ the linear system can be written as $P\mathbf{x} = \mathbf{x}.$
 
 <br><br>
 
-We found the PageRank of our websites is given by the stationary state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.38 \\ 0.12 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
+We found the PageRank of our websites is given by the steady state vector $\small{\mathbf{x} = \frac{1}{31}\begin{bmatrix}12 \\ 4 \\ 9 \\6 \end{bmatrix} = \begin{bmatrix} 0.39 \\ 0.13 \\ 0.29 \\ 0.19\end{bmatrix}} .$ 
 :::
 
 ## PageRank - but messier
@@ -90,7 +90,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Communicating States</span>
         <p>
-        If \(P_{ij} (n) > 0\) for some \(n\), then state \(j\) <b>reaches</b> state \(i\). If state \(j\) reaches state \(i\) and state \(i\) reaches state \(j\), then states \(i\) and \(j\) <b>communicate</b>.
+        If \(P^{(n)}_{ij} > 0\) for some \(n\), then state \(j\) <b>reaches</b> state \(i\). If state \(j\) reaches state \(i\) and state \(i\) reaches state \(j\), then states \(i\) and \(j\) <b>communicate</b>.
         </p>
     </div>
     """
@@ -201,7 +201,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label">Period of a State</span>
         <p>
-       The <b>period</b> \(d\) of state \(i\) is the largest integer for which \(P_{ii}(n) = 0\) whenever \(n\) is NOT divisible by \(d\). 
+       The <b>period</b> \(d\) of state \(i\) is the largest integer for which \(P^{(n)}_{ii} = 0\) whenever \(n\) is NOT divisible by \(d\). 
         </p>
     </div>
     """
@@ -209,9 +209,9 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-That is, $P_{ii}(n) > 0$ for ONLY multiples of $d$. So starting at $i$, you only have a chance to revisit $i$ at multiples of $d$ steps.
+That is, $P^{(n)}_{ii} > 0$ ONLY if $n$ is a multiple of $d$. So starting at $i$, you only have a chance to revisit $i$ at multiples of $d$ steps.
 
-__Note__: If $P_{ii}(n) = 0$ for all $n,$ (you can never make it back to $i$) then the period is not definied.
+__Note__: If $P^{(n)}_{ii} = 0$ for all $n,$ (you can never make it back to $i$) then the period is not defined.
 
 :::
 
@@ -365,7 +365,7 @@ __Example__: $\small{P =\left[\begin{array}{rrr}.5&.2&.3\\.3&.8&.3\\.2&0&.4\end{
 
 However, $\small{P^2 = \left[\begin{array}{rrr}.37&.26&.33\\.45&.70&.45\\.18&.04&.22\end{array}\right]}$ does. 
 
-Since every entry in $P^2$ is positive, the corresponding Markov chain is a regular (and $\small{P}$ is primitive.)
+Since every entry in $P^2$ is positive, the corresponding Markov chain is regular (and $\small{P}$ is primitive.)
 
 :::
 
@@ -399,7 +399,7 @@ def generate_html():
         <p>
         If a Markov chain is regular, then it is also irreducible and aperiodic.
 <br><br>
-        If a Markov chain is irreducible and aperiodic, it is regular
+        If a Markov chain is irreducible and aperiodic, it is regular.
         </p>
     </div>
     """
@@ -477,7 +477,7 @@ $$\small{P = \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix}.}$$
 
 However, $P^2$ is strictly positive:
 
-$$\small{P^2 = \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix} \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix} = \begin{bmatrix}0.5&0.25&0.25\\0.25&0.5&0.25\\0.25&0.5&0.25\end{bmatrix}.}$$
+$$\small{P^2 = \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix} \begin{bmatrix}0.5&0.5&0\\0.5&0&0.5\\0&0.5&0.5\end{bmatrix} = \begin{bmatrix}0.5&0.25&0.25\\0.25&0.5&0.25\\0.25&0.25&0.5\end{bmatrix}.}$$
 
 Hence, the Markov chain is regular. It converges to a unique steady state.
 ::: 
@@ -499,7 +499,7 @@ Hence, the Markov chain is regular. It converges to a unique steady state.
 - States 3, 4, and 5 cannot reach states 1 and 2
 :::
 :::
-2. The chain in not aperiodic (States 1 and 2 have period 2)
+2. The chain is not aperiodic (States 1 and 2 have period 2)
 
 3. Hence, this chain is not regular.
 
@@ -526,7 +526,7 @@ Here, $\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 
 :::{style="font-size: .8em"}
 Here, $\small{P = \begin{bmatrix} 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1/2 & 1/2 \\0 & 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1/2 & 1/2 & 0 \end{bmatrix}}.$
 
-There are 2 steady state vectors satisfying $P\mathbf{x} = \mathbf{x}:$ $\small{\begin{bmatrix} 1/2 \\ 1/2 \\ 0 \\ 0 \\ 0\end{bmatrix}}$ and $\small{\begin{bmatrix} 0 \\ 0 \\ 1/3 \\ 1/3 \\ 1/3\end{bmatrix}}$
+There are 2 (linearly independent) steady state vectors satisfying $P\mathbf{x} = \mathbf{x}:$ $\small{\begin{bmatrix} 1/2 \\ 1/2 \\ 0 \\ 0 \\ 0\end{bmatrix}}$ and $\small{\begin{bmatrix} 0 \\ 0 \\ 1/3 \\ 1/3 \\ 1/3\end{bmatrix}}$
 
 
 
@@ -588,12 +588,12 @@ __Key properties__:
 
 The Google matrix $G$ has a unique steady-state vector:
 
-$$\small{\boldsymbol{\pi} \approx \begin{bmatrix} 0.1603 \\ 0.1603 \\ 0.2265 \\ 0.2265 \\ 0.2265 \end{bmatrix}}$$
+$$\small{\boldsymbol{\pi} = \begin{bmatrix} 0.2 \\ 0.2 \\ 0.2 \\ 0.2 \\ 0.2 \end{bmatrix}}$$
 
 __Observations__:
 
 - All pages now have non-zero PageRank
-- Pages 3, 4, and 5 have higher ranks (more interconnected)
+- All pages have equal rank: each link into pages 1 and 2 carries full weight, while each link into pages 3, 4, and 5 carries half weight
 - The random jumps ensure regularity while preserving the link structure
 
 :::
@@ -651,7 +651,7 @@ def generate_html():
     <br><br>
     a.  Show by means of a computation that the chain is regular.
     <br>
-    b. Draw the markov chain and use that to prove it another way.
+    b. Draw the Markov chain and use that to prove it another way.
     <br>
     
         </p>
@@ -663,6 +663,6 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-$$\small{P^2 = \begin{bmatrix}0.59 & 0.1 & 0.4\\ 0.35 & 0.34 & 0.15 \\ 0.06 & 0.056 & 0.45 \end{bmatrix}}$$
+$$\small{P^2 = \begin{bmatrix}0.59 & 0.1 & 0.4\\ 0.35 & 0.34 & 0.15 \\ 0.06 & 0.56 & 0.45 \end{bmatrix}}$$
 
 :::
