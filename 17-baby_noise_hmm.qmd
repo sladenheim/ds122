@@ -5,8 +5,8 @@ title: HMM Example
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
-- Practice setting up an HMM model
-- Practice the Vierbi algorithm:
+- Practice setting up an HMM
+- Practice the Viterbi algorithm:
     1. Initialization
     2. Forward pass
     3. Backward pass
@@ -28,6 +28,7 @@ title: HMM Example
 ::: {.column width="70%"}
 Baby monitors allow new parents to combine caretaking of their baby with other activities, while the baby is napping. Many parents evaluate whether the baby is awake or asleep based on how much noise she makes over a certain period of time, say 2 minutes. 
 :::
+:::
 
 For this exercise we assume three possible levels of noise:
 
@@ -35,7 +36,6 @@ For this exercise we assume three possible levels of noise:
 - 1 - little noise;
 - 2 - much noise. 
 
-:::
 :::
 
 ## Baby-Noise Problem
@@ -189,7 +189,7 @@ The provided table gives the probabilities of different activity levels for when
 ::: {.column width="65%"}
 
 
- We assume that if the dog is sick on day $n$, it will remain sick on day $n+1$ with probability 70%. Whereas if it was healthy on day $n$, it will remain healthy on day $n+1$ with probability 90%. Finally, we assume that a dog is healthy 90% of the time. 
+ We assume that if the dog is sick on day $n$, it will remain sick on day $n+1$ with probability 70%. Whereas if it was healthy on day $n$, it will remain healthy on day $n+1$ with probability 90%. Finally, we assume that on the first day, the dog is healthy with probability 90%. 
 :::
 :::
 
@@ -240,7 +240,7 @@ The veterinarian assumes three possible activity levels:<br>
 
 The provided table gives the probabilities of different activity levels for when the dog is healthy and when it is sick.
 
- We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that a dog is healthy 90% of the time. We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet. <br>
+ We assume that if the dog is sick on day \(n\), it will remain sick on day \(n+1\) with probability 70%. Whereas if it was healthy on day \(n\), it will remain healthy on day \(n+1\) with probability 90%. Finally, we assume that on the first day, the dog is healthy with probability 90%. We are going to find the states of the dog in the last 3 days if first it was usual, then quiet, and then quiet. <br>
 
  We always start with the healthy state, followed by the sick state, and activity level -1, followed by 0, followed by 1.
         </p>
@@ -414,7 +414,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Given the code below. What is the final answer for the dog's health problem?
+    Given the code below, what is the final answer for the dog's health problem?
         </p>
     </div>
     """
@@ -428,7 +428,7 @@ def Viterbi(y, A, B, Pi):
     T = len(y) # length of the observed sequence
     # Initialize C & D
     C = np.empty((N, T), 'd') #'d' stands for type double
-    D = np.empty((N, T), 'B') #'B' stands for type unsigned integer 
+    D = np.empty((N, T), 'B') #'B' stands for type unsigned 8-bit integer (uint8) 
 
     # Initialization stage
     C[:, 0] = B[y[0], :] * Pi.T
