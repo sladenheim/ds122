@@ -18,7 +18,7 @@ Ambiguous words make POS tagging a nontrivial task.
 
 ## Ambiguous Words
 :::{style="font-size: .8em"}
-In each of the following sentences the word well belongs to a different part of speech.
+In each of the following sentences the word _well_ belongs to a different part of speech.
 
 - He did not feel very well. (adjective)
 - She took it well, all things considered. (adverb)
@@ -31,7 +31,7 @@ In each of the following sentences the word well belongs to a different part of 
 
 ## Parts-Of-Speech Tagging
 :::{style="font-size: .8em"}
-Back in the days, the POS annotation was done manually. Assigning POS tags manually within modern multibillion-word corpora is unrealistic and automatic tagging is used instead.
+Back in the day, the POS annotation was done manually. Assigning POS tags manually within modern multibillion-word corpora is unrealistic and automatic tagging is used instead.
 
 :::{.center-text}
 <img src="images/hmm/POS_1.png" width=700/>
@@ -40,11 +40,11 @@ Back in the days, the POS annotation was done manually. Assigning POS tags manua
 
 ## Parts-Of-Speech Tagging
 :::{style="font-size: .8em"}
-Nowadays, manual annotation is typically used on a small portion of a text to create training data. After that, different techniques, such as transformation based tagging, deep learing models, and probabilistic tagging, can be used to develop an automated POS tagger. 
+Nowadays, manual annotation is typically used on a small portion of a text to create training data. After that, different techniques, such as transformation-based tagging, deep learning models, and probabilistic tagging, can be used to develop an automated POS tagger. 
 
-- Transformation based approaches combine handcrafted rules  and automatically induced rules that are generated during the training. 
-- Deep learning tools assign POS tags to words based on the discovered patterns during the training. 
-- Probabilistic tagging include simple frequency-based methods and more complex models like Hidden Markov Models.
+- Transformation-based approaches combine handcrafted rules  and automatically induced rules that are generated during the training. 
+- Deep learning tools assign POS tags to words based on patterns discovered during training. 
+- Probabilistic tagging includes simple frequency-based methods and more complex models like Hidden Markov Models.
 :::
 
 ## Learning Objectives
@@ -79,7 +79,7 @@ __Question__: Use the provided corpus to annotate _Will can spot Mary._
 
 ##  Hidden and Observable States
 :::{style="font-size: .8em"}
-When we use HMMs for POS tagging, the _**tags serve as the hidden states**_ and the _**words represent the observable states**_. If we distinquish only between<br> _**nouns**_ ($NN$), _**verbs**_
+When we use HMMs for POS tagging, the _**tags serve as the hidden states**_ and the _**words represent the observable states**_. If we distinguish only between<br> _**nouns**_ ($NN$), _**verbs**_
 ($VB$), and _**other**_ ($O$) tags, then $NN$, $VB$, and $O$ represent the hidden states. The observable states can be _**going, to, walk**_, etc.
 
 :::{.center-text}
@@ -97,7 +97,7 @@ We will introduce the computation of the probabilities based on the following to
 <img src="images/hmm/toy_corpus_plain.svg" width=500/>
 :::
 
-For simplicity we will distinquish only between _**nouns**_ ($NN$), _**verbs**_ ($VB$), and _**other**_ ($O$)  tags.
+For simplicity we will distinguish only between _**nouns**_ ($NN$), _**verbs**_ ($VB$), and _**other**_ ($O$)  tags.
 
 :::
 
@@ -116,24 +116,24 @@ In other words, $P(VB|O) = \frac{2}{3}$ for this example.
 ## Transition Probabilities 
 :::{style="font-size: .8em"}
 More formally, the transition probabilities are computed in two steps. <br>
-__Step 1__: Count the occurences of tag pairs
+__Step 1__: Count the occurrences of tag pairs
 
-$$\small{L(t_{i-1}, t_i) \quad \forall i \in \{1,\dots, N\}.}$$
+$$\small{L(t_i, t_j) \quad \forall i, j \in \{1,\dots, N\}.}$$
 
 Here, $N$ is the total number of POS tags.<br>
-That is, for each pair of tags $(t_{i-1}, t_i)$, we count how many times tag $t_{i-1}$ is followed by tag $t_i$.<br>
+That is, for each pair of tags $(t_i, t_j)$, we count how many times tag $t_i$ is followed by tag $t_j$.<br>
 __Step 2__: Calculate the conditional probabilities using the obtained counts
 
-$$\small{P(X_n = t_i|X_{n-1} = t_{i-1}) = \frac{L(t_{i-1}, t_i)}{\sum_{j=1}^{N} L\left(t_{i-1}, t_j\right)}.}$$
+$$\small{P(X_n = t_j|X_{n-1} = t_i) = \frac{L(t_i, t_j)}{\sum_{k=1}^{N} L\left(t_i, t_k\right)}.}$$
 
-That is, we normalize the number of times that tag $t_{i-1}$ is followed by tag $t_i$ by the total number of tag pairs that start with tag $t_{i-1}$.
+That is, we normalize the number of times that tag $t_i$ is followed by tag $t_j$ by the total number of tag pairs that start with tag $t_i$.
 :::
 
 ## Transition Probabilities 
 :::{style="font-size: .8em"}
 
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -166,17 +166,17 @@ display(HTML(html_content))
 <img src="images/hmm/toy_corpus_color.svg" width=350/>
 :::
 
-To compute the emission probabilities we need to count the co-occurrences of a part of speech tag with a specific word. For example, the word "We" occurs 2 times in our corpus, tagged with a green tag for $O$ for _other_ (i.e., not a verb nor a noun). In total, the green tag appears three times in this corpus. Thus, the probability that the hidden state $O$ emits the word "We", $P(We|O)$, is $\frac{2}{3}$.
+To compute the emission probabilities we need to count the co-occurrences of a part of speech tag with a specific word. For example, the word "We" occurs 2 times in our corpus, tagged with a green tag for $O$ for _other_ (i.e., neither a verb nor a noun). In total, the green tag appears three times in this corpus. Thus, the probability that the hidden state $O$ emits the word "We", $P(We|O)$, is $\frac{2}{3}$.
 :::
 
 ## Emission Probabilities 
 :::{style="font-size: .8em"}
 The emission probabilities are also computed in two steps.<br>
-__Step 1__:  Count the co-occurences of tags and words
+__Step 1__:  Count the co-occurrences of tags and words
 
 $$\small{L(t_{i}, w_k) \quad \forall i \in \{1,\dots, N\} \text{ and} \: \: \forall k \in \{1,\dots, K\}.}$$
 
-Here, $K$ is the total number of words. <br>
+Here, $K$ is the total number of distinct words (the vocabulary size). <br>
 That is, for each tag-word pair $(t_{i}, w_k)$, we count how many times the word $w_k$ is associated with the tag $t_i$. <br>
 __Step 2__:  Calculate the conditional probabilities using the obtained counts
 
@@ -190,7 +190,7 @@ That is, to find the conditional probabilities we divide $L(t_{i}, w_k)$ by the 
 
 
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -245,7 +245,7 @@ Since the training set is relatively small, we can assign the tags manually, usi
 :::{style="font-size: .8em"}
 
 **Transition probabilities**<br>
-The below table shows the number of occurences of different tag pairs. It includes ```<s>``` tag that is needed to define the initial probabilities.
+The below table shows the number of occurrences of different tag pairs. It includes ```<s>``` tag that is needed to define the initial probabilities.
 
 
 | 2nd tag\1st tag | ```<s>``` | $NN$ |$MD$ |$VB$ |$O$ |
@@ -259,7 +259,7 @@ The below table shows the number of occurences of different tag pairs. It includ
 
 ## 8-Word Corpus
 :::{style="font-size: .8em"}
-Dividing the number of occurences of each tag pair $(t_{i-1},t_i)$ by the total number of tag pairs that starts with tag $t_{i-1}$ yields the transition matrix and the initial probabilities.
+Dividing the number of occurrences of each tag pair $(t_{i-1},t_i)$ by the total number of tag pairs that start with tag $t_{i-1}$ yields the transition matrix and the initial probabilities.
 
 $$ A = \begin{bmatrix}
 1/9 & 1/4 & 1 & 1\\
@@ -296,7 +296,7 @@ $$
 
 ## 8-Word Corpus
 :::{style="font-size: .8em"}
-Dividing the number of co-occurences of a POS tag with a certain word by the total number of times the tag is used provides us with the emission matrix.
+Dividing the number of co-occurrences of a POS tag with a certain word by the total number of times the tag is used provides us with the emission matrix.
 
 $$\small{B = \begin{bmatrix}
 4/9 & 0 & 0 & 0\\
@@ -329,7 +329,7 @@ def Viterbi(y, A, B, Pi):
     T = len(y) # length of the observed sequence
     # Initialize C & D
     C = np.empty((N, T), 'd') #'d' stands for type double
-    D = np.empty((N, T), 'B') #'B' stands for type unsigned integer 
+    D = np.empty((N, T), 'B') #'B' stands for type unsigned 8-bit integer 
 
     # Initialization stage
     C[:, 0] = B[y[0], :] * Pi.T
@@ -343,7 +343,7 @@ def Viterbi(y, A, B, Pi):
 
     # Backward pass
     x = np.empty(T, 'B')
-    x[-1] = np.argmax(C[:, T - 1]) + 1 # finds the value of s
+    x[-1] = np.argmax(C[:, T - 1]) + 1 # most likely final state
     for i in reversed(range(1, T)): 
         x[i - 1] = D[x[i] - 1, i]
 
@@ -390,7 +390,7 @@ From the computation of the transition matrix, we know that
 - 3 represents a non-modal verb,
 - 4 represents other POS tags.
 
-This implies that the answer that we obtained, $\begin{bmatrix} 1 & 2 & 3 & 1 & 4 \end{bmatrix}$, corresponds with the following sequesnce of POS tags:<br>
+This implies that the answer that we obtained, $\begin{bmatrix} 1 & 2 & 3 & 1 & 4 \end{bmatrix}$, corresponds with the following sequence of POS tags:<br>
 noun, modal verb, non-modal verb, noun, and other tag. <br>
 The model assigned all the POS tags correctly, because the observed sequence was _Will can spot Mary._ 
 :::
@@ -398,7 +398,7 @@ The model assigned all the POS tags correctly, because the observed sequence was
 ## Group Question 1
 :::{style="font-size: .8em"}
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -434,7 +434,7 @@ display(HTML(html_content))
 <!-- ## Group Question 1
 :::{style="font-size: .8em"}
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
