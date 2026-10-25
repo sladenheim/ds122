@@ -2,35 +2,37 @@
 title: Evaluation of Parameter Estimators
 ---
 
-## An Impossible Choice?
-
+## Horse-Kick Fatalities 
 :::{style="font-size: .8em"}
 
-:::{.columns}
-::: {.column width="70%"}
-Imagine Levels.fyi has two algorithms for predicting junior data‑scientist salaries:
-:::
-
-::: {.column width="30%"}
 :::{.center-text}
-<img src="images/parameter_estimation/levels.png" width=250/>
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+horse_kicks = pd.DataFrame(
+data = np.array([
+[0, 108.67, 109],
+[1, 66.29, 65],
+[2, 20.22, 22],
+[3, 4.11, 3],
+[4, 0.63, 1],
+[5, 0.08, 0],
+[6, 0.01, 0]]),
+columns = ["Number of Deaths Per Year","Predicted Instances (Poisson)","Observed Instances"])
+horse_kicks[["Predicted Instances (Poisson)","Observed Instances"]].plot.bar(rot=0, figsize=(10, 3), fontsize=14)
+plt.xlabel("Number of Deaths Per Year", size=18)
+plt.ylabel("Count", size=18);
+plt.legend(prop={'size': 18})
+```
 :::
+
+Remember Bortkiewicz's analysis of horse-kick deaths in the Prussian army? He used the Poisson distribution to decide whether a high number of deaths in a year was just a coincidence. But how did he choose the right parameter for his model?
+
+That question leads us to parameter estimation, the focus of the next several lectures.
 :::
-
-- **Algorithm A**: Always predicts annual salary **10k higher** than the true value.
-- **Algorithm B**: On average correct, but can be **7k above or below** the true value.
-
-Which one should they use?
-
-:::
-
-<br>
-
-Today, we will answer this using the ideas of bias, variance, and Mean Squared Error (MSE).
-:::
-
-
-
 
 
 ## Learning Objectives
@@ -190,7 +192,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Statistic </span>
         <p>
-        A statistic is  any function that can be computed from the collected sample. 
+        A statistic is any function that can be computed from the collected sample. 
         </p>
     </div>
     """
@@ -248,7 +250,7 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Example__: We are studying the variance of height among male students at BU. Our sample of size 30 is shown below. 
+__Example__: We are studying the distribution of height among male students at BU. Our sample of size 30 is shown below. 
 
 ```{python}
 from scipy.stats import norm
@@ -261,7 +263,7 @@ mu = 70
 sig = 3
 #
 samp_size = 30
-rng = 0
+rng = default_rng(0)
 
 fig, ax = plt.subplots(1, 1, figsize = (14,1))
 
@@ -277,7 +279,7 @@ for spine in [list(ax.spines.values())[i] for i in [0, 1, 3]]:
     spine.set_visible(False)
 ```
 
-We want to fit normal distribution $\mathcal{N}(\mu, \sigma^2)$ to this data. Parameter estimation in this case would be finding the right values for the parameters $\mu$ and $\sigma$.
+We want to fit a normal distribution $\mathcal{N}(\mu, \sigma^2)$ to this data. Parameter estimation in this case would be finding the right values for the parameters $\mu$ and $\sigma$.
 
 :::
 
@@ -321,7 +323,7 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
-__Example__: The sample average of 71.3 inches is a point estimate of the average height of male students at BU.
+__Example__: The sample average of 69.6 inches is a point estimate of the average height of male students at BU.
 ```{python}
 # to define the range of the figure
 xmin, xmax = (min(samp_x)-1, max(samp_x)+1)
@@ -427,7 +429,7 @@ display(HTML(html_content))
 
 :::
 ::: {.column width="75%"}
-__Example__: Recall that Bernoulli random variable has
+__Example__: Recall that a Bernoulli random variable has
 
 - only two outcomes: 0 and 1
 - one parameter $p$, which is the probability that the random variable is equal to 1
@@ -435,7 +437,7 @@ __Example__: Recall that Bernoulli random variable has
 :::
 :::
 
-Consider data sample (or realizations) $\small{\{x^{(1)}, \dots, x^{(m)}\}}$ drawn independently and identically from a Bernoulli distribution with mean $\theta.$
+Consider a data sample (or realizations) $\small{\{x^{(1)}, \dots, x^{(m)}\}}$ drawn independently and identically from a Bernoulli distribution with mean $\theta.$
 <!-- 
 $$\small{p\left(x^{(i)}; \theta\right) = \theta^{x^{(i)}}\left(1-\theta\right)^{\left(1-x^{(i)}\right)}.} $$ -->
 
@@ -470,7 +472,7 @@ def generate_html():
     
     $$ \operatorname{bias}\left(\hat{\theta}_m\right) = E\left[\hat{\theta}_m\right] - \theta, $$
 
-    where the expectation is over the data (seen as realizations of a random variable) and \(\theta\) is the true underlying value of \(\theta\) used to define the data-generating distribution.
+    where the expectation is over the data (seen as realizations of a random variable) and \(\theta\) is the true underlying value of the parameter used to define the data-generating distribution.
         </p>
     </div>
     """
@@ -510,7 +512,7 @@ def generate_html():
         <p>
     The variance of an estimator is simply the variance
 
-    $$ \operatorname{Var}\left(\hat{\theta}\right) = \operatorname{Var}\left(g\left(x^{(1)}, \dots, x^{(m)}\right)\right)$$
+    $$ \operatorname{Var}\left(\hat{\theta}_m\right) = \operatorname{Var}\left(g\left(x^{(1)}, \dots, x^{(m)}\right)\right)$$
 
     where \(g\left(x^{(1)}, \dots, x^{(m)}\right)\) is a function of the data set.   
         </p>
@@ -524,7 +526,7 @@ Remember that the data set is random; it is assumed to be an i.i.d. sample of so
 
 Recall: <br>
 I. If $\operatorname{Var}(X)$ exists and $Y=a+bX$, then $\operatorname{Var}(Y) = b^2\operatorname{Var}(X)$.<br>
-II. If $\{X_1, X_2, \dots, X_m\}$ are i.i.d., then $\operatorname{Var}\sum_{i=1}^m X_i = m\operatorname{Var}\left(X_1\right).$
+II. If $\{X_1, X_2, \dots, X_m\}$ are i.i.d., then $\operatorname{Var}\left(\sum_{i=1}^m X_i\right) = m\operatorname{Var}\left(X_1\right).$
 :::
 
 ## Variance
@@ -546,7 +548,7 @@ This has a desirable property: as the number of data points $m$ increases, the v
 ## Mean Squared Error
 
 :::{style="font-size: .8em"}
-Consider two estimators, $g$ and $h$, each of which are used to estimate a certain parameter $\theta$.
+Consider two estimators, $g$ and $h$, each of which is used to estimate a certain parameter $\theta$.
 
 ```{python}
 from scipy.stats import norm
@@ -647,7 +649,7 @@ We can assume that each swipe is drawn independently from a Bernoulli distributi
 :::
 
 During the lecture we saw that the mean of the collected swipes    
-$$\small{\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}},$$ 
+$$\small{\hat{\theta}_m = \frac{1}{m}\sum_{i=1}^m x^{(i)}}$$ 
 
 can be used for the estimation of $\theta.$ 
 
@@ -661,18 +663,17 @@ __Question 2__:
 This estimation is 
 
 - accurate: $\small{\hat{\theta}_{100}}$ is unbiased;
-- relatively precise: $\small{\operatorname{Var}(\hat{\theta}_{100}}) = \frac{1}{100} \theta(1-\theta).$
+- relatively precise: $\small{\operatorname{Var}(\hat{\theta}_{100}) = \frac{1}{100} \theta(1-\theta).}$
 
 ```{python}
 #| echo: true
-import random
-random.seed(2)
+rng = np.random.default_rng(2)
 
 # Assume that the true probability of a right swipe is 0.37
 true_theta = 0.37
 
 # Number of swipes per simulation
-n = 100
+m = 100
 
 # Number of simulations
 num_simulations = 1000
@@ -682,7 +683,7 @@ estimated_thetas = []
 
 # Perform simulations
 for _ in range(num_simulations):
-    swipes = np.random.binomial(1, true_theta, n)
+    swipes = rng.binomial(1, true_theta, m)
     estimated_theta = np.mean(swipes)
     estimated_thetas.append(estimated_theta)
 
@@ -788,7 +789,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-    Consider again data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean \(\theta\)
+    Consider again a data sample \(\{x^{(1)}, \dots, x^{(m)}\}\) drawn independently and identically from a Bernoulli distribution with mean \(\theta\)
 
     and the estimator 
 
