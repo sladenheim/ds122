@@ -667,6 +667,7 @@ This estimation is
 
 ```{python}
 #| echo: true
+#| classes: "code-max-height-short"
 rng = np.random.default_rng(2)
 
 # Assume that the true probability of a right swipe is 0.37
@@ -686,7 +687,6 @@ for _ in range(num_simulations):
     swipes = rng.binomial(1, true_theta, m)
     estimated_theta = np.mean(swipes)
     estimated_thetas.append(estimated_theta)
-
 ```
 
 :::

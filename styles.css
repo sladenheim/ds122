@@ -153,3 +153,8 @@
   max-height: 400px;
   overflow-y: auto;
 }
+
+.code-max-height-short pre {
+  max-height: 320px;
+  overflow-y: auto;
+}
