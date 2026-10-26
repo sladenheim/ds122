@@ -15,7 +15,7 @@ title: Maximum Likelihood Estimation
 
 ## Train Problem
 :::{style="font-size: .8em"}
-A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+A railroad gives each train a number starting from 1 up to some number $N$. One day, you see a train with the number 60. 
 
 :::{.center-text}
 <img src="images/train/train60.jpeg" width=300/>
@@ -37,7 +37,7 @@ The table below lists some common distributions and their parameters.
 |Geometric   | $p$ |
 |Exponential | $\lambda$ |
 |Uniform     | $(a,b)$ |
-|Normal      | $(\mu, \sigma)$ |
+|Normal      | $(\mu, \sigma^2)$ |
 
 Assume that you know that data is drawn from a particular _**kind**_ of distribution, but you don't know the value(s) of the distribution's parameter(s). 
 :::
@@ -86,7 +86,7 @@ This shift in terminology highlights that we are now focusing on how the probabi
 :::
 
 :::{.notes}
-Subtle difference with parameter estimation: paramter estimation can be unrelated to the actual parameters, for instance it can be the range of outcomes in the normal distribution, not necessarily mu and sigma.
+Subtle difference with parameter estimation: parameter estimation can be unrelated to the actual parameters, for instance it can be the range of outcomes in the normal distribution, not necessarily mu and sigma.
 :::
 
 ## Model Fitting
@@ -95,7 +95,6 @@ __Example__: Consider the dataset below:
 ```{python}
 from scipy.stats import norm
 from scipy.stats import uniform
-from numpy.random import default_rng
 import matplotlib.pyplot as plt
 
 # specify the parameters
@@ -118,11 +117,11 @@ ax.yaxis.set_visible(False)
 for spine in [list(ax.spines.values())[i] for i in [0, 1, 3]]:
     spine.set_visible(False)
 ```
-Assuming that this data is drawn from a normal distribution 
+Assume that this data is drawn from a normal distribution
 
 $$\small{p(x; \theta) = \mathcal{N}(x; \mu, \sigma^2).}$$
 
-Then model fitting would consist of finding the $\mu$ and $\sigma$ that best match the given data $x$ shown above. In other words, _**the likelihood function gives the probability of observing the given data as a function of the parameter(s)**_. Therefore, _**the parameters can be estimated by maximizing the likelihood function**_.
+Then model fitting would consist of finding the $\mu$ and $\sigma^2$ that best match the given data $x$ shown above. In other words, _**the likelihood function gives the probability (or probability density) of observing the given data as a function of the parameter(s)**_. Therefore, _**the parameters can be estimated by maximizing the likelihood function**_.
 :::
 
 :::{.notes}
@@ -139,7 +138,7 @@ Consider a set of $m$ data items
 
 $$ \small X_s = (x^{(1)}, x^{(2)}, \dots, x^{(m)}), $$ 
 
-drawn independently from the unknown distribution $p(x)$.
+drawn independently from the unknown distribution $p(x; \theta)$.
 
 What is the probability of the entire dataset $X_s$?
 
@@ -161,7 +160,7 @@ $$ \small p(X_s; \theta) = \prod_{i=1}^m p(x^{(i)}; \theta). $$ -->
 
 ## Calculating Likelihood
 :::{style="font-size: .8em"}
-Note that each individual $p(x^{(i)}; \theta)$ is a value between 0 and 1.
+Note that for a discrete distribution, each individual $p(x^{(i)}; \theta)$ is a value between 0 and 1 (for a continuous distribution, density values are typically small as well).
 
 There are $m$ of these numbers being multiplied.   So for any reasonable-sized dataset, the joint probability is going to be _**very small**_.
 <br><br>
@@ -182,7 +181,7 @@ The table below shows some of the properties of the natural logarithm.
 |Product rule | $\log ab = \log a + \log b$ |
 |Quotient rule | $\log \frac{a}{b} = \log a - \log b$ |
 |Power rule   | $\log a^n = n \log a$ |
-|Exponential\logarithmic | $\log e^x = e^{\log x} = x$ |
+|Exponential/logarithmic | $\log e^x = e^{\log x} = x$ |
 
 ```{python}
 from IPython.core.display import HTML
@@ -224,7 +223,7 @@ $$\small{\log p(X_s; \theta).}$$
 
 Which becomes:
 
-$$\small{\log p(X_s; \theta) = \log \prod_{i=1}^m p(x_i; \theta) = \sum_{i=1}^m \log p(x_i; \theta).}$$
+$$\small{\log p(X_s; \theta) = \log \prod_{i=1}^m p(x^{(i)}; \theta) = \sum_{i=1}^m \log p(x^{(i)}; \theta).}$$
 
 This way we are no longer multiplying many small numbers, and we work with values that are easy to represent.
 
@@ -253,7 +252,7 @@ Fragment
 Answer. b (In fact,  log0.05≈−3
  .)
 
-Note: The log of a number less than one is negative, so log-likelihoods are always negative values.
+Note: The log of a number less than one is negative, so for discrete models log-likelihoods are never positive. (For continuous models, densities can exceed one, so log-likelihoods can be positive.)
 :::
 
 ## Log-Likelihood
@@ -310,8 +309,8 @@ def generate_html():
         <p>
    Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
 
-Three independent oservations are made from this distribution:
-\(x_1 = 1, x_2 = 2, x_3 = 2.\)<br>
+Three independent observations are made from this distribution:
+\(x^{(1)} = 1, x^{(2)} = 2, x^{(3)} = 2.\)<br>
 
     a. Find the likelihood function.<br>
     <br>
@@ -320,7 +319,8 @@ Three independent oservations are made from this distribution:
     <br>    
     <br>
     <br>
-        </div>
+        </p>
+    </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
@@ -332,7 +332,7 @@ display(HTML(html_content))
 ## Log-Likelihood
 :::{style="font-size: .79em"}
 __Example (continued)__: 
-We can visualise the log-likelihood function by varying $\theta.$
+We can visualize the log-likelihood function by varying $\theta.$
 
 ```{python}
 import numpy as np
@@ -407,7 +407,7 @@ c
 ## Computation of MLE
 :::{style="font-size: .8em"}
 
-__Example (continued):__ Earlier we obtained the following log-likehood function:
+__Example (continued):__ Earlier we obtained the following log-likelihood function:
 
 $$\small{\log p(X_s; \theta) = 5\log \theta + 5\log (1-\theta) + 5\log\frac{2}{9}}.$$
 
@@ -439,7 +439,7 @@ ax.plot(x, loglik(x), lw = 3, color = 'blue')
 ax.set_xlabel(r'$\theta$', size = 16)
 ax.set_ylabel('Log-Likelihood', size = 16);
 ax.set_xticks(np.arange(0, 1, 0.1))
-plt.title(r'Log-Likelihood for considered discrete model based on sample $X$', size = 18);
+plt.title(r'Log-Likelihood for considered discrete model based on sample $X_s$', size = 18);
 
 mle = 0.5
 ymin = np.min(loglik(x))
@@ -483,6 +483,7 @@ def generate_html():
     <br>
         <br>
     <br>
+        </p>
     </div>
     """
 html_content = generate_html()
@@ -496,11 +497,10 @@ display(HTML(html_content))
 
 Typically, to find the Maximum Likelihood Estimate $\hat{\theta}$ for distribution parameter $\theta$, we perform the following steps:
 
- 1. Compute the likehood function $p\left(X_s;\theta \right).$<br>
+ 1. Compute the likelihood function $p\left(X_s;\theta \right).$<br>
  2. Compute the corresponding log-likelihood function $\log p\left(X_s;\theta \right).$<br>
  3. Take the derivative of the log-likelihood function with respect to $\theta$.<br>
- 4. Set the derivative to zero to find the MLE. <br>
- 4. (Optional) Confirm that the obtained extremum is indeed a maximum by taking the second derivative or from the plot of the log-likelihood function. 
+ 4. Set the derivative to zero and solve for $\theta$ to find the MLE. <br>
 
  However, there are exceptions!
 :::
@@ -518,10 +518,16 @@ We assume:
 Let $\theta = N$. The likelihood of seeing train 60 is:
 
 $$
-p(X_s; \theta) = \frac{1}{\theta}, \quad \text{for } \theta \geq 60.
+p(X_s; \theta) =
+\begin{cases}
+\frac{1}{\theta}, & \theta \geq 60, \\
+0, & \theta < 60,
+\end{cases}
 $$
 
-This function decreases as $\theta$ increases.  
+since train 60 could not exist if there were fewer than 60 trains.
+
+For $\theta \geq 60$, this function decreases as $\theta$ increases, so it is maximized at the smallest allowed value of $\theta$. The derivative is never zero, so here we find the maximum directly from the shape of the function.
 So the maximum likelihood estimate is: $\hat{\theta} = 60.$
 
 
@@ -543,18 +549,29 @@ def generate_html():
         <p>
    A student notices their roommate watching episode 8 of a TV series on Netflix. The show looks interesting, and the student wonders if they will have enough time to watch the entire series over a long weekend. <br>
    
-   Help the student estimate the total number of episodes in the series using the maximum likelihood estimation.
+   Help the student estimate the total number of episodes in the series using maximum likelihood estimation.
        <br>
     <br>
     <br>
         <br>
     <br>
+        </p>
     </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
 ```
 
+:::
+
+:::{.notes}
+Same idea as the train problem, just with episodes.
+
+Assume episodes numbered 1 to N, each equally likely to be the one we see. Likelihood is 1/N for N >= 8, and 0 for N < 8 (can't see ep 8 if there are only 7).
+
+1/N is decreasing, so pick the smallest N allowed -> N hat = 8.
+
+Ask: does 8 seem like a good guess? Probably not - the MLE can never overshoot, only undershoot.
 :::
 
 <!-- ## Group Question 2
