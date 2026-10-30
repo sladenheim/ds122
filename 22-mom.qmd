@@ -13,7 +13,7 @@ In the last lecture, we discussed how to evaluate an estimator.
 :::
 
 <!-- Today we will learn a different technique for estimating parameters called the method of moments. It was introduced in 1894 by Karl Pearson and is the oldest method for deriving point estimators. -->
-Today we will learn how to create an estimator. In particular, we will discuss the technique known as the method of momements. It was introduced in 1894 by Karl Pearson and is the oldest method for deriving point estimators.
+Today we will learn how to create an estimator. In particular, we will discuss the technique known as the method of moments. It was introduced in 1894 by Karl Pearson and is the oldest method for deriving point estimators.
 :::
 
 
@@ -32,7 +32,7 @@ Today we will learn how to create an estimator. In particular, we will discuss t
 
 ## Train Problem
 :::{style="font-size: .8em"}
-A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+A railroad gives each train a number starting from 1 up to some number $N$. One day, you see a train with the number 60. 
 
 :::{.center-text}
 <img src="images/train/train60.jpeg" width=300/>
@@ -44,7 +44,7 @@ __Question__: Estimate how many trains the railroad has using the method of mome
 ## Moments
 :::{style="font-size: .8em"}
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -66,13 +66,13 @@ __Remark__: The $\small k$th moment of $\small X$ about scalar $\small c$ is equ
 Often, we are interested in the first moment of $\small X$: 
 $$\small \mu_1 = E[X],$$ 
 and the second moment of $\small X$ about $\small \mu_1$: 
-$$\small \operatorname{Var}(X) = E[(X − \mu_1)^2.$$
+$$\small \operatorname{Var}(X) = E[(X - \mu_1)^2].$$
 :::
 
 ## Moments
 :::{style="font-size: .75em"}
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -98,8 +98,8 @@ __Remark__: The $\small k$th sample moment of $X$ about scalar $c$ is equal to
 
 $$\small \frac{1}{m} \sum_{i=1}^m (x^{(i)}-c)^k.$$ 
 
-That is, the first sample moment is just the **sample mean**, the average value of a sample. 
-The second sample moment about the sample mean is the **sample variance**.
+In particular, the first sample moment is just the **sample mean**, the average value of a sample. 
+The second sample moment about the sample mean is the (biased) **sample variance**, which divides by $m$ rather than $m-1$.
 :::
 
 ## Method of Moments
@@ -107,12 +107,12 @@ The second sample moment about the sample mean is the **sample variance**.
 
 _**The method of moments assumes that to find a good estimator, we should have the true and sample moments match as best we can.**_ 
 
-If we only need to estimate one parameter that denoted as $\theta$, then we should choose the parameter $\theta$ such that the first true moment $\mu_1$ is equal to the first sample moment $\hat{\mu}_1$. (In this case, we frequently drop the subscript.)
+If we only need to estimate one parameter, denoted as $\theta$, then we should choose the parameter $\theta$ such that the first true moment $\mu_1$ is equal to the first sample moment $\hat{\mu}_1$. (In this case, we frequently drop the subscript.)
 <br><br>
 
-<!-- __Example__: Let $x^{(1)}, x^{(1)}, ..., x^{(m)}$ be an i.i.d. sample from a continuous uniform distribution on $(0,\theta)$. What is the method of moments estimate of $\theta$?
+<!-- __Example__: Let $x^{(1)}, x^{(2)}, ..., x^{(m)}$ be an i.i.d. sample from a continuous uniform distribution on $(0,\theta)$. What is the method of moments estimate of $\theta$?
 
-Let $X$ be continuous random variable that is uniformly distributed on $(0,\theta)$. Then $x^{(1)}, x^{(1)}, ..., x^{(m)}$ are i.i.d. realizations from $X$. 
+Let $X$ be continuous random variable that is uniformly distributed on $(0,\theta)$. Then $x^{(1)}, x^{(2)}, ..., x^{(m)}$ are i.i.d. realizations from $X$. 
 
 We know that $E[X] = \frac{0+\theta}{2} = \frac{\theta}{2}.$ Thus, $\frac{\theta}{2}$ is the first true moment.  -->
 :::
@@ -165,7 +165,7 @@ __Example (continued)__: Since for the Poisson distribution with parameter $\the
 
 $$\mu_1 = E[X] = \theta.$$
 
-The method of moments tells us that $\theta = \mu_1 = \hat{\mu}_1$, where $\hat{\mu}_1$ is the sample mean. Hence, to find the method of moments estimate of $\theta$ we simply need to find the mean of the counts.
+The method of moments tells us to set $\mu_1 = \hat{\mu}_1$, so $\hat{\theta} = \hat{\mu}_1$, where $\hat{\mu}_1$ is the sample mean. Hence, to find the method of moments estimate of $\theta$ we simply need to find the mean of the counts.
 
 ```{python}
 #| echo: true
@@ -182,13 +182,13 @@ Thus, the estimate of $\theta$ for this particular dataset is simply 24.9.
 ## Train Problem
 :::{style="font-size: .8em"}
 Let $\theta = N$ be the total number of trains. <br>
-Let $X$ represent the train number. Then $X$ has a discrete uniform distribution on $[1,\theta]$. 
+Let $X$ represent the train number. Then $X$ has a discrete uniform distribution on $\{1, 2, \ldots, \theta\}$. 
 
 - First true moment:  $\mu = E[X] = \frac{1 + \theta}{2}$
 
 - First sample moment:  $\hat{\mu} = \frac{60}{1} = 60$
 
-- Matching true and sample moments: $\frac{1 + \theta}{2} = 60 \Rightarrow \theta = 119$
+- Matching true and sample moments: $\frac{1 + \theta}{2} = 60 \Rightarrow \hat{\theta} = 119$
 
 _Estimated number of trains: 119._
 
@@ -200,14 +200,14 @@ $\hat{\mu} = \frac{60}{1} = 60.$
 $\frac{N+1}{2} = 60$. Thus, $\hat{N} = 119.$\\ -->
 :::
 
-## Group Quesiton 1
+## Group Question 1
 :::{style="font-size: .8em"}
 
 | $x$ | $1$ | $2$ |
 | :---: | :---: | :---: |
 | $p(x;\theta)$ | $\theta$ | $1-\theta$|
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -215,7 +215,7 @@ def generate_html():
         <p>
    Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
 
-Three independent oservations are made from this distribution:
+Three independent observations are made from this distribution:
 \(x^{(1)} = 1, x^{(2)} = 2, x^{(3)} = 2.\)<br>
 
     a. Find the first true moment.<br>
@@ -224,6 +224,7 @@ Three independent oservations are made from this distribution:
     b. Find the first sample moment.
     <br>
     <br>
+    </p>
     </div>
     """
 html_content = generate_html()
@@ -231,11 +232,11 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Quesiton 1
+## Group Question 1
 :::{style="font-size: .8em"}
 
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -248,6 +249,7 @@ def generate_html():
         <br>
     <br>
     <br>
+    </p>
     </div>
     """
 html_content = generate_html()
@@ -263,7 +265,7 @@ display(HTML(html_content))
 ::: 
 
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -277,6 +279,7 @@ def generate_html():
     <br>
         <br>
     <br>
+    </p>
     </div>
     """
 html_content = generate_html()
@@ -290,7 +293,7 @@ display(HTML(html_content))
 :::{style="font-size: .8em"}
 
 ```{python}
-from IPython.core.display import HTML
+from IPython.display import HTML
 
 def generate_html():
     return r"""
@@ -302,7 +305,8 @@ def generate_html():
     <br>
         <br>
     <br>
-    </div>
+    </p>
+22-mo    </div>
     """
 html_content = generate_html()
 display(HTML(html_content))
