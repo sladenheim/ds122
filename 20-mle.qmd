@@ -505,7 +505,7 @@ Typically, to find the Maximum Likelihood Estimate $\hat{\theta}$ for distributi
  However, there are exceptions!
 :::
 
-## Train Problem
+## Train Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 We assume:
