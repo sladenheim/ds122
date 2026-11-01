@@ -10,7 +10,7 @@ A survey studied the relationship between TV ownership and well-being.
 <img src="images/ci/couch_potato.png" width=300/>
 ::: 
 
-Participants were presented with a ladder where steps numbered 0 to 10:
+Participants were presented with a ladder with steps numbered 0 to 10:
 
 - 0 is the worst possible life
 - 10 is the best possible life
@@ -27,11 +27,11 @@ They were asked which step came closest to the way they felt about their life.
 <img src="images/ci/Gallup_survey.png" width=700/>
 :::
 
-_"For the European data, one can say with 95% confidence that the true population for wellbeing among those without TVs is between 4.88 and <br> 5.26 [...]"_
+_"For the European data, one can say with 95% confidence that the true population mean for wellbeing among those without TVs is between 4.88 and <br> 5.26 [...]"_
 
 The confidence interval: _between 4.88 and 5.26._
 
-**The survey does not tell us that watching TV is good for our well-being,  just that owning one is!**
+**The survey does not tell us that watching TV is good for our well-being, just that TV owners report higher well-being!**
 
 
 :::
@@ -89,7 +89,7 @@ display(HTML(html_content))
 
 That is, a 95% confidence interval for $\theta$ is a random interval that contains $\theta$ with probability 0.95.
 
-__Example__: Assume that a populaiton is normally distributed with mean $\mu$ and variance $\sigma^2$. For instance, we can think of SAT scores for students in Massachusetts.
+__Example__: Assume that a population is normally distributed with mean $\mu$ and variance $\sigma^2$. For instance, we can think of SAT scores for students in Massachusetts.
 
 To estimate the true value of $\mu$ we repeat the sampling process 20 times and compute the confidence interval for parameter $\mu$ for each sample. 
 :::
@@ -108,7 +108,7 @@ import scipy.stats as stats
 
 rng = default_rng(13)
 
-# Data from 2020 for SAT scores nationwide from above link
+# Data from 2020 for SAT scores nationwide
 mu = 1050
 sig = 216
 #
@@ -119,8 +119,9 @@ xmin, xmax = (x[0], x[-1])
 ax1.plot(x, norm.pdf(x, loc = mu, scale = sig),'k-', lw = 5, alpha = 0.6)
 #
 # points under the curve
-pop_x = norm.rvs(size = 1000, loc = mu, scale = sig)
-pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig)) for x_coord in pop_x]
+pop_rng = default_rng(0)
+pop_x = norm.rvs(size = 1000, loc = mu, scale = sig, random_state = pop_rng)
+pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig), random_state = pop_rng) for x_coord in pop_x]
 ax1.scatter(pop_x, pop_y, marker = '.', alpha = 0.5, color = 'darkblue')
 ax1.yaxis.set_major_locator(plt.NullLocator())
 ax1.set_ylabel('Density', size = 16)
@@ -138,7 +139,7 @@ t_stat = stats.t.ppf(1-0.025, samp_size - 1)
 for samp in range (20):
     samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
     M = np.mean(samp_x)
-    std_err = np.std(samp_x) / np.sqrt(samp_size)
+    std_err = np.std(samp_x, ddof = 1) / np.sqrt(samp_size)
     if contains(mu, M, t_stat * std_err):
         col = 'g'
     else:
@@ -181,12 +182,12 @@ Now that we understand how to interpret confidence intervals, the next question 
 :::{style="font-size: .8em"}
 _**Assume that our population has a Gaussian (i.e., normal) distribution.**_
 
-Let $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a population that has a _**normal distribution with unknown mean**_ $\mu$ _**and known variance**_ $\sigma^2$. <br>
+Let $x^{(1)}, x^{(2)}, ..., x^{(n)}$ be a random sample from a population that has a _**normal distribution with unknown mean**_ $\mu$ _**and known variance**_ $\sigma^2$. <br>
 Denote the _**sample mean**_ as
 
 $$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x^{(i)}.$$ 
 
-Let $z(\alpha)$ be the number for which the area under the standard normal density function to the right of $z(\alpha)$ is $\alpha$ with $0 \leq \alpha \leq 1$. Note that the symmetry of the standard normal density function about zero implies that $z(1-\alpha) = -z(\alpha)$.
+Let $z(\alpha)$ be the number for which the area under the standard normal density function to the right of $z(\alpha)$ is $\alpha$ with $0 < \alpha < 1$. Note that the symmetry of the standard normal density function about zero implies that $z(1-\alpha) = -z(\alpha)$.
 :::
 
 ## Mean of a Normal Distribution
@@ -217,7 +218,7 @@ This implies that the probability that $\mu$ lies in the interval
 
 $$\left[M - z(\alpha/2)  \frac{\sigma}{\sqrt{n}}, M + z(\alpha/2)  \frac{\sigma}{\sqrt{n}}\right]$$
 
-is approximately $1-\alpha.$ In other words, this is a _**$100(1-\alpha)\%$ confidence interval**_ for the population mean, $\mu$.
+is $1-\alpha.$ In other words, this is a _**$100(1-\alpha)\%$ confidence interval**_ for the population mean, $\mu$.
 
 <br><br>
 
@@ -230,9 +231,9 @@ How can we replace it?
 :::{style="font-size: .8em"}
 Of course, we can estimate $\sigma$ from the data. 
  
-$\sqrt{\frac{1}{n}\sum_i (x_i - M)^2}$ is a __biased__ estimate of the true standard deviation, so we typically apply _**Bessel's correction**_ to get an __unbiased__ estimate:
+$\frac{1}{n}\sum_i (x^{(i)} - M)^2$ is a __biased__ estimate of the true variance, so we typically apply _**Bessel's correction**_ to get an __unbiased__ estimate $s^2$ of the variance, and use its square root as our estimate of the standard deviation:
 
-$$ s = \sqrt{\frac{1}{n-1}\sum_i (x_i - M)^2}. $$
+$$ s = \sqrt{\frac{1}{n-1}\sum_i (x^{(i)} - M)^2}. $$
 
 This substitution has a far-reaching consequence: _**the distribution of $\frac{M - \mu}{s/\sqrt{n}}$ is a <br>
 $t$ distribution with $n-1$ degrees of freedom.**_
@@ -241,7 +242,7 @@ $t$ distribution with $n-1$ degrees of freedom.**_
 ## The $t$ Distribution
 :::{style="font-size: .8em"}
 
- A man named William Gosset worked at the Guinness Brewery in Ireland. He needed a way to determine if changes in the brewing processes made a difference. Unfortunately, he generally only had small samples sizes.
+ A man named William Gosset worked at the Guinness Brewery in Ireland. He needed a way to determine if changes in the brewing processes made a difference. Unfortunately, he generally only had small sample sizes.
 
 :::{.center-text}
 <img src="images/ci/Guiness.jpg" width=550/>
@@ -253,7 +254,7 @@ $t$ distribution with $n-1$ degrees of freedom.**_
 :::{style="font-size: .8em"}
 William Gosset introduced the $t$-distribution after realizing the normal distribution wasn't suitable for small samples. Its heavier tails reflect a higher chance of extreme values, especially with smaller sample sizes. <br>
 <br>
-As $\nu$ (the degres of freedom, $\nu=n-1$) goes to infinity, we get the normal distribution.
+As $\nu$ (the degrees of freedom, $\nu=n-1$) goes to infinity, we get the normal distribution.
 
 :::{.center-text}
 <img src="images/ci/Student_t.png" width=350/>
@@ -263,7 +264,7 @@ As $\nu$ (the degres of freedom, $\nu=n-1$) goes to infinity, we get the normal 
 
 <!-- ## The $t$ Distribution
 :::{style="font-size: .78em"}
-We assume again that $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a normal distribution having mean $\mu$ and variance $\sigma^2$. Let $\tau_{n-1}(x)$ denote the PDF of the $t$ distribution with $n-1$ degrees of freedom and $t$ be a constant such that 
+We assume again that $x^{(1)}, x^{(2)}, ..., x^{(n)}$ be a random sample from a normal distribution having mean $\mu$ and variance $\sigma^2$. Let $\tau_{n-1}(x)$ denote the PDF of the $t$ distribution with $n-1$ degrees of freedom and $t$ be a constant such that 
 
 $$\small{\int_{-t}^t \tau_{n-1}(x) dx = 1 - \alpha.}$$
 
@@ -280,7 +281,7 @@ When the population standard deviation $\sigma$ is not known the $100(1-\alpha)\
 
 $$\left[M - t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}, M + t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}\right].$$ 
 
-Since people often prefer to use the normal distribution, and since the $t$-distribution becomes equivalent to the normal when the sample size $n$ becomes large, common practice is to use normal distribution instead of the $t$-distribution for $n \geq 30$. 
+Since people often prefer to use the normal distribution, and since the $t$-distribution becomes equivalent to the normal when the sample size $n$ becomes large, common practice is to use the normal distribution instead of the $t$-distribution for $n \geq 30$. 
 
 _**For this course, we recommend using exclusively $t$-distribution when the population standard deviation is not known.**_
 :::
@@ -289,13 +290,13 @@ _**For this course, we recommend using exclusively $t$-distribution when the pop
 :::{style="font-size: .8em"}
 What happens if the type of the population distribution is not known?
 
-Let $x^{(1)}, x^{(2)},, ..., x^{(n)}$ be a random sample from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __known variance__ $\sigma^2$. Let 
+Let $x^{(1)}, x^{(2)}, ..., x^{(n)}$ be a random sample from a population that has an __unknown distribution__ with __unknown mean__ $\mu$ and __known variance__ $\sigma^2$. Let 
 
-$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x_i.$$ 
+$$M = \overline{X} = \frac{1}{n} \sum_{i=1}^n x^{(i)}.$$ 
 
 The Central Limit Theorem tells us that the distribution of $\frac{M - \mu}{\sigma/\sqrt{n}}$ can be approximated by a standard normal distribution, so
 
-$$P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) = 1-\alpha.$$
+$$P\left(-z(\alpha/2) \leq \frac{M - \mu}{\sigma/\sqrt{n}} \leq z(\alpha/2)\right) \approx 1-\alpha.$$
 :::
 
 ## Mean of Any Distribution
@@ -309,7 +310,7 @@ When the sample of size $n$ is from a population that has an __unknown distribut
 $$\left[M - t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}, M + t_{n-1}(\alpha/2)  \frac{s}{\sqrt{n}}\right].$$ 
 
 
-Here, $s$ is again an unbiased estimate of the true standard deviation.
+Here, $s$ is again the Bessel-corrected sample standard deviation.
 :::
 
 ## Mean of Any Distribution
@@ -327,7 +328,7 @@ For the SAT example, the figure below shows the 95% confidence intervals for the
 ```{python}
 rng = default_rng(12)
 
-# Data from 2020 for SAT scores nationwide from above link
+# Data from 2020 for SAT scores nationwide
 mu = 1050
 sig = 216
 #
@@ -338,8 +339,9 @@ xmin, xmax = (x[0], x[-1])
 ax1.plot(x, norm.pdf(x, loc = mu, scale = sig),'k-', lw = 5, alpha = 0.6)
 #
 # points under the curve
-pop_x = norm.rvs(size = 1000, loc = mu, scale = sig)
-pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig)) for x_coord in pop_x]
+pop_rng = default_rng(0)
+pop_x = norm.rvs(size = 1000, loc = mu, scale = sig, random_state = pop_rng)
+pop_y = [uniform.rvs(size = 1, scale = norm.pdf(x_coord, loc = mu, scale = sig), random_state = pop_rng) for x_coord in pop_x]
 ax1.scatter(pop_x, pop_y, marker = '.', alpha = 0.5, color = 'darkblue')
 ax1.yaxis.set_major_locator(plt.NullLocator())
 ax1.set_ylabel('Density', size = 16)
@@ -354,7 +356,7 @@ t_stat = stats.t.ppf(1-0.025, samp_size - 1)
 samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
 samp_y = [2.75 for x in samp_x]
 M = np.mean(samp_x)
-std_err = np.std(samp_x) / np.sqrt(samp_size)
+std_err = np.std(samp_x, ddof = 1) / np.sqrt(samp_size)
 #
 ax2.set_xlim(xmin, xmax)
 ax2.set_ylim(0.5, 3)
@@ -363,20 +365,21 @@ ax2.scatter(samp_x, samp_y, marker = 'o', facecolors='none', edgecolors='red', l
 ax2.text(xmax, 2.75, 'Sample $n = 15$', size = 16, color = 'red', va = 'center', ha = 'right')
 ax2.scatter(M, 2.25, marker = 'o', facecolors = 'g', edgecolors='g', linewidths = 1.5, s = 64)
 ax2.errorbar(M, 2.25, xerr = t_stat * std_err, fmt = 'None', ecolor = 'g', elinewidth = 1.5, capsize = 10, capthick = 1.5)
-ax2.text(xmax, 2.25, 'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
+ax2.text(xmax, 2.25, r'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
 ax2.text(M, 2, 'M', size = 20, color = 'g', ha = 'center', va = 'center')
 #
 samp_size = 50
+t_stat = stats.t.ppf(1-0.025, samp_size - 1)
 samp_x = norm.rvs(size = samp_size, loc = mu, scale = sig, random_state = rng)
 samp_y = [1.25 for x in samp_x]
 M = np.mean(samp_x)
-std_err = np.std(samp_x) / np.sqrt(samp_size)
+std_err = np.std(samp_x, ddof = 1) / np.sqrt(samp_size)
 #
 ax2.scatter(samp_x, samp_y, marker = 'o', facecolors='none', edgecolors='red', linewidths = 1.5, s = 48)
 ax2.text(xmax, 1.25, 'Sample $n = 50$', size = 16, color = 'red', va = 'center', ha = 'right')
 ax2.scatter(M, 0.75, marker = 'o', facecolors = 'g', edgecolors='g', linewidths = 1.5, s = 64)
-ax2.errorbar(M, 0.75, xerr = 1.96 * std_err, fmt = 'None', ecolor = 'g', elinewidth = 1.5, capsize = 10, capthick = 1.5)
-ax2.text(xmax, 0.75, 'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
+ax2.errorbar(M, 0.75, xerr = t_stat * std_err, fmt = 'None', ecolor = 'g', elinewidth = 1.5, capsize = 10, capthick = 1.5)
+ax2.text(xmax, 0.75, r'Confidence Interval for $\mu$', size = 16, color = 'g', va = 'center', ha = 'right')
 ax2.text(M, 0.5, 'M', size = 20, color = 'g', ha = 'center', va = 'center')
 
 #ax2.text(M+f, 1.75, r'$M + f$', size = 20, color = 'g', ha = 'left', va = 'center')
@@ -386,7 +389,7 @@ ax2.xaxis.set_visible(False)
 for spine in ax2.spines.values():
     spine.set_visible(False)
 #
-ax1a.text(mu, np.sum(ax1a.get_ylim())/2, '$\mu$', size = 20, color = 'darkblue', ha = 'center')
+ax1a.text(mu, np.sum(ax1a.get_ylim())/2, r'$\mu$', size = 20, color = 'darkblue', ha = 'center')
 # ax1a.text(mu+sig, np.sum(ax1a.get_ylim())/2, '$\mu+\sigma$', size = 20, color = 'darkblue', ha = 'left')
 ax1a.text(mu, ax1a.get_ylim()[1], '^', size = 20, color = 'darkblue', ha = 'center')
 # ax1a.text(mu+sig, ax1a.get_ylim()[1], '^', size = 20, color = 'darkblue', ha = 'left')
@@ -423,7 +426,7 @@ There are standard ways for reporting confidence intervals.
 
 In text, we write:
 
-$M = 30.5 \text{cm, 95% CI } [18.0, 43.0]$
+$M = 30.5 \text{ cm, 95\% CI } [18.0, 43.0]$
 
 In a table, we can use this format:
 
@@ -500,9 +503,9 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-a. In this problem the sample size $n$ is equal to 40, the sample mean $\overline{X}$ is equal to 310 kWh, and the population standard deviation $\sigma$ is 89 kWh. Then from the CLT we know that
-$$\overline{X} \sim N\left(310, \left( \frac{89}{\sqrt{40}}\right)^2\right).$$ Since the population standard deviation is provided, we can use the $Z$-score of 1.96 for the 95\% confidence interval computation (see the $Z$-table). The desired interval is then given by 
-$$\left[\overline{X}-1.96\:\frac{\sigma}{n}, \overline{X}+1.96\:\frac{\sigma}{n}\right] = \left[310 - 1.96 \frac{89}{\sqrt{40}}, 310 + 1.96 \frac{89}{\sqrt{40}}\right]=\left[282.4, 337.6\right].$$
+a. In this problem the sample size $n$ is equal to 40, the sample mean $M$ is equal to 310 kWh, and the population standard deviation $\sigma$ is 89 kWh. Then from the CLT we know that
+$$M \sim N\left(310, \left( \frac{89}{\sqrt{40}}\right)^2\right).$$ Since the population standard deviation is provided, we can use the $Z$-score of 1.96 for the 95\% confidence interval computation (see the $Z$-table). The desired interval is then given by 
+$$\left[M-1.96\:\frac{\sigma}{\sqrt{n}}, M+1.96\:\frac{\sigma}{\sqrt{n}}\right] = \left[310 - 1.96 \frac{89}{\sqrt{40}}, 310 + 1.96 \frac{89}{\sqrt{40}}\right]=\left[282.4, 337.6\right].$$
 b. For the 99\% confidence interval the $Z$-score is equal to 2.58 (see the $Z$-table). Thus, we obtain
-$$\left[\overline{X}-2.58\:\frac{\sigma}{n}, \overline{X}+2.58\:\frac{\sigma}{n}\right] = \left[310 - 2.58 \frac{89}{\sqrt{40}}, 310 + 2.58 \frac{89}{\sqrt{40}}\right]=\left[273.7, 346.3\right].$$
+$$\left[M-2.58\:\frac{\sigma}{\sqrt{n}}, M+2.58\:\frac{\sigma}{\sqrt{n}}\right] = \left[310 - 2.58 \frac{89}{\sqrt{40}}, 310 + 2.58 \frac{89}{\sqrt{40}}\right]=\left[273.7, 346.3\right].$$
 :::
