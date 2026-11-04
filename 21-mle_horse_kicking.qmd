@@ -8,7 +8,7 @@ title: Parameter Estimation Practice
 
 - Practice solving MLE questions
 - Practice solving MoM questions
-- Practive evaluating estimators in terms of bias, variance, and MSE
+- Practice evaluating estimators in terms of bias, variance, and MSE
 
 :::
 
@@ -41,6 +41,21 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+Likelihood:
+$$p(X_s;\theta) = \prod_{i=1}^n \theta(1-\theta)^{x_i-1} = \theta^n (1-\theta)^{\sum_{i=1}^n x_i - n}$$
+
+Log-likelihood:
+$$\log p(X_s;\theta) = n\log\theta + \left(\sum_{i=1}^n x_i - n\right)\log(1-\theta)$$
+
+Derivative set to zero:
+$$\frac{n}{\theta} - \frac{\sum_{i=1}^n x_i - n}{1-\theta} = 0 \;\Rightarrow\; n(1-\theta) = \theta\left(\sum_{i=1}^n x_i - n\right) \;\Rightarrow\; n = \theta\sum_{i=1}^n x_i$$
+
+$$\hat{\theta}_{MLE} = \frac{n}{\sum_{i=1}^n x_i} = \frac{1}{\bar{x}}$$
+
+Example: data $\{1, 3, 2\}$ gives $\bar{x} = 2$, so $\hat{\theta} = 0.5$.
+:::
+
 
 ## Group Question 1
 :::{style="font-size: .8em"}
@@ -70,6 +85,17 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+:::
+
+:::{.notes}
+First moment of a geometric RV: $E[X] = \frac{1}{\theta}$.
+
+First sample moment: $\bar{x} = \frac{1}{n}\sum_{i=1}^n x_i$.
+
+Set them equal: $\frac{1}{\theta} = \bar{x}$, so
+$$\hat{\theta}_{MoM} = \frac{1}{\bar{x}} = \frac{n}{\sum_{i=1}^n x_i}.$$
+
+Same answer as the MLE.
 :::
 
 ## Group Question 2
@@ -105,6 +131,11 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+The data has two 0s, two 1s and one 2:
+$$p(X_s;\theta) = p(1)\,p(1)\,p(0)\,p(2)\,p(0) = \left(\frac{\theta}{2}\right)^2 (1-\theta)\left(\frac{\theta}{2}\right)(1-\theta) = \left(\frac{\theta}{2}\right)^3(1-\theta)^2 = \frac{\theta^3(1-\theta)^2}{8}$$
+:::
+
 ## Group Question 2
 :::{style="font-size: .8em"}
 
@@ -135,6 +166,14 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+b. Log-likelihood:
+$$\log p(X_s;\theta) = 3\log\theta + 2\log(1-\theta) - 3\log 2$$
+
+c. Derivative set to zero:
+$$\frac{3}{\theta} - \frac{2}{1-\theta} = 0 \;\Rightarrow\; 3(1-\theta) = 2\theta \;\Rightarrow\; \hat{\theta}_{MLE} = \frac{3}{5} = 0.6$$
+:::
+
 ## Group Question 2
 :::{style="font-size: .8em"}
 
@@ -145,7 +184,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-   d. Find the method of moments estimate of \(\theta.\)
+   d. Find the method of moments estimate of \(\small \theta.\)
        <br>
     <br>
     <br>
@@ -165,6 +204,19 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+First moment:
+$$E[X] = 0(1-\theta) + 1\cdot\frac{\theta}{2} + 2\cdot\frac{\theta}{2} = \frac{3\theta}{2}$$
+
+Sample mean:
+$$\bar{x} = \frac{1+1+0+2+0}{5} = \frac{4}{5}$$
+
+Set equal: $\frac{3\theta}{2} = \frac{4}{5}$, so
+$$\hat{\theta}_{MoM} = \frac{8}{15} \approx 0.533$$
+
+Note this differs from the MLE ($0.6$).
+:::
+
 ## Group Question 3
 :::{style="font-size: .8em"}
 
@@ -175,7 +227,7 @@ def generate_html():
     return r"""
     <div class="blue-box">
         <p>
-   Suppose \(\small X_1\) and \(\small X_2\) are independent random variables. \(\small X_1\) follows an exponential distribution with parameter \(\small \frac{1}{\theta}\). \( \small X_2\) is uniformly distributed on interval \(\small [0,\theta].\) \(\small \theta\) is unknown. Consider the following estimator for \(\small \theta:\)
+   Suppose \(\small X_1\) and \(\small X_2\) are independent random variables. \(\small X_1\) follows an exponential distribution with parameter \(\small \frac{1}{\theta}\). \( \small X_2\) is uniformly distributed on the interval \(\small [0,\theta].\) \(\small \theta\) is unknown. Consider the following estimator for \(\small \theta:\)
     $$\small \hat{\theta} = \frac{1}{4}x_1 + \frac{3}{2}x_2.$$
     Here, \(x_1\) and \(x_2\) are realizations of \(X_1\) and \(X_2\), respectively. <br>
 a. Compute the bias of \(\small \hat{\theta}.\)
@@ -192,6 +244,16 @@ html_content = generate_html()
 display(HTML(html_content))
 ```
 
+:::
+
+:::{.notes}
+Facts: $X_1 \sim \text{Exp}(\lambda = 1/\theta)$ has $E[X_1] = \theta$. $X_2 \sim U[0,\theta]$ has $E[X_2] = \frac{\theta}{2}$.
+
+a. By linearity of expectation:
+$$E[\hat{\theta}] = \frac{1}{4}E[X_1] + \frac{3}{2}E[X_2] = \frac{\theta}{4} + \frac{3\theta}{4} = \theta$$
+$$\text{Bias}(\hat{\theta}) = E[\hat{\theta}] - \theta = 0$$
+
+b. Yes. The bias is $0$ for every value of $\theta$, so $\hat{\theta}$ is unbiased.
 :::
 
 ## Group Question 3
@@ -224,6 +286,16 @@ display(HTML(html_content))
 
 :::
 
+:::{.notes}
+Facts: $\text{Var}(X_1) = \theta^2$ and $\text{Var}(X_2) = \frac{\theta^2}{12}$.
+
+c. $X_1$ and $X_2$ are independent, so
+$$\text{Var}(\hat{\theta}) = \left(\frac{1}{4}\right)^2\text{Var}(X_1) + \left(\frac{3}{2}\right)^2\text{Var}(X_2) = \frac{\theta^2}{16} + \frac{9}{4}\cdot\frac{\theta^2}{12} = \frac{\theta^2}{16} + \frac{3\theta^2}{16} = \frac{\theta^2}{4}$$
+
+d.
+$$\text{MSE}(\hat{\theta}) = \text{Var}(\hat{\theta}) + \text{Bias}(\hat{\theta})^2 = \frac{\theta^2}{4} + 0 = \frac{\theta^2}{4}$$
+:::
+
 
 
 
@@ -235,7 +307,7 @@ display(HTML(html_content))
 
 ## Train Problem
 :::{style="font-size: .8em"}
-__Example__: A railroad gives each train a number starting from 1 up to some number 𝑁. One day, you see a train with the number 60. 
+__Example__: A railroad gives each train a number starting from 1 up to some number $N$. One day, you see a train with the number 60. 
 
 :::{.center-text}
 <img src="images/train/train60.jpeg" width=350/>
@@ -276,7 +348,7 @@ Hence, the maximum likelihood estimate is: $\hat{\theta} = 60.$
 
 ## Horse-Kick Fatalities
 :::{style="font-size: .8em"}
-__Example__: Recall that Bortkiewicz studied deaths by horse-kick in the Prussian army over 200 years to see if they occurred at a constant rate. He modeled the data using a Poisson distribution, estimating the parameter $\lambda.$  
+__Example__: Recall that Bortkiewicz studied deaths by horse-kick in the Prussian army over 20 years to see if they occurred at a constant rate. He modeled the data using a Poisson distribution, estimating the parameter $\lambda.$  
 
 ```{python}
 import pandas as pd
@@ -311,7 +383,7 @@ The likelihood and log-likelihood functions then become
 
 $$p(X_s;\theta) = \prod_{i=1}^{m} \theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!},$$
 
-$$ \log p(X_s; \theta) = \sum_{i=0}^m \log \left(\theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!}\right).$$ 
+$$ \log p(X_s; \theta) = \sum_{i=1}^m \log \left(\theta^{x^{(i)}} \frac{e^{- \theta}}{x^{(i)}!}\right).$$ 
 
 :::
 
@@ -323,7 +395,7 @@ $$ \log p(x^{(i)}; \theta) = \log \left(\theta^{x^{(i)}} \frac{e^{- \theta}}{x^{
 
 Using this we can express the log-likelihood of the data as
     
-$$ \log p(X_s; \theta) =  \sum_{i=0}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right) $$
+$$ \log p(X_s; \theta) =  \sum_{i=1}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right) $$
 :::
 
 ## Horse-Kick Fatalities
@@ -354,16 +426,16 @@ To find the maximum of the log-likelihood of the data as a function of $\theta$,
 ## Horse-Kick Fatalities
 :::{style="font-size: .8em"}
 __Example (continued)__: 
-$$\small{\frac{\partial}{\partial\theta}\log p(X_s; \theta) = \frac{\partial}{\partial\theta} \sum_{i=0}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right)}$$
+$$\small{\frac{\partial}{\partial\theta}\log p(X_s; \theta) = \frac{\partial}{\partial\theta} \sum_{i=1}^m \left( x^{(i)} \log \theta - \theta - \log x^{(i)}!\right)}$$
 
-$$\small{=\sum_{i=0}^m \left(x^{(i)} \frac{1}{\theta} - 1 \right)
-= \frac{1}{\theta}\sum_{i=0}^m x^{(i)} - m.}$$
+$$\small{=\sum_{i=1}^m \left(x^{(i)} \frac{1}{\theta} - 1 \right)
+= \frac{1}{\theta}\sum_{i=1}^m x^{(i)} - m.}$$
 
 Setting the derivative to zero, we get the expression for the ML estimator 
 
-$$\small{\frac{1}{{\theta}}\sum_{i=0}^m x^{(i)} - m = 0,}$$
+$$\small{\frac{1}{{\theta}}\sum_{i=1}^m x^{(i)} - m = 0,}$$
 
-$$\small{{\hat{\theta}} = \frac{1}{m}\sum_{i=0}^m x^{(i)}.}$$
+$$\small{{\hat{\theta}} = \frac{1}{m}\sum_{i=1}^m x^{(i)}.}$$
 
 :::
 
@@ -396,10 +468,10 @@ plt.text(mle+0.05, ymin+20, r'$\hat{\theta} = 0.61$', size = 16, ha = 'left', va
 
 plt.ylabel('Log-Likelihood', size = 16)
 plt.xlabel(r'$\theta$', size = 16)
-plt.title('MLE of theta for Poisson Model applied to Horse-Kick Data', size = 18);
+plt.title(r'MLE of $\theta$ for Poisson Model applied to Horse-Kick Data', size = 18);
 ```
 
-The plot confirms that 0.61 is indeed a maximum. Therefore, the MLE for $\theta$, $\hat{\theta}$ = 0.61.
+The plot confirms that 0.61 is indeed a maximum. Therefore, the MLE for $\theta$, $\hat{\theta} = 0.61$.
 
 :::
 
@@ -438,10 +510,10 @@ __Example (continued)__:
 The figure shows that the Poisson model is indeed a very good fit to the data!
 <br><br>
 
-From this, Bortkeiwicz concluded that there was nothing particularly unusual about the years when there were many deaths by horse-kick.  They could be just what is expected if deaths occurred at a constant rate.
+From this, Bortkiewicz concluded that there was nothing particularly unusual about the years when there were many deaths by horse-kick.  They could be just what is expected if deaths occurred at a constant rate.
 :::
 
-## Group Quesiton 1
+## Group Question 1
 :::{style="font-size: .8em"}
 
 | $x$ | $1$ | $2$ |
@@ -456,7 +528,7 @@ def generate_html():
         <p>
    Suppose that \(X\) is a discrete random variable with the probability mass function given by the table above.<br>
 
-Three independent oservations are made from this distribution:
+Three independent observations are made from this distribution:
 \(x_1 = 1, x_2 = 2, x_3 = 2.\)<br>
 
     a. Find the likelihood function.<br>
@@ -472,7 +544,7 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Quesiton 1
+## Group Question 1
 :::{style="font-size: .8em"}
 ```{python}
 def qloglik(theta):
@@ -510,7 +582,7 @@ display(HTML(html_content))
 ```
 :::
 
-## Group Quesiton 2
+## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -541,7 +613,7 @@ display(HTML(html_content))
 :::
 
 
-## Group Quesiton 2
+## Group Question 2
 :::{style="font-size: .8em"}
 
 ```{python}
