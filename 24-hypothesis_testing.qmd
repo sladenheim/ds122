@@ -74,7 +74,7 @@ The table below sums up the results of the simulations, each simulating a sample
 __Questions__: 
 
 - Based on the simulations what is the probability of getting a sample with at least 20% left-handed students?
-- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12? 
+- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12%? 
 :::
 
 ## Fisher's Approach
@@ -130,8 +130,8 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> The \(p\)-value </span>
         <p>
-        Consider an observed test statistic \(t\) from an unknown distribution \(T.\)  Then the p-value \(p\)
-        is the probability of observing a test-statistic value at least as "extreme" as \(t\) if null hypothesis \(H_{0}\) were true.
+        Consider an observed test statistic \(t\) with distribution \(T\) under the null hypothesis \(H_{0}\).  Then the p-value \(p\)
+        is the probability of observing a test-statistic value at least as "extreme" as \(t\) if the null hypothesis \(H_{0}\) were true.
         </p>
     </div>
     """
@@ -141,6 +141,10 @@ display(HTML(html_content))
 <br>
 
 In other words, the p-value is the probability of obtaining test results at least as extreme as the result actually observed, under the assumption that the null hypothesis is correct.
+:::
+
+::: {.notes}
+A test-statistic is a single number calculated from your data to measure how far your result is from what the null hypothesis predicts. You compare it to the values you'd expect if the null hypothesis were true. If it lands far out in the tail of the distribution, the result is "surprising" and you have evidence to reject the null hypothesis.
 :::
 
 ##  The Lady Tasting Tea
@@ -172,7 +176,15 @@ Let a random variable $X$ be equal to the number of successes. Then
 
 $${\displaystyle X\sim \operatorname {Hypergeometric} (N=8,K=4,n=4)},$$
 
-where $N$ is the population size or total number of cups of tea, $K$ is the number of success states in the population or four cups of either type, and $n$ is the number of draws, or four cups. 
+where $N$ is the population size or total number of cups of tea, $K$ is the number of success states in the population ($K=4$ milk-first cups), and $n$ is the number of draws ($n=4$ cups chosen). 
+:::
+
+::: {.notes}
+The hypergeometric distribution gives the probability of getting k "successes" when you draw n items without replacement from a population of N items, K of which are successes.
+
+$$
+P(X=k) = \frac{{\binom{K}{k} \binom{N-K}{n-k}}}{{\binom{N}{n}}}
+$$
 :::
 
 ##  The Lady Tasting Tea
@@ -186,7 +198,7 @@ And what is the _p_-value?   This is
 
 $$ p = P(X \ge t) = P(X \ge 4) = \frac{1}{70} \approx 1.4\%  $$
 
-In other words, if the lady were in fact choosing at random, this outcome would happen only about 1.4% of the time, ie, one time in 70.
+In other words, if the lady were in fact choosing at random, this outcome would happen only about 1.4% of the time, i.e., one time in 70.
 
 Given this result, Fisher was willing to conclude that the lady's tea identification was not random, and therefore he was willing to _**reject the null hypothesis.**_
 :::
@@ -196,7 +208,7 @@ Given this result, Fisher was willing to conclude that the lady's tea identifica
 _**What if she had failed? What if the lady had chosen instead two cups of each kind of tea?**_   
 
 
-In this case, the probability of an outcome as extreme as that is 75%.
+In this case, the probability of an outcome as extreme as that is $P(X \ge 2) = \frac{53}{70} \approx 76\%$.
 
 Should we then conclude that the null hypothesis is _**true**_?
 
@@ -205,6 +217,10 @@ Definitely _**not.**_  By choosing as she did, the lady would not be providing a
 <br><br>
 As Fisher emphasized, we can never accept the null hypothesis - _**we can only fail to reject it**_.
 
+:::
+
+::: {.notes}
+Not having evidence for somethign, doesn't prove its opposite is true. Court renders a "not guilty" verdict, but that doesn't mean the defendant is innocent (just not enough evidence to convict).
 :::
 
 ##  Neyman-Pearson Approach
@@ -234,14 +250,15 @@ Jerzy Neyman and Egon Pearson advanced an approach to deal with this.
 :::
 :::
 
+:::
+
 They argued that the experimenter should make a statement in advance about what they are looking for.   They called this the __alternative hypothesis.__
 
-:::
 :::
 
 ##  Alternative Hypothesis
 :::{style="font-size: .8em"}
-__Example__: Let's say we are investigating whether a vaccine shortens the duration of an infectious illness.
+__Example__: Let's say we are investigating whether a vaccine affects the duration of an infectious illness.
 
 We would state two hypotheses:
     
@@ -350,7 +367,7 @@ def generate_html():
     <div class="purple-box">
      <span class="label"> Type II Error </span>
         <p>
-        A type II error is accepting the null hypothesis when it is false.
+        A type II error is failing to reject the null hypothesis when it is false.
         </p>
     </div>
     """
@@ -384,7 +401,7 @@ display(HTML(html_content))
 
 __Remark__: The power of the test equals $1-\beta$.
 
-__Example__: In a medical test, there is a big difference between a false positive and a false negative errors.
+__Example__: In a medical test, there is a big difference between a false positive and a false negative error.
 
 Consider a cancer screen.  
 
@@ -430,7 +447,7 @@ So they would demand to see a small $p$-value, less than 0.001, in order to reje
 
 However, this means that in doing so, they run the risk of false negatives -- failing to detect an effect that is present.
 
-In the Neyman-Pearson framework, we don't look at the value of $p$ other than to compare it to $\alpha$.  That is, unlike Fisher's approach, we don't use $p$ to tell us "how big the effect is."  
+In the Neyman-Pearson framework, we don't look at the value of $p$ other than to compare it to $\alpha$.  That is, unlike Fisher's approach, we don't use $p$ to tell us "how strong the evidence against $H_0$ is."  
 
 For example, if $\alpha$ were 0.05, we would reject the null hypothesis if $p$ were 0.04, or 0.01, or 0.00001.   
 :::
@@ -443,7 +460,7 @@ For example, if $\alpha$ were 0.05, we would reject the null hypothesis if $p$ w
 __Questions__: 
 
 - Based on the simulations what is the probability of getting a sample with at least 20% left-handed students?
-- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12? 
+- Does the evidence support Zaza’s suspicion that the proportion of left-handed students at BU is greater than 12%? 
 :::
 
 ## Left-Handedness at BU
@@ -458,7 +475,7 @@ __Questions__:
 :::
 
 :::{style="font-size: .8em"}
-The probability of getting a sample with at least 20% left-handed students is the sum of the number of frequencies at and above 20, divided by the total number simulations:
+The probability of getting a sample with at least 20% left-handed students is the sum of the frequencies at and above 20, divided by the total number of simulations:
  $$\small \frac{41 + 10 + 5 + 4}{1000} = 0.06. $$
 :::
 
@@ -466,7 +483,7 @@ The probability of getting a sample with at least 20% left-handed students is th
 :::{style="font-size: .8em"}
 Zaza let the null hypothesis be that the actual percentage of left-handed students is 12% versus the alternative hypothesis that the actual percentage is higher than that.
 
-Zaza decided to reject the hypothesis if the simulated outcome has the probability less than 1% under the null hypothesis. 
+Zaza decided to reject the null hypothesis if the observed outcome has probability less than 1% under the null hypothesis. 
 
 What should Zaza conclude regarding the null hypothesis?
 
@@ -492,6 +509,7 @@ def generate_html():
     <br>
     <br>
     <br>
+    </p>
     </div>
     """
 html_content = generate_html()
@@ -500,8 +518,10 @@ display(HTML(html_content))
 :::
 
 :::{.notes}
-a. To find the significance level, we need to find the probability that the hypothesis is rejected. From the question, we know that happens if 0 or 10 heads are observed. Thus, we need to find $P(X=0 or 10)$. To find this, we plug both 0 and 10 into the binomial PDF, with n =10 and p=.5. 
-\[ = {10 \choose 0} (.5)^0 (.5)^{10} + {10 \choose 10} (.5)^{10} (.5)^0 \] This equals 0.002. \\
-b. To find the power of the test when the true probability is .1, we need to find the probability the test rejects the null hypothesis (which it should) when the probability is .1. To find this, we find $ P(X = 0 | p = .1) + P(X = 10 | p =.1) $ 
-\[ = {10 \choose 0} (.1)^0 (.9)^{10} + {10 \choose 10} (.1)^{10} (.9)^0\] This comes out to 0.349, which is the power of the test. 
+a. To find the significance level, we need to find the probability that the hypothesis is rejected. From the question, we know that happens if 0 or 10 heads are observed. Thus, we need to find $P(X=0 \text{ or } X=10)$. To find this, we plug both 0 and 10 into the binomial PMF, with $n=10$ and $p=0.5$:
+$$ {10 \choose 0} (0.5)^0 (0.5)^{10} + {10 \choose 10} (0.5)^{10} (0.5)^0 \approx 0.002. $$
+
+b. To find the power of the test when the true probability is 0.1, we need to find the probability the test rejects the null hypothesis (which it should) when the probability is 0.1. To find this, we find $P(X = 0 \mid p = 0.1) + P(X = 10 \mid p = 0.1)$:
+$$ {10 \choose 0} (0.1)^0 (0.9)^{10} + {10 \choose 10} (0.1)^{10} (0.9)^0 \approx 0.349. $$
+This is the power of the test.
 :::
