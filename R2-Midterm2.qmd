@@ -1,0 +1,847 @@
+---
+title: Review - Midterm 2
+---
+
+## Setup
+
+1. Wednesday November 11, 1:15-2:15PM, CGS 511
+2. Practice exam: instructions, formula sheet, z-table
+3. 5 questions
+    - 1 question: MCQs (no explanation)
+    - 4 free response questions
+    - No coding question
+4. Calculators allowed but NOT provided (no symbolic math)
+5. **NO PHONES**
+
+## Questions
+
+- Practice Exams
+- HW4 (CLT), HW5, HW6, HW7
+- Group questions in lecture notes
+- Discussion questions (Discussions 5-9)
+
+## Topics
+
+1. Weak Law of Large Numbers and Central Limit Theorem
+2. Markov Chains: state-transition diagrams, transition matrices, steady-states, convergence, etc.
+3. Hidden Markov Models: Emission matrix, Viterbi algorithm, etc.
+4. Parameter Estimation: MLE, MOM, etc.
+5. Confidence Intervals
+
+## Law of Large Numbers (L11)
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Weak Law of Large Numbers </span>
+        <p>
+        Let \(\small X_1, X_2, \dots\) be independent random variables with \(\small E[X_i] = \mu\) and \(\small \operatorname{Var}(X_i) = \sigma^2\). Let \(\small \overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i\). Then, for any \(\small \varepsilon > 0\),
+        $$\small{P(|\overline{X}_n - \mu| \geq \varepsilon) \to 0 \quad \text{as } n \to \infty.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__In words__: the sample average settles down to the true mean as $\small n$ grows.
+
+__Why__: $\small E[\overline{X}_n] = \mu$ and $\small \operatorname{Var}(\overline{X}_n) = \frac{\sigma^2}{n} \to 0$.
+
+:::: {.incremental}
+- The WLLN tells us _where_ $\small \overline{X}_n$ goes. What does it _not_ tell us about $\small \overline{X}_n$ for a fixed $\small n$?
+::::
+:::
+
+:::{.notes}
+It says nothing about the shape of the distribution of $\overline{X}_n$. That is what the CLT gives us.
+:::
+
+## Central Limit Theorem (L11)
+
+:::{style="font-size: .7em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> The Central Limit Theorem (CLT) </span>
+        <p>
+        Let \(\small X_1, X_2, \dots\) be i.i.d. with mean \(\small \mu\) and variance \(\small \sigma^2\), and let \(\small S_n = \sum_{i=1}^n X_i\). Then
+        $$\small{\frac{S_n - n\mu}{\sigma\sqrt{n}}}$$
+        tends to the standard normal distribution as \(\small n \to \infty\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Working version__ (for large $\small n$):
+
+| Quantity | Approximate distribution | Standardize with |
+|---|:--:|:--:|
+| Sum $\small S_n = X_1 + \dots + X_n$ | $\small N(n\mu,\; n\sigma^2)$ | $\small Z = \frac{S_n - n\mu}{\sigma\sqrt{n}}$ |
+| Average $\small \overline{X}_n = \frac{1}{n}S_n$ | $\small N\left(\mu,\; \frac{\sigma^2}{n}\right)$ | $\small Z = \frac{\overline{X}_n - \mu}{\sigma/\sqrt{n}}$ |
+
+__Recipe__: find $\small \mu$ and $\small \sigma^2$ of _one_ $\small X_i$, scale up to the sum or average, standardize, read the $\small z$-table.
+
+:::: {.incremental}
+- The $\small X_i$ do _**not**_ need to be normal. How large $\small n$ must be depends on how skewed / heavy-tailed the $\small X_i$ are.
+- Be careful: the standard deviation of the sum is $\small \sigma\sqrt{n}$, not $\small \sigma n$.
+::::
+:::
+
+## CLT
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    Let \(\small X_1, X_2, \ldots, X_{10}\) be independent continuous random variables, each uniformly distributed over \(\small  [0,1].\) <br>
+
+    a. Use the CLT to approximate the distribution of \(\small  S_{10} = \sum_{i=1}^{10} X_i.\) <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    
+    b. Calculate an approximation to \(\small  P(S_{10} > 6).\)
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+     </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. Each $X_i \sim U[0,1]$ has $\mu = E[X_i] = \frac{1}{2}$ and $\sigma^2 = \operatorname{Var}(X_i) = \frac{1}{12}$. By the CLT, the sum is approximately normal with mean $n\mu$ and variance $n\sigma^2$:
+$$S_{10} \approx N\left(10 \cdot \tfrac{1}{2},\; 10 \cdot \tfrac{1}{12}\right) = N\left(5,\; \tfrac{5}{6}\right).$$
+
+b. Standardize with $\sigma\sqrt{n} = \sqrt{5/6} \approx 0.913$:
+$$P(S_{10} > 6) \approx P\left(Z > \frac{6 - 5}{\sqrt{5/6}}\right) = P(Z > 1.10) = 1 - 0.8643 \approx 0.136.$$
+:::
+
+## Markov Chains (L12)
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Markov Chain and Transition Matrix </span>
+        <p>
+        A process \(\small X_0, X_1, \dots\) on a finite set of states \(\small S\) is a <b>Markov chain</b> if the next state depends only on the current state:
+        $$\small{P(X_{n+1} = i \mid X_n = j, X_{n-1} = x_{n-1}, \dots, X_0 = x_0) = P(X_{n+1} = i \mid X_n = j).}$$
+        <b>Transition matrix:</b> \(\small P_{ij} = P(X_{n+1} = i \mid X_n = j)\) &nbsp; (column \(\small j\) = "from", row \(\small i\) = "to").<br>
+        <b>n-step transition matrix:</b> \(\small P^{(n)}_{ij} = P(X_n = i \mid X_0 = j)\), and \(\small P^{(n)} = P^n\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Distributions Over States (Forward Kolmogorov) </span>
+        <p>
+        If \(\small \mathbf{x}_n\) is the probability vector with \(\small \mathbf{x}_{n,i} = P(X_n = i)\), then by the law of total probability
+        $$\small{\mathbf{x}_{n+1} = P\mathbf{x}_n, \qquad \mathbf{x}_n = P^n \mathbf{x}_0.}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.incremental}
+- In our convention, do the _rows_ or the _columns_ of $\small P$ sum to 1?
+- How do you go from a state-transition diagram to $\small P$ (and back)?
+::::
+:::
+
+:::{.notes}
+Columns sum to 1: column $j$ lists where you can go from state $j$. Each arrow $j \to i$ with label $p$ in the diagram becomes entry $P_{ij} = p$.
+:::
+
+## Steady States (L13)
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Steady State </span>
+        <p>
+        A nonzero vector \(\small \mathbf{x}\) with \(\small P\mathbf{x} = \mathbf{x}\) is a <b>steady state</b> of the chain. We usually scale it so its entries sum to 1 (a probability vector \(\small \boldsymbol{\pi}\)).<br>
+        <b>Theorem:</b> Every finite-state Markov chain has at least one steady state.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Detailed Balance </span>
+        <p>
+        A chain satisfies <b>detailed balance</b> with respect to \(\small \boldsymbol{\pi}\) if \(\small \pi_i P_{ji} = \pi_j P_{ij}\) for all \(\small i, j\).<br>
+        <b>Theorem:</b> If a chain satisfies detailed balance with respect to \(\small \boldsymbol{\pi}\), then \(\small \boldsymbol{\pi}\) is a steady state.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Finding $\small \boldsymbol{\pi}$__: solve $\small (P - I)\boldsymbol{\pi} = \mathbf{0}$ together with $\small \sum_i \pi_i = 1$. __Checking__ a candidate: just compute $\small P\boldsymbol{\pi}$.
+
+:::: {.incremental}
+- Is detailed balance _necessary_ for $\small \boldsymbol{\pi}$ to be a steady state?
+::::
+:::
+
+:::{.notes}
+No. Detailed balance is sufficient, not necessary. A chain can have a steady state that does not satisfy detailed balance (e.g., a chain that cycles 1 → 2 → 3 → 1 has steady state (1/3, 1/3, 1/3), but probability only flows one way around the cycle).
+:::
+
+## Convergence of Markov Chains (L14)
+
+:::{style="font-size: .62em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Irreducibility, Periodicity, Regularity </span>
+        <p>
+        <ul>
+        <li>State \(\small j\) <b>reaches</b> state \(\small i\) if \(\small P^{(n)}_{ij} > 0\) for some \(\small n\). States that reach each other <b>communicate</b>.</li>
+        <li>A chain is <b>irreducible</b> if all states communicate.</li>
+        <li>The <b>period</b> \(\small d\) of state \(\small i\) is the largest integer such that \(\small P^{(n)}_{ii} = 0\) whenever \(\small n\) is not divisible by \(\small d\). If \(\small d > 1\) the state is <b>periodic</b>; if \(\small d = 1\) it is <b>aperiodic</b>. Communicating states have the same period.</li>
+        <li>A chain is <b>regular</b> if some power \(\small P^k\) has only strictly positive entries.</li>
+        </ul>
+        Regular \(\small \iff\) irreducible and aperiodic.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Markov Chain Convergence </span>
+        <p>
+        Every <b>regular</b> Markov chain has a unique steady state \(\small \boldsymbol{\pi}\), and for <b>any</b> initial distribution \(\small \mathbf{x}_0\), \(\small \mathbf{x}_k = P^k\mathbf{x}_0 \to \boldsymbol{\pi}\) as \(\small k \to \infty\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::: {.incremental}
+- A state has a self-loop ($\small P_{ii} > 0$). What is its period?
+::::
+:::
+
+## Markov Chain
+
+:::{style="font-size: .75em"}
+
+A robot vacuum moves between 4 rooms arranged in a hallway. Every minute it moves to a new room according to the state-transition diagram below.
+
+```{dot}
+//| fig-width: 7
+//| fig-height: 1.6
+digraph MC {
+  rankdir=LR;
+  node [shape=circle, fontsize=18, width=0.6, fixedsize=true];
+  edge [fontsize=14];
+  1 -> 2 [label="1"];
+  2 -> 1 [label="0.5"];
+  2 -> 3 [label="0.5"];
+  3 -> 2 [label="0.5"];
+  3 -> 4 [label="0.5"];
+  4 -> 3 [label="1"];
+}
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Write down the transition matrix \(\small P\).
+    <br>
+    <br>
+    <br>
+    b. Is the chain irreducible? Find the period of each state.
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. Column $j$ = "from state $j$":
+$$P = \begin{bmatrix} 0 & 0.5 & 0 & 0\\ 1 & 0 & 0.5 & 0\\ 0 & 0.5 & 0 & 1\\ 0 & 0 & 0.5 & 0 \end{bmatrix}.$$
+Each column sums to 1.
+
+b. Yes. Every state reaches every other state and all states communicate. Every step moves you either from an even room to an odd room (or vice versa), so a return to any state takes an even number of steps. Every state has period $d = 2$.
+:::
+
+## Markov Chain
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    c. Is the chain regular? The robot starts in room 1, so \(\small \mathbf{x}_0 = [1, 0, 0, 0]^T\). Compute \(\small \mathbf{x}_1, \mathbf{x}_2, \mathbf{x}_3, \mathbf{x}_4\). Does \(\small \mathbf{x}_n\) converge?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    d. Find a steady state \(\small \boldsymbol{\pi}\) of the chain. <i>Hint: use detailed balance.</i>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+c. No. The chain is irreducible but periodic, so it is not regular: every power $P^k$ has zeros.
+$$\mathbf{x}_1 = \begin{bmatrix}0\\1\\0\\0\end{bmatrix}, \; \mathbf{x}_2 = \begin{bmatrix}0.5\\0\\0.5\\0\end{bmatrix}, \; \mathbf{x}_3 = \begin{bmatrix}0\\0.75\\0\\0.25\end{bmatrix}, \; \mathbf{x}_4 = \begin{bmatrix}0.375\\0\\0.625\\0\end{bmatrix}.$$
+The zeros keep alternating between rooms $\{1,3\}$ and $\{2,4\}$, so $\mathbf{x}_n$ does not converge.
+
+d. Detailed balance, $\pi_i P_{ji} = \pi_j P_{ij}$, for each pair of neighbors:
+$\pi_1 \cdot 1 = \pi_2 \cdot 0.5 \Rightarrow \pi_2 = 2\pi_1$; $\pi_2 \cdot 0.5 = \pi_3 \cdot 0.5 \Rightarrow \pi_3 = \pi_2$; $\pi_3 \cdot 0.5 = \pi_4 \cdot 1 \Rightarrow \pi_4 = \pi_3/2$.
+So $\boldsymbol{\pi} \propto (1, 2, 2, 1)$, and normalizing gives $\boldsymbol{\pi} = \left(\frac{1}{6}, \frac{1}{3}, \frac{1}{3}, \frac{1}{6}\right)$. Check: $P\boldsymbol{\pi} = \boldsymbol{\pi}$.
+A steady state exists (every finite chain has one) even though the chain does not converge to it.
+:::
+
+## Markov Chain
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    e. The robot is reprogrammed: in room 4 it now stays in room 4 with probability 0.5 and moves to room 3 with probability 0.5. Everything else is unchanged.<br>
+    &nbsp;&nbsp;&nbsp; i. What is the new period of each state?<br>
+    &nbsp;&nbsp;&nbsp; ii. Does \(\small \mathbf{x}_n\) now converge for every initial distribution \(\small \mathbf{x}_0\)? Justify your answer.<br>
+    &nbsp;&nbsp;&nbsp; iii. Find the steady state the chain converges to.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+e. The only change is column 4: $P_{34} = 0.5$, $P_{44} = 0.5$.
+
+i. State 4 has a self-loop, so it can return in 1 step: period 1. All states still communicate, so they all have period 1 (aperiodic).
+
+ii. Yes. The chain is irreducible and aperiodic, hence regular. A regular chain has a unique steady state, and $\mathbf{x}_n \to \boldsymbol{\pi}$ for every $\mathbf{x}_0$.
+
+iii. Detailed balance: $\pi_2 = 2\pi_1$, $\pi_3 = \pi_2$, and now $\pi_3 \cdot 0.5 = \pi_4 \cdot 0.5 \Rightarrow \pi_4 = \pi_3$.
+So $\boldsymbol{\pi} \propto (1, 2, 2, 2)$, giving $\boldsymbol{\pi} = \left(\frac{1}{7}, \frac{2}{7}, \frac{2}{7}, \frac{2}{7}\right)$.
+:::
+
+## Hidden Markov Models (L15)
+
+:::{style="font-size: .62em"}
+
+__Assumptions__: (1) _Markov property_ for the hidden states, (2) _stationarity_: transition probabilities do not change over time, (3) _output independence_: the observation at time $\small n$ depends only on the hidden state at time $\small n$.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> HMM Ingredients </span>
+        <p>
+        Hidden states \(\small Q = \{q_1, \dots, q_N\}\), possible observations \(\small V = \{v_1, \dots, v_M\}\).
+        <ul>
+        <li><b>Transition matrix</b> \(\small A\) (\(\small N \times N\)): \(\small A_{ij} = P(\text{state } q_i \text{ at } n+1 \mid \text{state } q_j \text{ at } n)\)</li>
+        <li><b>Emission matrix</b> \(\small B\) (\(\small M \times N\)): \(\small B_{ij} = P(\text{observation } v_i \text{ at } n \mid \text{state } q_j \text{ at } n)\)</li>
+        <li><b>Initial probabilities</b> \(\small \boldsymbol{\pi}\): \(\small \pi_i = P(x_0 = q_i)\)</li>
+        </ul>
+        Columns of \(\small A\) and of \(\small B\) sum to 1.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Joint Probability of Observations and Hidden States </span>
+        <p>
+        For observations \(\small O = (o_0, \dots, o_{T-1})\) and hidden states \(\small X = (x_0, \dots, x_{T-1})\):
+        $$\small{P(O, X) = P(x_0)\prod_{n=1}^{T-1} P(x_n \mid x_{n-1}) \prod_{n=0}^{T-1} P(o_n \mid x_n).}$$
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Decoding__: find the hidden sequence $\small X$ that maximizes $\small P(O, X)$. Brute force checks all $\small N^T$ sequences, which is infeasible.
+:::
+
+## Viterbi Algorithm (L16-17)
+
+:::{style="font-size: .6em"}
+
+$\small C$ (best probabilities so far) and $\small D$ (best previous state) are $\small N \times T$ matrices. Column $\small t$ corresponds to observation $\small o_{t-1}$.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Viterbi: Three Stages </span>
+        <p>
+        <b>1. Initialization:</b> \(\small C_{i1} = B_{\text{cindex}(o_0)\,i}\;\pi_i\), &nbsp; \(\small D_{i1} = 0\).<br><br>
+        <b>2. Forward pass</b> (for \(\small t = 2, \dots, T\)):
+        $$\small{C_{it} = \max_j \; B_{\text{cindex}(o_{t-1})\,i}\; A_{ij}\; C_{j,t-1}, \qquad D_{it} = \operatorname{argmax}_j \; B_{\text{cindex}(o_{t-1})\,i}\; A_{ij}\; C_{j,t-1}.}$$
+        <b>3. Backward pass:</b> \(\small s = \operatorname{argmax}_i C_{iT}\) gives the last hidden state. Then follow \(\small D\) backwards: the entry \(\small D_{sT}\) is the state at time \(\small T-1\), and so on back to column 1.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## HMM
+
+:::{style="font-size: .75em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A parent uses a baby monitor to decide whether the baby is awake or asleep. Every 2 minutes the monitor reports one of two noise levels: 0 - quiet, 1 - noisy. The table gives the probability of each noise level when the baby is awake and when she is asleep.<br><br>
+    <table style="margin: auto; text-align: center; font-size: 0.9em;">
+      <tr><th>state \ noise level</th><th>&nbsp; 0 (quiet) &nbsp;</th><th>&nbsp; 1 (noisy) &nbsp;</th></tr>
+      <tr><th>Awake</th><td>0.5</td><td>0.5</td></tr>
+      <tr><th>Asleep</th><td>0.85</td><td>0.15</td></tr>
+    </table>
+    <br>
+    If the baby was asleep in the last 2 minutes, she remains asleep with probability 80%. If she was awake in the last 2 minutes, she remains awake with probability 60%. When the parent starts monitoring, the baby is asleep with probability 70%.<br><br>
+    Find the most likely states of the baby over the last 4 minutes if the monitor reported <b>noisy, quiet</b>. Always list the awake state first, followed by the asleep state.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## HMM
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    a. Define \(\small \boldsymbol{\pi}, A, B,\) and \(\small O\).
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    b. Perform the initialization stage of the Viterbi algorithm.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. States: 1 = Awake, 2 = Asleep. Observations: row 1 = quiet (0), row 2 = noisy (1). Columns are "from" states.
+$$\boldsymbol{\pi} = \begin{bmatrix}0.3\\0.7\end{bmatrix}, \quad A = \begin{bmatrix}0.6 & 0.2\\0.4 & 0.8\end{bmatrix}, \quad B = \begin{bmatrix}0.5 & 0.85\\0.5 & 0.15\end{bmatrix}, \quad O = (1, 0).$$
+
+b. The first observation is noisy, so we use row 2 of $B$:
+$C_{11} = P(1 \mid Aw)P(Aw) = 0.5 \cdot 0.3 = 0.15$, $C_{21} = P(1 \mid As)P(As) = 0.15 \cdot 0.7 = 0.105$, and $D_{11} = D_{21} = 0$.
+:::
+
+## HMM
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    c. Perform the forward pass of the Viterbi algorithm.
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    d. Perform the backward pass. What is the most likely sequence of states?
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+c. Column 2 (quiet, use $B_{1i}$):
+$C_{12} = \max\{0.5 \cdot 0.6 \cdot 0.15,\; 0.5 \cdot 0.2 \cdot 0.105\} = \max\{0.045, 0.0105\} = 0.045$, $D_{12} = 1$.
+$C_{22} = \max\{0.85 \cdot 0.4 \cdot 0.15,\; 0.85 \cdot 0.8 \cdot 0.105\} = \max\{0.051, 0.0714\} = 0.0714$, $D_{22} = 2$.
+
+$$C = \begin{bmatrix}0.15 & 0.045\\0.105 & 0.0714\end{bmatrix}, \quad D = \begin{bmatrix}0 & 1\\0 & 2\end{bmatrix}.$$
+
+d. The largest entry in the last column of $C$ is $C_{22} = 0.0714$, so $x_1 = $ Asleep. $D_{22} = 2$ gives $x_0 = $ Asleep.
+Viterbi path: (Asleep, Asleep).
+
+Note: $C_{11} > C_{21}$, but the first state is still Asleep. Picking the largest entry in each column of $C$ is not the Viterbi path; you must trace back through $D$.
+:::
+
+## Evaluating Estimators (L19)
+
+:::{style="font-size: .65em"}
+
+__Vocabulary__: a _population_ is the full set of possible observations; a _sample_ is the observed subset; a _statistic_ is any function of the sample; a _point estimator_ $\small \hat{\theta}_m$ is a statistic used to estimate $\small \theta$. Its _sampling distribution_ is its distribution over repeated samples.
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Bias, Variance, MSE </span>
+        <p>
+        \(\small \operatorname{bias}(\hat{\theta}_m) = E[\hat{\theta}_m] - \theta\) &nbsp; (unbiased if this is 0)<br><br>
+        \(\small \operatorname{Var}(\hat{\theta}_m) = E\left[(\hat{\theta}_m - E[\hat{\theta}_m])^2\right]\)<br><br>
+        \(\small \operatorname{MSE}(\hat{\theta}_m) = E\left[(\hat{\theta}_m - \theta)^2\right] = \operatorname{bias}(\hat{\theta}_m)^2 + \operatorname{Var}(\hat{\theta}_m)\)
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Tools you need__: linearity of expectation, $\small \operatorname{Var}(a + bX) = b^2\operatorname{Var}(X)$, and for i.i.d. data $\small \operatorname{Var}\left(\sum_{i=1}^m X_i\right) = m\operatorname{Var}(X_1)$.
+
+__Example__: for the sample mean $\small \hat{\theta}_m = \frac{1}{m}\sum_i x^{(i)}$: $\small E[\hat{\theta}_m] = \mu$ (unbiased) and $\small \operatorname{Var}(\hat{\theta}_m) = \frac{\sigma^2}{m}$.
+
+:::: {.incremental}
+- Can a biased estimator be better than an unbiased one?
+::::
+:::
+
+:::{.notes}
+Yes, if its MSE is smaller: a small bias can be worth it if the variance drops a lot.
+:::
+
+## Maximum Likelihood Estimation (L20-21)
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Likelihood and Log-Likelihood </span>
+        <p>
+        For i.i.d. data \(\small X_s = (x^{(1)}, \dots, x^{(m)})\) from \(\small p(x; \theta)\):
+        $$\small{p(X_s; \theta) = \prod_{i=1}^m p(x^{(i)}; \theta), \qquad \log p(X_s; \theta) = \sum_{i=1}^m \log p(x^{(i)}; \theta).}$$
+        The <b>MLE</b> \(\small \hat{\theta}\) is the value of \(\small \theta\) that maximizes the (log-)likelihood.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+__Recipe__:
+
+1. Write the likelihood $\small p(X_s; \theta)$.
+2. Take the log (products become sums, powers come down).
+3. Differentiate with respect to $\small \theta$.
+4. Set the derivative to 0 and solve. (Check it is a maximum.)
+
+
+:::: {.incremental}
+- Why is it OK to maximize the log-likelihood instead of the likelihood?
+::::
+:::
+
+:::{.notes}
+log is strictly increasing. It also turns the product into a sum, which is easier to differentiate (and better for small probabilities)
+:::
+
+## Method of Moments (L22)
+
+:::{style="font-size: .65em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Moments and Method of Moments </span>
+        <p>
+        \(\small k\)th moment: \(\small \mu_k = E[X^k]\). &nbsp;&nbsp; \(\small k\)th sample moment: \(\small \hat{\mu}_k = \frac{1}{m}\sum_{i=1}^m (x^{(i)})^k\).<br><br>
+        <b>Method of moments:</b> set the true moments equal to the sample moments and solve for the parameter(s). For one parameter: solve \(\small \mu_1(\theta) = \hat{\mu}_1 = \overline{x}\).
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+## Parameter Estimation
+
+:::{style="font-size: .75em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A shuttle bus runs on a fixed loop, and a new bus arrives at the stop every \(\small \theta\) minutes. Riders show up at random times, so a rider's waiting time \(\small X\) is uniformly distributed on \(\small [0, \theta]\):
+    $$\small{f(x; \theta) = \begin{cases} \frac{1}{\theta}, & 0 \leq x \leq \theta,\\ 0, & \text{otherwise.}\end{cases}}$$
+    The schedule is not posted, so a student records the waiting times (in minutes) of 10 independent riders:
+    <table style="margin: auto; text-align: center; font-size: 0.9em;">
+      <tr><td>3.1</td><td>7.4</td><td>1.2</td><td>5.6</td><td>9.8</td><td>2.5</td><td>4.0</td><td>6.3</td><td>0.9</td><td>3.7</td></tr>
+    </table>
+    <br>
+    a. Write down the likelihood function \(\small p(X_s; \theta)\). Find the maximum likelihood estimate \(\small \hat{\theta}_{MLE}\).
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. Each observation contributes $\frac{1}{\theta}$ if $0 \leq x^{(i)} \leq \theta$ and 0 otherwise. All 10 observations must be at most $\theta$, i.e., $\theta \geq \max_i x^{(i)} = 9.8$:
+$$p(X_s; \theta) = \prod_{i=1}^{10} f(x^{(i)}; \theta) = \begin{cases} \theta^{-10}, & \theta \geq 9.8,\\ 0, & \theta < 9.8.\end{cases}$$
+The derivative $-10\,\theta^{-11}$ is never zero, so we can't set it to 0. For $\theta \geq 9.8$, $\theta^{-10}$ is decreasing, so the likelihood is maximized at the smallest allowed value: $\hat{\theta}_{MLE} = \max_i x^{(i)} = 9.8$ minutes. Same idea as the train problem.
+:::
+
+## Parameter Estimation
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    b. Find the method of moments estimate \(\small \hat{\theta}_{MOM}\). <i>(The 10 waiting times sum to 44.5 minutes.)</i>
+    <br>
+    <br>
+    <br>
+    <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+b. First true moment: $\mu_1 = E[X] = \frac{0 + \theta}{2} = \frac{\theta}{2}$. First sample moment: $\hat{\mu}_1 = \overline{x} = \frac{44.5}{10} = 4.45$.
+Setting $\frac{\theta}{2} = 4.45$ gives $\hat{\theta}_{MOM} = 2\overline{x} = 8.9$ minutes.
+:::
+
+## Confidence Intervals (L23)
+
+:::{style="font-size: .62em"}
+
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label"> Confidence Interval </span>
+        <p>
+        A confidence interval is a <b>random interval</b>, calculated from the sample, that contains \(\small \theta\) with some specified probability. A 95% CI procedure captures the true \(\small \theta\) in about 95% of repeated samples.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+$\small 100(1-\alpha)\%$ CI for the mean $\small \mu$, with $\small M = \overline{x}$ and sample size $\small n$:
+
+| Population | $\small \sigma$ | Interval | Why |
+|---|:--:|:--:|:--:|
+| Normal | known | $\small M \pm z(\alpha/2)\,\frac{\sigma}{\sqrt{n}}$ | $\small \frac{M - \mu}{\sigma/\sqrt{n}} \sim N(0,1)$ |
+| Any (large $\small n$) | known | $\small M \pm z(\alpha/2)\,\frac{\sigma}{\sqrt{n}}$ | CLT (approximate) |
+| Normal or any | unknown | $\small M \pm t_{n-1}(\alpha/2)\,\frac{s}{\sqrt{n}}$ | $\small \frac{M - \mu}{s/\sqrt{n}} \sim t_{n-1}$ |
+
+with $\small s = \sqrt{\frac{1}{n-1}\sum_i (x^{(i)} - M)^2}$ (Bessel's correction). For 95%: $\small z(0.025) = 1.96$.
+
+:::: {.incremental}
+- How does the width change if $\small n$ goes up? If the confidence level goes from 95% to 99%?
+- "There is a 95% probability that $\small \mu$ is in $\small [18.0, 43.0]$." What is wrong with this statement?
+::::
+:::
+
+:::{.notes}
+Width shrinks like $1/\sqrt{n}$ (4x the data halves the width). Higher confidence means a larger critical value, so a wider interval.
+
+$\mu$ is fixed, not random. Once computed, the interval either contains $\mu$ or not. The 95% describes the procedure over repeated samples.
+:::
+
+## Confidence Interval
+
+:::{style="font-size: .8em"}
+```{python}
+from IPython.core.display import HTML
+
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+    A random sample of 36 Boston commuters was selected as part of a study on daily commute times, and the one-way commute time (in minutes) was recorded for each commuter in the sample during October 2026. The average commute time was found to be 28 minutes. In a very large transportation survey the previous year, it was found that the standard deviation of commute times was 9 minutes.<br>
+    Assuming the standard deviation is unchanged, provide the 95% confidence interval for the mean commute time in October 2026.<br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+:::
+
+:::{.notes}
+a. Here $n = 36$, $M = 28$ minutes, and the population standard deviation is $\sigma = 9$ minutes, so $\frac{\sigma}{\sqrt{n}} = \frac{9}{6} = 1.5$. By the CLT, $M \approx N\left(\mu, 1.5^2\right)$. Since $\sigma$ is known, we use the $Z$-score 1.96:
+$$\left[M - 1.96\,\frac{\sigma}{\sqrt{n}},\; M + 1.96\,\frac{\sigma}{\sqrt{n}}\right] = \left[28 - 1.96(1.5),\; 28 + 1.96(1.5)\right] = [25.06, 30.94].$$
+:::

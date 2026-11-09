@@ -50,6 +50,7 @@ project:
     # - 37-mcmc_practice.qmd        
     # - 38-review_part2.qmd
     - R1-Midterm1.qmd
+    - R2-Midterm2.qmd
 
 # Shared metadata — applies to every lecture; a lecture's own front matter
 # (title, filters, or any format overrides) still takes precedence.
