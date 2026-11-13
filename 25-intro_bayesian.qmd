@@ -2,64 +2,6 @@
 title: Introduction to Bayesian Statistics
 ---
 
-## Group Question 3
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-   Suppose \(\small X_1\) and \(\small X_2\) are independent random variables. \(\small X_1\) follows an exponential distribution with parameter \(\small \frac{1}{\theta}\). \( \small X_2\) is uniformly distributed on interval \(\small [0,\theta].\) \(\small \theta\) is unknown. Consider the following estimator for \(\small \theta:\)
-    $$\small \hat{\theta} = \frac{1}{4}x_1 + \frac{3}{2}x_2.$$
-    Here, \(x_1\) and \(x_2\) are realizations of \(X_1\) and \(X_2\), respectively.<br>
-a. Compute the bias of \(\small \hat{\theta}.\)
-    <br>
-    <br>
-    <br>
-b. Is \(\small \hat{\theta}\) unbiased? Explain your answer.
-    <br>
-    <br>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-:::
-
-## Group Question 3
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-c. Compute the variance of \(\small \hat{\theta}.\)
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-d. Find the mean squared error of \(\small \hat{\theta}.\)
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-
-:::
-
 ## Finding the Ship of Gold
 :::{style="font-size: .8em"}
 
@@ -96,11 +38,11 @@ It never clicked how “wild” the Wild West was until I learned that the easie
 - a short train ride, and 
 - a steamer back up.
 
-This is precisely why the SS Central America was sailing North in early September 1857.
+This is precisely why the SS Central America was sailing north in early September 1857.
 
 Unfortunately, it encountered a powerful storm and sank on September 12.
 
-The exact location of the wreck was not known to anybody until 1988. What was known were the weather reports and statements/testimonies from varios eyewitnesses of the event. 
+The exact location of the wreck was not known to anybody until 1988. What was known were the weather reports and statements/testimonies from various eyewitnesses of the event. 
 :::
 
 ## Finding the Ship of Gold
@@ -135,9 +77,9 @@ Surprisingly, they found the wreck and the gold in a cell with low probability. 
 :::
 
 :::{.notes}
-Thompson’s team found and initially recovered substantial treasure from the SS Central America, but he and his organization became embroiled in multi-million dollar legal battles involving insurers, investors, and crew. His refusal to comply with court orders over the missing 500 coins led to arrests, convictions, and long-term jail time. 
+Thompson’s team found and initially recovered substantial treasure from the SS Central America, but he and his organization became embroiled in multimillion-dollar legal battles involving insurers, investors, and crew. His refusal to comply with court orders over the missing 500 coins led to arrests, convictions, and long-term jail time. 
 
-With great power of Bayesian statistics, comes great responsibility!
+With great power of Bayesian statistics comes great responsibility!
 :::
 
 
@@ -178,7 +120,7 @@ Let's see why using a Bayes table.
 :::
 
 :::{.notes}
-Bayesian - 2 types of pronounciation
+Bayesian - 2 types of pronunciation
 :::
 
 ## The Cookie Problem
@@ -215,8 +157,8 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
-__Remark__: From the law of total probability it follows that, if we let $\small{A_1, \dots, A_n}$ be events where $\small{A_i}$'s are disjoint and form the entire sample space, then 
-$$\small{P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\Sigma_j P(B|A_j)P(A_j)}.}$$ 
+__Remark__: From the law of total probability it follows that, if we let $\small{A_1, \dots, A_n}$ be disjoint events whose union is the entire sample space, then
+$$\small{P(A_i|B) = \frac{P(B|A_i)P(A_i)}{\sum_j P(B|A_j)P(A_j)}.}$$
 :::
 
 ## The Cookie Problem
@@ -241,7 +183,7 @@ $$\small P(B_1 \vert V) = \frac{P(V \vert B_1)\;P(B_1)}{P(V)}.$$
 From the problem description we know that
 
 - $\small P(B_1) = \frac{1}{2}$ because one of the two bowls was selected randomly 
-- $\small P(V \vert B_1) = \frac{30}{40} = \frac{3}{4}$ because bowl 1 contains 40 cookies 30 of which are vanilla.
+- $\small P(V \vert B_1) = \frac{30}{40} = \frac{3}{4}$ because bowl 1 contains 40 cookies, 30 of which are vanilla.
 
 We use the law of total probability to find $\small P(V):$
 
@@ -289,14 +231,14 @@ $$\small P(B_1 \vert V) = \frac{P(V \vert B_1)\;P(B_1)}{P(V)} = \frac{(3/4)(1/2)
 
 Hence, the probability that the cookie came from bowl 2 is 
 $$\small 1- \frac{3}{5} = \frac{2}{5},$$ 
-which is indeed lower than $\frac{3}{5}.$
+which is indeed lower than $\small \frac{3}{5}.$
 
 
 In Bayesian statistics, we refer to $\small B_1$ as a **hypothesis** and to $\small V$ as the **data**.
 
 __Notation__: Typically, we denote a hypothesis by $\small H$, and the data by $\small D$. 
 
-We can use this to rewrite the Bayes’ rule as follows. 
+We can use this to rewrite Bayes’ rule as follows. 
 
 
 
@@ -340,7 +282,7 @@ display(HTML(html_content))
 :::{style="font-size: .8em"}
 
 _**Prior**_:<br>
-Often the most subjective part of Bayes’ rule. In some cases it can be computed directly (e.g., equal likelihood of choosing each bowl), while in others it depends on modeling assumptions (e.g., selection proportional to bowl size or relevant background information).<br><br>
+Often the most subjective part of Bayes’ rule. In some cases it can be computed directly (e.g., equal chance of choosing each bowl), while in others it depends on modeling assumptions (e.g., selection proportional to bowl size or relevant background information).<br><br>
 _**Likelihood**_:<br>
 Usually well defined and straightforward to compute. When the data‑generating process is known (as in the cookie bowl problem), probabilities under each hypothesis can be calculated directly.
 
@@ -469,7 +411,7 @@ The unnormalized posterior is computed by multiplying the prior and likelihood c
 table['unnorm. post.'] = table['prior'] * table['likelihood']
 ```
 ```{python}
-# | echo: false 
+#| echo: false
 table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}"}).hide(axis="index")
 ```
 
@@ -515,11 +457,11 @@ table['posterior'] = table['unnorm. post.'] / prob_data
 ```
 
 ```{python}
-# | echo: false 
+#| echo: false
 table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}", "posterior": "{:.2f}"}).hide(axis="index")
 ```
 
-The posterior probability of the first bowl given a vanilla cookie is $0.6 = \frac{3}{5}$, consistent with the earlier Bayes’ theorem calculation. 
+The posterior probability of the first bowl given a vanilla cookie is $0.6 = \frac{3}{5}$, consistent with the earlier Bayes’ rule calculation. 
 
 Note that both the prior and the posterior are _**distributions**_! The entries of each of these columns are probabilities and sum to 1. 
 <!-- As expected for mutually exclusive and exhaustive hypotheses, the posteriors sum to 1. -->
@@ -540,7 +482,7 @@ def update(table):
 
 table = pd.DataFrame()
 table['hypothesis'] = ['first bowl', 'second bowl']
-table['prior'] = 1/2, 1/2,
+table['prior'] = 1/2, 1/2
 table['likelihood'] = 3/4, 1/2
 
 update(table)
@@ -749,7 +691,6 @@ def generate_html():
         <p>
 Red howler monkeys eat a variety of foods. Holly’s favorite is figs. For her birthday, researchers prepared three food boxes.
 </p>
-     <p><l start="*">
         <ul>
            
             <li><strong>Box 1:</strong> 40% leaves, 25% figs, 10% plums, remainder buds and flowers</li>
@@ -757,7 +698,6 @@ Red howler monkeys eat a variety of foods. Holly’s favorite is figs. For her b
             <li><strong>Box 3:</strong> 50% leaves, 15% figs, 15% plums, remainder buds and flowers</li>
 
         </ul>
-</p>
     </div>
     """
 html_content = generate_html()
@@ -809,6 +749,7 @@ c. Construct a Bayes table and use it to compute the posterior probability that 
     <br>
     <br>
     <br>
+        </p>
     </div>
     """
 html_content = generate_html()
