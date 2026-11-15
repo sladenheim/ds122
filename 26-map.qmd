@@ -2,33 +2,6 @@
 title: Maximum A Posteriori Estimator
 ---
 
-## Group Question From Last Lecture
-:::{style="font-size: .8em"}
-
-```{python}
-from IPython.core.display import HTML
-
-def generate_html():
-    return r"""
-    <div class="blue-box">
-        <p>
-   Suppose we have a box with a 6-sided die, an 8-sided die, and a 12-sided die. We choose one of the dice at random, roll it, and report that the outcome is a 1. Make a Bayes table to compute the probability that we chose the 6-sided die.
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    </div>
-    """
-html_content = generate_html()
-display(HTML(html_content))
-```
-:::
-
 ## Learning Objectives
 :::{style="font-size: .8em"}
 
@@ -57,11 +30,11 @@ __Questions__:
 1. Find the maximum a posteriori (MAP) estimate for the probability of heads. 
 2. How do different choices for the prior influence the MAP estimate?
 
-<!-- (Eventually, we will decide whether the coin should be consider fair based on this data.) -->
+<!-- (Eventually, we will decide whether the coin should be considered fair based on this data.) -->
 
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .75em"}
 
 Let's suppose we were dealing with 101 bowls instead of just 2. Like before, there is an equal probability of picking each bowl. 
@@ -79,7 +52,7 @@ _**If you choose a bowl at random, and then grab a cookie at random and get a va
 
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .8em"}
 Let us use a uniform prior distribution. 
 :::
@@ -107,14 +80,14 @@ dist_101
 ```
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .72em"}
 The likelihood of drawing a vanilla cookie from each bowl is given by the bowl number:
 ```{python}
 #| echo: true
 likelihood_vanilla = np.arange(101)/100
 ```
-We can perform a Bayesian update using the update function we defined last time. This function multiplies the prior by the likelihood and then normalizes the result.
+We can perform a Bayesian update using our `update` function. This function multiplies the prior by the likelihood and then normalizes the result.
 :::
 
 :::{style="font-size: .72em"}
@@ -125,7 +98,7 @@ update(dist_101, likelihood_vanilla)
 ```
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .8em"}
 The above table gives us the posterior distribution of probabilities across bowls. Since the table contains many probabilities, it’s easier to visualize them. Let’s plot the prior distribution in gray and the posterior distribution in blue.
 
@@ -147,9 +120,9 @@ dist_101_1_update = dist_101.copy();
 :::{style="font-size: .8em"}
 The posterior probability increases with bowl number, which is what we would expect since each higher bowl number has a higher percentage of vanilla cookies.
 
-We can see that the probability we drew our cookie from Bowl 1 is very small - almost zero.
+We can see that the probability we drew our cookie from Bowl 0 is exactly zero (it has no vanilla cookies), and the probability for Bowl 1 is very small - almost zero.
 
-And the most likely Bowl is Bowl 100, which makes sense since that bowl is 100% Vanilla cookies.
+And the most likely Bowl is Bowl 100, which makes sense since that bowl is 100% vanilla cookies.
 
 <br>
 
@@ -159,7 +132,7 @@ The answer is obtained by simply performing another Bayesian update.
 
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -183,7 +156,7 @@ plt.show()
 Now the small numbered bowls are even less likely, and the high numbered bowls are even more likely.
 :::
 
-## The Extended Cookie Problem 
+## The Extended Cookie Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 Let's make things more interesting.  _**What if we put the cookie back again and our next draw from that same bowl were a chocolate cookie?**_
@@ -265,12 +238,12 @@ dist_101.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)
 ax.legend(['Posteriors'], fontsize = 14)
 plt.xlabel('Bowl number', size = 16)
 plt.ylabel('Probability', size = 16)
-map = dist_101['probs'].idxmax()
+map_est = dist_101['probs'].idxmax()
 ymin = dist_101['probs'].min()
 ax.set_ylim(ymin = ymin)
-plt.vlines(x = map, ymin = ymin, ymax = dist_101['probs'].max(), linestyles = 'dashed', color = 'g')
-plt.plot(map, ymin, 'o', color = 'g', markersize = 14, clip_on = False)
-plt.text(map+2, ymin+0.00015, r'MAP = 67', size = 16, ha = 'left', va = 'bottom')
+plt.vlines(x = map_est, ymin = ymin, ymax = dist_101['probs'].max(), linestyles = 'dashed', color = 'g')
+plt.plot(map_est, ymin, 'o', color = 'g', markersize = 14, clip_on = False)
+plt.text(map_est+2, ymin+0.00015, r'MAP = 67', size = 16, ha = 'left', va = 'bottom')
 plt.show()
 ```
 :::
@@ -287,7 +260,7 @@ The cookie problem with 101 bowls is equivalent to a more typical question about
 _Imagine that you have one bowl of chocolate and vanilla cookies. You don’t know what fraction of cookies are vanilla, but you think it is equally likely to be any fraction from 0 to 1. If you draw three cookies and two are vanilla, what proportion of cookies in the bowl do you think are vanilla?_
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 We can go ahead and approach this problem just like the extended cookie problem.
@@ -352,7 +325,7 @@ update(prior, likelihood);
 ```
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 :::{.center-text}
 ```{python}
@@ -368,7 +341,7 @@ plt.show()
 
 This figure shows the posterior distribution of $p$, which is the proportion of heads for the Euro coin that was spun.
 
-The posterior distribution represents our beliefs about $p$ after seeing the data.  It indicates that the values less than 0.4 and greater than 0.7 are unlikely, while  values between 0.5 and 0.6 are most likely.
+The posterior distribution represents our beliefs about $p$ after seeing the data.  It indicates that the values less than 0.4 and greater than 0.7 are unlikely, while values between 0.5 and 0.6 are most likely.
 :::
 
 ## The Coin Problem
@@ -439,7 +412,7 @@ fig, ax = plt.subplots(figsize=(8,3))
 p_dist_tri.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)
 p_dist_unif = p_dist.copy()
 p_dist_unif.plot(ax = ax, color = 'orange', lw = 4, style = '--', fontsize = 14)
-ax.legend(['Triangle Prior', 'Uniform Prior'], fontsize = 14, loc = 'best')
+ax.legend(['Posterior (triangle prior)', 'Posterior (uniform prior)'], fontsize = 14, loc = 'best')
 plt.xlabel('$p$', size = 16)
 plt.ylabel('Probability', size = 16);
 ```
@@ -464,7 +437,7 @@ display(HTML(html_content))
 
 ## Priors
 :::{style="font-size: .8em"}
-There is no discernable difference between the results using the two priors.
+There is no discernible difference between the results using the two priors.
 
 That means that if two individuals had different views of the likelihood of an unbalanced coin (that is, different opinions about the prior on $p$), there is enough data that their different views would not affect their ultimate analysis.
 
@@ -476,7 +449,7 @@ This situation is called __swamping the prior.__   With enough data, people who 
 
 :::
 
-## Group Question 1
+## Group Question 1 {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -487,7 +460,7 @@ def generate_html():
     <div class="blue-box">
         <p>
    You have a coin with uncertain fairness. You consider the following probabilities of heads, \(p\): 0, 0.25, 0.5, 0.75, and 1. You flip the coin 10 times and observe 7 heads.<br>
-    Using an uninformative prior, compute the posterior probabilities for the five values of \(p\) that are being considered. Provide your final answer using a full Bayes' table. That is, your table must include the following columns: hypothesis, prior, likelihood, unnormalized posterior, and posterior.
+    Using an uninformative prior, compute the posterior probabilities for the five values of \(p\) that are being considered. Provide your final answer using a full Bayes table. That is, your table must include the following columns: hypothesis, prior, likelihood, unnormalized posterior, and posterior.</p>
     <br>
     <br>
     <br>
