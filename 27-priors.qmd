@@ -38,6 +38,58 @@ __Questions__:
 
 :::
 
+## Review: Bayesian Updating
+:::{style="font-size: .8em"}
+
+Last lecture we wrote the Bayesian update in terms of _**distributions**_:
+
+$$
+\text{posterior} \propto \text{prior} \times \text{likelihood}
+$$
+
+1. Multiply the prior by the likelihood of the data.
+2. Divide by the sum so the probabilities add up to 1.
+
+<br>
+
+When we get **more data**, the posterior becomes the new prior and we simply update again.
+
+__Extended cookie problem__: 101 bowls, bowl $i$ is $i\%$ vanilla, uniform prior.
+
+- Draw vanilla &rarr; higher-numbered bowls become more likely; bowl 0 drops to 0.
+- Draw vanilla again &rarr; the posterior shifts even further toward high-numbered bowls.
+- Draw chocolate &rarr; bowl 100 drops to 0, and the peak moves back toward the middle.
+
+:::
+
+## Review: Maximum A Posteriori Estimator
+:::{style="font-size: .8em"}
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="purple-box">
+     <span class="label">Maximum A Posteriori (MAP) Estimate</span>
+        <p>
+         The maximum a posteriori (MAP) estimate is the hypothesis that maximizes the posterior probability.
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+In Python, we find it with `dist['probs'].idxmax()`.
+
+- __Cookies__: after drawing vanilla, vanilla, chocolate, the MAP is **Bowl 67**, the bowl closest to the observed proportion $2/3$ vanilla. With a uniform prior, the MAP matches the proportion in the data.
+- __Monty Hall__: you pick door 1 and Monty opens door 3. The posteriors are $1/3$, $2/3$, and $0$ for doors 1, 2, and 3. The MAP is **door 2**, so you should switch.
+
+<br>
+
+Today we ask: _**what happens to the MAP when we change the prior?**_
+
+:::
+
 ## Estimating Proportions
 :::{style="font-size: .8em"}
 The cookie problem with 101 bowls is equivalent to a more typical question about the proportion of vanilla cookies in one bowl:
@@ -313,5 +365,86 @@ def generate_html():
 html_content = generate_html()
 display(HTML(html_content))
 ```
+
+:::
+
+## Group Question 2
+:::{style="font-size: .75em"}
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        A magician has a bag containing 30 coins that all look identical. However, there are actually three types of coins: \(A\), \(B\), and \(C\).
+        <ul>
+            <li>10 coins of type \(A\) are biased, with \(P(H \mid A) = 3/5\).</li>
+            <li>5 coins of type \(B\) are biased, with \(P(H \mid B) = 1/10\).</li>
+            <li>15 coins of type \(C\) are fair, with \(P(H \mid C) = 1/2\).</li>
+        </ul>
+        The magician takes a coin from the bag at random and flips it. The result is heads.<br><br>
+        a. Fill out the Bayes table below to find the posterior probability of each coin type. Also give the value of the normalizer (the total probability of the data).
+        <br><br>
+        <table style="margin: auto; text-align: center; font-size: 0.9em; border-collapse: collapse;" border="1">
+          <tr><th>&nbsp; Hypothesis &nbsp;</th><th>&nbsp; Prior &nbsp;</th><th>&nbsp; Likelihood &nbsp;</th><th>&nbsp; Unnorm. post. &nbsp;</th><th>&nbsp; Posterior &nbsp;</th></tr>
+          <tr><td>type A</td><td><br><br></td><td></td><td></td><td></td></tr>
+          <tr><td>type B</td><td><br><br></td><td></td><td></td><td></td></tr>
+          <tr><td>type C</td><td><br><br></td><td></td><td></td><td></td></tr>
+        </table>
+        <br>
+        Normalizer: ____________
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+:::{.notes}
+**Solution (a)**
+
+| Hypothesis | Prior | Likelihood | Unnorm. post. | Posterior |
+|---|---|---|---|---|
+| type A | 10/30 = 1/3 | 3/5 | 1/5 = 12/60 | 12/28 = 3/7 |
+| type B | 5/30 = 1/6 | 1/10 | 1/60 | 1/28 |
+| type C | 15/30 = 1/2 | 1/2 | 1/4 = 15/60 | 15/28 |
+
+Normalizer: 12/60 + 1/60 + 15/60 = 28/60 = 7/15 ≈ 0.4667
+:::
+
+## Group Question 2
+:::{style="font-size: .8em"}
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        b. Find the maximum a posteriori (MAP) estimate for the type of the coin. Explain your reasoning.
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        c. Is the prior in this problem informative? Explain your reasoning.
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+:::{.notes}
+**Solution (b)**: The MAP is coin type C, because it has the highest posterior probability (15/28 ≈ 0.536).
+
+**Solution (c)**: Yes. The prior (1/3, 1/6, 1/2) is not uniform. It uses what we know about how many coins of each type are in the bag, so it is informative.
 
 :::
