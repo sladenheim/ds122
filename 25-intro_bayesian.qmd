@@ -238,7 +238,7 @@ In Bayesian statistics, we refer to $\small B_1$ as a **hypothesis** and to $\sm
 
 __Notation__: Typically, we denote a hypothesis by $\small H$, and the data by $\small D$. 
 
-We can use this to rewrite Bayes’ rule as follows. 
+We can use this to rewrite Bayes' rule as follows. 
 
 
 
@@ -282,11 +282,11 @@ display(HTML(html_content))
 :::{style="font-size: .8em"}
 
 _**Prior**_:<br>
-Often the most subjective part of Bayes’ rule. In some cases it can be computed directly (e.g., equal chance of choosing each bowl), while in others it depends on modeling assumptions (e.g., selection proportional to bowl size or relevant background information).<br><br>
+Often the most subjective part of Bayes' rule. In some cases it can be computed directly (e.g., equal chance of choosing each bowl), while in others it depends on modeling assumptions (e.g., selection proportional to bowl size or relevant background information).<br><br>
 _**Likelihood**_:<br>
 Usually well defined and straightforward to compute. When the data‑generating process is known (as in the cookie bowl problem), probabilities under each hypothesis can be calculated directly.
 
-<!-- The _**prior**_ is often the most challenging component of Bayes’ rule to specify. In some cases, it can be determined exactly—for example, in the cookie bowl problem, where each bowl is selected with equal probability. In other situations, additional assumptions must be incorporated, such as selecting bowls in proportion to their size. More generally, the choice of prior may depend on which background information is deemed relevant, and reasonable individuals may disagree on this point.<br><br>
+<!-- The _**prior**_ is often the most challenging component of Bayes' rule to specify. In some cases, it can be determined exactly—for example, in the cookie bowl problem, where each bowl is selected with equal probability. In other situations, additional assumptions must be incorporated, such as selecting bowls in proportion to their size. More generally, the choice of prior may depend on which background information is deemed relevant, and reasonable individuals may disagree on this point.<br><br>
 The _**likelihood**_, by contrast, is typically well defined and can be computed directly. In the cookie problem, the composition of each bowl is known, allowing us to calculate the probability of the observed data under each hypothesis. -->
 
 :::
@@ -381,7 +381,7 @@ display(HTML(html_content))
 ## Bayes Table
 :::{style="font-size: .8em"}
 
-The likelihood of each hypothesis is the fraction of cookies in each bowl that is vanilla.  
+The likelihood of the data under each hypothesis is the fraction of vanilla cookies in that bowl.  
 
 ```{python}
 #| echo: true
@@ -461,7 +461,7 @@ table['posterior'] = table['unnorm. post.'] / prob_data
 table.style.format({"prior": "{:.2f}", "likelihood": "{:.2f}", "unnorm. post.": "{:.3f}", "posterior": "{:.2f}"}).hide(axis="index")
 ```
 
-The posterior probability of the first bowl given a vanilla cookie is $0.6 = \frac{3}{5}$, consistent with the earlier Bayes’ rule calculation. 
+The posterior probability of the first bowl given a vanilla cookie is $0.6 = \frac{3}{5}$, consistent with the earlier Bayes' rule calculation. 
 
 Note that both the prior and the posterior are _**distributions**_! The entries of each of these columns are probabilities and sum to 1. 
 <!-- As expected for mutually exclusive and exhaustive hypotheses, the posteriors sum to 1. -->
@@ -674,9 +674,9 @@ display(HTML(html_content))
 ## Group Question 1
 :::{.columns}
 ::: {.column width="45%"}
-<!-- :::{.center-text}
+:::{.center-text}
 <img src="images/bayesian_intro/Holly_BD.png" width=500/>
-::: -->
+:::
 :::
 ::: {.column width="55%"}
 :::{style="font-size: .7em"}

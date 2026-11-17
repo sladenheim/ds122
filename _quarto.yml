@@ -33,7 +33,8 @@ project:
     - 24-hypothesis_testing.qmd
     - 25-intro_bayesian.qmd
     - 26-map.qmd
-    - 27-mmse.qmd
+    - 27-priors.qmd
+    - 28-mmse.qmd
     # - 28-poisson_processes.qmd
     # - 29-bayesian_testing.qmd
     # - 30-comparison.qmd          # older lecture (Dec 2025); current: 30-naive_bayes.qmd

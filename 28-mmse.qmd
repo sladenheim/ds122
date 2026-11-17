@@ -2,6 +2,37 @@
 title: Minimum Mean Squared Error Estimator
 ---
 
+## Bayes vs Frequentist
+:::{style="font-size: .8em"}
+
+:::{.center-text}
+<img src="images/mmse/bayes_vs_frequentist.png" width=450/>
+:::
+
+__Probability:__
+
+* Frequentist probability assumes that data represents independent trials under identical conditions.
+* Bayesian probability uses probability to model our _**degree of belief**_ of a hypothesis.
+
+:::
+
+## Bayes vs Frequentist
+:::{style="font-size: .8em"}
+
+__Slogan:__
+
+* In frequentist statistics, the model is fixed and the data are random.
+* In Bayesian statistics, the data are fixed and the model is random.
+
+__Point Estimates:__
+
+* Typical point estimators used in frequentist statistics are the MLE and MoM estimators.
+* Typical point estimators used in Bayesian statistics are the MAP and minimum mean squared error (MMSE) estimators.
+
+Today, we will introduce the MMSE estimator.
+
+:::
+
 ## Learning Objectives
 :::{style="font-size: .8em"}
 

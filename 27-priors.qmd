@@ -1,0 +1,317 @@
+---
+title: Priors
+---
+
+```{python}
+import numpy as np
+import pandas as pd
+from scipy.stats import randint, binom
+import matplotlib.pyplot as plt
+from IPython.core.display import HTML
+```
+
+## The Coin Problem
+:::{style="font-size: .8em"}
+
+An article in The Guardian stated: _When spun on edge 250 times, a Belgian one-euro coin came up heads 140 times and tails 110._
+
+:::{.center-text}
+<img src="images/map/euro-coin.png" width=200/>
+:::
+
+__Questions__:
+
+1. Find the maximum a posteriori (MAP) estimate for the probability of heads.
+2. How do different choices for the prior influence the MAP estimate?
+
+:::
+
+## Learning Objectives
+:::{style="font-size: .8em"}
+
+- Likelihood of the entire data set
+- Priors
+    - Uninformative
+    - Informative
+- Swamping the prior
+- Application to the coin problem
+
+:::
+
+## Estimating Proportions
+:::{style="font-size: .8em"}
+The cookie problem with 101 bowls is equivalent to a more typical question about the proportion of vanilla cookies in one bowl:
+
+<br><br>
+
+_Imagine that you have one bowl of chocolate and vanilla cookies. You don't know what fraction of cookies are vanilla, but you think it is equally likely to be any fraction from 0 to 1. If you draw three cookies and two are vanilla, what proportion of cookies in the bowl do you think are vanilla?_
+:::
+
+## The Coin Problem {.scrollable}
+:::{style="font-size: .8em"}
+
+We can approach this problem just like the extended cookie problem.
+
+```{python}
+# distribution version of update from the previous lecture
+def update(distribution, likelihood):
+    '''perform a Bayesian update on distribution using likelihood'''
+    distribution['probs'] = distribution['probs'] * likelihood
+    prob_data = distribution['probs'].sum()
+    distribution['probs'] = distribution['probs'] / prob_data
+    return distribution
+```
+
+```{python}
+#| echo: true
+p_dist = pd.DataFrame(index = np.arange(101)/100)
+
+# uniform prior distribution
+p_dist['probs'] = randint(0, 101).pmf(np.arange(101))
+p_dist_batch = p_dist.copy()  # copy of the uniform prior for the single-update approach
+
+# likelihoods
+likelihood_heads = np.arange(101) / 100
+likelihood_tails = 1 - likelihood_heads
+```
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 2.5))
+plt.plot(np.arange(101)/100, likelihood_heads, 'green', label = 'P(Heads | p)', lw = 4)
+plt.plot(np.arange(101)/100, likelihood_tails, 'red', label = 'P(Tails | p)', lw = 4)
+plt.legend(loc = 'best', fontsize = 14)
+plt.xlabel('$p$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.title('Likelihoods', size = 20)
+plt.show()
+```
+:::
+:::
+
+## The Coin Problem
+:::{style="font-size: .8em"}
+Let's represent the data from the problem. There are 140 heads and 110 tails. It doesn't matter what order they occur in.
+
+```{python}
+#| echo: true
+data = 'H' * 140 + 'T' * 110
+data
+```
+
+```{python}
+#| echo: true
+for item in data:
+    if item == 'H':
+        update(p_dist, likelihood_heads)
+    elif item == 'T':
+        update(p_dist, likelihood_tails)
+    else:
+        print('Bad data!')
+```
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        Is it possible to find the posterior distribution using only one Bayesian update?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## The Coin Problem
+:::{style="font-size: .8em"}
+
+```{python}
+#| echo: true
+# compute the likelihood of the whole dataset
+from scipy.stats import binom
+likelihood = [binom.pmf(140, 250, p) for p in p_dist.index]
+
+update(p_dist_batch, likelihood);
+```
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 3))
+p_dist_batch.plot(ax=ax, lw=4, legend=False, title='Posterior Distribution of $p$', fontsize=14)
+ax.set_xlabel('$p$', size=14)
+ax.set_ylabel('Probability', size=14)
+plt.show()
+```
+:::
+:::
+
+## The Coin Problem
+:::{style="font-size: .8em"}
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8, 3))
+p_dist.plot(ax=ax, lw=4, legend=False, title='Posterior Distribution of $p$', fontsize=14)
+ax.set_xlabel('$p$', size=14)
+ax.set_ylabel('Probability', size=14)
+plt.show()
+```
+:::
+
+This figure shows the posterior distribution of $p$, the probability of heads for the euro coin that was spun.
+
+The posterior reflects updated beliefs about $p$ after observing the data, indicating that values below 0.4 and above 0.7 are unlikely, while values between approximately 0.5 and 0.6 are most probable.
+:::
+
+## The Coin Problem
+:::{style="font-size: .8em"}
+_**What is the MAP estimate in this case?**_
+
+```{python}
+#| echo: true
+p_dist['probs'].idxmax()
+```
+
+The MAP is 0.56, which is also the proportion of heads in the dataset, $140/250$. This gives an answer to our first question about the coin.
+
+<br>
+
+We obtained our answer using the uniform prior, the prior that assigns the same prior probability to each hypothesis. The uniform prior essentially makes no a priori assumption about the values of the parameter being estimated. For that reason, it is often called an __uninformative__ prior.
+
+Will this answer change if we select a different prior?
+:::
+
+## Priors
+:::{style="font-size: .8em"}
+
+In the Bayesian view, we are using probability to represent our _**confidence**_ across different hypotheses.
+
+The role of the prior is to represent our level of confidence, or our state of knowledge, _**before seeing any data.**_
+
+Based on what we know about coins, if a coin is lopsided, $p$ might deviate from $\frac{1}{2}$. However, it seems unlikely that the Belgian euro coin is so imbalanced that $p$ might be 0.1 or 0.9.
+
+It might be more reasonable to choose a prior that gives higher probability to values of $p$ near $\frac{1}{2}$ and lower probability to extreme values.
+
+As an example, let's try a _**triangle-shaped**_ prior. Such a prior is considered _**informative**_, because we are using our knowledge about coins to construct it.
+
+:::
+
+## Triangle-Shaped Prior
+:::{style="font-size: .8em"}
+```{python}
+#| echo: true
+triangle_prior = np.append(np.arange(50), np.arange(50, -1, -1))
+triangle_prior = triangle_prior / np.sum(triangle_prior)
+
+p_dist_tri = pd.DataFrame(index = np.arange(101)/100)
+p_dist_tri['probs'] = triangle_prior
+```
+
+:::{.center-text}
+```{python}
+p_dist_tri.plot(lw = 4, legend = False, title = 'Triangle-shaped Prior for $p$', fontsize = 14, figsize=(6,4))
+plt.xlabel('$p$', size = 14)
+plt.ylabel('Probability', size = 14)
+plt.show()
+```
+:::
+:::
+
+## Priors
+:::{style="font-size: .8em"}
+Let's compute the posterior distribution starting from this prior.
+
+```{python}
+#| echo: true
+update(p_dist_tri, likelihood);
+```
+
+:::{.center-text}
+```{python}
+fig, ax = plt.subplots(figsize=(8,3))
+p_dist_tri.plot(ax = ax, color = 'cornflowerblue', lw = 4, fontsize = 14)
+p_dist.plot(ax = ax, color = 'orange', lw = 4, style = '--', fontsize = 14)
+ax.legend(['Posterior (triangle prior)', 'Posterior (uniform prior)'], fontsize = 14, loc = 'best')
+plt.xlabel('$p$', size = 16)
+plt.ylabel('Probability', size = 16)
+plt.show()
+```
+:::
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+         What happened here?
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Swamping The Prior
+:::{style="font-size: .8em"}
+
+- The posterior distributions are nearly identical under the two priors.
+- Although different individuals may start with different beliefs about the coin's bias, the data dominate the analysis.
+- With a large sample size (250 observations), the influence of the prior becomes negligible.
+- As a result, different prior beliefs lead to essentially the same posterior distribution.
+- This effect is known as __swamping the prior__: with sufficient data, posteriors converge despite differing priors.
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        You have a coin with uncertain fairness. You consider the following probabilities of heads, \(p\): 0, 0.25, 0.5, 0.75, and 1. You flip the coin 10 times and observe 7 heads.<br>
+        a. Using the uniform prior, compute the posterior probabilities for the five values of \(p\) that are being considered. Provide your final answer using a full Bayes table.
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
+
+## Group Question 1
+:::{style="font-size: .8em"}
+
+```{python}
+def generate_html():
+    return r"""
+    <div class="blue-box">
+        <p>
+        b. Find the maximum a posteriori (MAP) estimate for \(p\).
+        <br>
+        <br>
+        <br>
+        <br>
+        </p>
+    </div>
+    """
+html_content = generate_html()
+display(HTML(html_content))
+```
+
+:::
