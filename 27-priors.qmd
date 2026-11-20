@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from IPython.core.display import HTML
 ```
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 An article in The Guardian stated: _When spun on edge 250 times, a Belgian one-euro coin came up heads 140 times and tails 110._
@@ -26,7 +26,7 @@ __Questions__:
 
 :::
 
-## Learning Objectives
+## Learning Objectives {.scrollable}
 :::{style="font-size: .8em"}
 
 - Likelihood of the entire data set
@@ -38,7 +38,7 @@ __Questions__:
 
 :::
 
-## Review: Bayesian Updating
+## Review: Bayesian Updating {.scrollable}
 :::{style="font-size: .8em"}
 
 Last lecture we wrote the Bayesian update in terms of _**distributions**_:
@@ -62,7 +62,7 @@ __Extended cookie problem__: 101 bowls, bowl $i$ is $i\%$ vanilla, uniform prior
 
 :::
 
-## Review: Maximum A Posteriori Estimator
+## Review: Maximum A Posteriori Estimator {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -90,7 +90,7 @@ Today we ask: _**what happens to the MAP when we change the prior?**_
 
 :::
 
-## Estimating Proportions
+## Estimating Proportions {.scrollable}
 :::{style="font-size: .8em"}
 The cookie problem with 101 bowls is equivalent to a more typical question about the proportion of vanilla cookies in one bowl:
 
@@ -141,7 +141,7 @@ plt.show()
 :::
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 Let's represent the data from the problem. There are 140 heads and 110 tails. It doesn't matter what order they occur in.
 
@@ -177,7 +177,7 @@ display(HTML(html_content))
 
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -200,7 +200,7 @@ plt.show()
 :::
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 :::{.center-text}
 ```{python}
@@ -217,7 +217,7 @@ This figure shows the posterior distribution of $p$, the probability of heads fo
 The posterior reflects updated beliefs about $p$ after observing the data, indicating that values below 0.4 and above 0.7 are unlikely, while values between approximately 0.5 and 0.6 are most probable.
 :::
 
-## The Coin Problem
+## The Coin Problem {.scrollable}
 :::{style="font-size: .8em"}
 _**What is the MAP estimate in this case?**_
 
@@ -235,7 +235,7 @@ We obtained our answer using the uniform prior, the prior that assigns the same 
 Will this answer change if we select a different prior?
 :::
 
-## Priors
+## Priors {.scrollable}
 :::{style="font-size: .8em"}
 
 In the Bayesian view, we are using probability to represent our _**confidence**_ across different hypotheses.
@@ -250,7 +250,7 @@ As an example, let's try a _**triangle-shaped**_ prior. Such a prior is consider
 
 :::
 
-## Triangle-Shaped Prior
+## Triangle-Shaped Prior {.scrollable}
 :::{style="font-size: .8em"}
 ```{python}
 #| echo: true
@@ -271,7 +271,7 @@ plt.show()
 :::
 :::
 
-## Priors
+## Priors {.scrollable}
 :::{style="font-size: .8em"}
 Let's compute the posterior distribution starting from this prior.
 
@@ -307,7 +307,7 @@ display(HTML(html_content))
 
 :::
 
-## Swamping The Prior
+## Swamping The Prior {.scrollable}
 :::{style="font-size: .8em"}
 
 - The posterior distributions are nearly identical under the two priors.
@@ -318,7 +318,7 @@ display(HTML(html_content))
 
 :::
 
-## Group Question 1
+## Group Question 1 {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -346,7 +346,23 @@ display(HTML(html_content))
 
 :::
 
-## Group Question 1
+:::{.notes}
+**Solution (a)**: Likelihood of 7 heads in 10 flips: $P(D \mid p) = \binom{10}{7} p^7 (1-p)^3 = 120\, p^7 (1-p)^3$.
+
+| $p$ | Prior | Likelihood | Unnorm. post. | Posterior |
+|---|---|---|---|---|
+| 0 | 0.2 | 0 | 0 | 0 |
+| 0.25 | 0.2 | 0.0031 | 0.0006 | 0.0083 |
+| 0.5 | 0.2 | 0.1172 | 0.0234 | 0.3162 |
+| 0.75 | 0.2 | 0.2503 | 0.0501 | 0.6754 |
+| 1 | 0.2 | 0 | 0 | 0 |
+
+Total probability of the data: 0.0741.
+
+$p = 0$ and $p = 1$ get posterior 0 because we saw both heads and tails. The $\binom{10}{7}$ factor cancels when normalizing, so students who leave it out get the same posteriors.
+:::
+
+## Group Question 1 {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
@@ -368,7 +384,11 @@ display(HTML(html_content))
 
 :::
 
-## Group Question 2
+:::{.notes}
+**Solution (b)**: The MAP estimate is $p = 0.75$, with posterior probability 0.6754. It is the grid value closest to the observed proportion of heads, $7/10 = 0.7$.
+:::
+
+## Group Question 2 {.scrollable}
 :::{style="font-size: .75em"}
 
 ```{python}
@@ -414,7 +434,7 @@ display(HTML(html_content))
 Normalizer: 12/60 + 1/60 + 15/60 = 28/60 = 7/15 ≈ 0.4667
 :::
 
-## Group Question 2
+## Group Question 2 {.scrollable}
 :::{style="font-size: .8em"}
 
 ```{python}
